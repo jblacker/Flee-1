@@ -1,0 +1,5 @@
+C:\dev\Flee\FleeSharp\obj\Debug\Ciloci.Flee.csprojResolveAssemblyReference.cache
+C:\dev\Flee\FleeSharp\obj\Debug\Ciloci.Flee.CompileErrors.resources
+C:\dev\Flee\FleeSharp\obj\Debug\Ciloci.Flee.ElementNames.resources
+C:\dev\Flee\FleeSharp\obj\Debug\Ciloci.Flee.GeneralErrors.resources
+C:\dev\Flee\FleeSharp\obj\Debug\Ciloci.Flee.csproj.GenerateResource.Cache
