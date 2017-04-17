@@ -64,8 +64,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccessTestExpressionOwner.cs" />
     <Compile Include="CalcEngineTests\CalcEngineTests.cs" />
+    <Compile Include="CalcEngineTests\SimpleCalcEngineTests.cs" />
+    <Compile Include="CustomPropertyDescriptor.cs" />
+    <Compile Include="ExpressionOwner.cs" />
+    <Compile Include="ExpressionTests\BenchmarkTests.cs" />
+    <Compile Include="ExpressionTests\ExpressionTestBase.cs" />
+    <Compile Include="Keyboard.cs" />
+    <Compile Include="Monitor.cs" />
+    <Compile Include="Mouse.cs" />
+    <Compile Include="NestedA.cs" />
+    <Compile Include="OverloadTestExpressionOwner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestImport.cs" />
+    <Compile Include="TestStruct.cs" />
+    <Compile Include="UselessCustomTypeDescriptor.cs" />
+    <Compile Include="UselessTypeDescriptionProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FleeSharp\FleeSharp.csproj">
@@ -87,6 +102,41 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestScripts\CheckedTests.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestScripts\IndividualTests.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestScripts\InvalidExpressions.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestScripts\LongBranchLogicalTest.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestScripts\SimpleCalcEngineTests.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestScripts\ValidCasts.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestScripts\ValidExpressions.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
