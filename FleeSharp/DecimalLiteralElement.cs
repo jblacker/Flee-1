@@ -1,17 +1,34 @@
-using System;
-using System.Reflection;
-using System.Reflection.Emit;
-using Microsoft.VisualBasic.CompilerServices;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
+    using System;
+    using System.Reflection;
+    using System.Reflection.Emit;
+    using Microsoft.VisualBasic.CompilerServices;
+
     internal class DecimalLiteralElement : RealLiteralElement
     {
         private static readonly ConstructorInfo ourConstructorInfo = GetConstructor();
 
         private readonly decimal myValue;
-
-        public override Type ResultType => typeof(decimal);
 
         private DecimalLiteralElement()
         {
@@ -24,7 +41,7 @@ namespace Flee
 
         private static ConstructorInfo GetConstructor()
         {
-            var types = new Type[]
+            var types = new[]
             {
                 typeof(int),
                 typeof(int),
@@ -32,12 +49,13 @@ namespace Flee
                 typeof(bool),
                 typeof(byte)
             };
-            return typeof(decimal).GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, CallingConventions.Any, types, null);
+            return typeof(decimal).GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, CallingConventions.Any, types,
+                null);
         }
 
         public static DecimalLiteralElement Parse(string image, IServiceProvider services)
         {
-            var options = (ExpressionParserOptions)services.GetService(typeof(ExpressionParserOptions));
+            var options = (ExpressionParserOptions) services.GetService(typeof(ExpressionParserOptions));
             var element = new DecimalLiteralElement();
             DecimalLiteralElement parse;
             try
@@ -69,5 +87,7 @@ namespace Flee
             ilg.Emit(OpCodes.Call, ourConstructorInfo);
             Utility.EmitLoadLocal(ilg, index);
         }
+
+        public override Type ResultType => typeof(decimal);
     }
 }

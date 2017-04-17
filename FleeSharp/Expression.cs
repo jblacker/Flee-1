@@ -1,47 +1,98 @@
-using System;
-using System.ComponentModel.Design;
-using System.Reflection;
-using System.Reflection.Emit;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
+    using System;
+    using System.ComponentModel.Design;
+    using System.Reflection;
+    using System.Reflection.Emit;
+
     internal class Expression<T> : IDynamicExpression, IGenericExpression<T>
     {
-        private readonly string myExpression;
-        private ExpressionContext myContext;
-        private ExpressionOptions myOptions;
-        private readonly ExpressionInfo myInfo;
-        private ExpressionEvaluator<T> myEvaluator;
-
-        private object myOwner;
         private const string EmitAssemblyName = "FleeExpression";
 
         private const string DynamicMethodName = "Flee Expression";
+        private ExpressionEvaluator<T> myEvaluator;
+        private ExpressionOptions myOptions;
+
+        private object myOwner;
+
         public Expression(string expression, ExpressionContext context, bool isGeneric)
         {
             Utility.AssertNotNull(expression, "expression");
-            this.myExpression = expression;
+            this.Text = expression;
             this.myOwner = context.ExpressionOwner;
 
-            this.myContext = context;
+            this.Context = context;
 
             if (context.NoClone == false)
             {
-                this.myContext = context.CloneInternal(false);
+                this.Context = context.CloneInternal(false);
             }
 
-            this.myInfo = new ExpressionInfo();
+            this.Info1 = new ExpressionInfo();
 
-            this.SetupOptions(this.myContext.Options, isGeneric);
+            this.SetupOptions(this.Context.Options, isGeneric);
 
-            this.myContext.Imports.ImportOwner(this.myOptions.OwnerType);
+            this.Context.Imports.ImportOwner(this.myOptions.OwnerType);
 
             this.ValidateOwner(this.myOwner);
 
             this.Compile(expression, this.myOptions);
 
-            this.myContext.CalculationEngine?.FixTemporaryHead(this, this.myContext, this.myOptions.ResultType);
+            this.Context.CalculationEngine?.FixTemporaryHead(this, this.Context, this.myOptions.ResultType);
         }
+
+        public IExpression Clone()
+        {
+            var copy = (Expression<T>) this.MemberwiseClone();
+            copy.Context = this.Context.CloneInternal(true);
+            copy.myOptions = copy.Context.Options;
+            return copy;
+        }
+
+        public ExpressionContext Context { get; private set; }
+
+        public object Evaluate()
+        {
+            return this.myEvaluator(this.myOwner, this.Context, this.Context.Variables);
+        }
+
+        T IGenericExpression<T>.Evaluate()
+        {
+            return this.EvaluateGeneric();
+        }
+
+        ExpressionInfo IExpression.Info => this.Info1;
+
+        public object Owner
+        {
+            get { return this.myOwner; }
+            set
+            {
+                this.ValidateOwner(value);
+                this.myOwner = value;
+            }
+        }
+
+        public string Text { get; }
 
         private void SetupOptions(ExpressionOptions options, bool isGeneric)
         {
@@ -64,7 +115,7 @@ namespace Flee
             this.AddServices(services);
 
             // Parse and get the root element of the parse tree
-            var topElement = this.myContext.Parse(expression, services);
+            var topElement = this.Context.Parse(expression, services);
 
             if (options.ResultType == null)
             {
@@ -89,27 +140,28 @@ namespace Flee
             }
 
             var delegateType = typeof(ExpressionEvaluator<>).MakeGenericType(typeof(T));
-            this.myEvaluator = (ExpressionEvaluator<T>)dm.CreateDelegate(delegateType);
+            this.myEvaluator = (ExpressionEvaluator<T>) dm.CreateDelegate(delegateType);
         }
 
         private DynamicMethod CreateDynamicMethod()
         {
             // Create the dynamic method
-            Type[] parameterTypes = {
-            typeof(object),
-            typeof(ExpressionContext),
-            typeof(VariableCollection)
-        };
+            Type[] parameterTypes =
+            {
+                typeof(object),
+                typeof(ExpressionContext),
+                typeof(VariableCollection)
+            };
             return new DynamicMethod(DynamicMethodName, typeof(T), parameterTypes, this.myOptions.OwnerType);
         }
 
         private void AddServices(IServiceContainer dest)
         {
             dest.AddService(typeof(ExpressionOptions), this.myOptions);
-            dest.AddService(typeof(ExpressionParserOptions), this.myContext.ParserOptions);
-            dest.AddService(typeof(ExpressionContext), this.myContext);
+            dest.AddService(typeof(ExpressionParserOptions), this.Context.ParserOptions);
+            dest.AddService(typeof(ExpressionContext), this.Context);
             dest.AddService(typeof(IExpression), this);
-            dest.AddService(typeof(ExpressionInfo), this.myInfo);
+            dest.AddService(typeof(ExpressionInfo), this.Info1);
         }
 
         private static void EmitToAssembly(ExpressionElement rootElement, IServiceContainer services)
@@ -121,11 +173,12 @@ namespace Flee
             var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Save);
             var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyFileName, assemblyFileName);
 
-            var mb = moduleBuilder.DefineGlobalMethod("Evaluate", MethodAttributes.Public | MethodAttributes.Static, typeof(T), new[] {
-            typeof(object),
-            typeof(ExpressionContext),
-            typeof(VariableCollection)
-        });
+            var mb = moduleBuilder.DefineGlobalMethod("Evaluate", MethodAttributes.Public | MethodAttributes.Static, typeof(T), new[]
+            {
+                typeof(object),
+                typeof(ExpressionContext),
+                typeof(VariableCollection)
+            });
             var ilg = new FleeIlGenerator(mb.GetILGenerator());
 
             rootElement.Emit(ilg, services);
@@ -144,51 +197,18 @@ namespace Flee
             }
         }
 
-        public object Evaluate()
-        {
-            return this.myEvaluator(this.myOwner, this.myContext, this.myContext.Variables);
-        }
-
         public T EvaluateGeneric()
         {
-            return this.myEvaluator(this.myOwner, this.myContext, this.myContext.Variables);
-        }
-        T IGenericExpression<T>.Evaluate()
-        {
-            return EvaluateGeneric();
-        }
-
-        public IExpression Clone()
-        {
-            var copy = (Expression<T>)this.MemberwiseClone();
-            copy.myContext = this.myContext.CloneInternal(true);
-            copy.myOptions = copy.myContext.Options;
-            return copy;
+            return this.myEvaluator(this.myOwner, this.Context, this.Context.Variables);
         }
 
         public override string ToString()
         {
-            return this.myExpression;
+            return this.Text;
         }
+
+        public ExpressionInfo Info1 { get; }
 
         internal Type ResultType => this.myOptions.ResultType;
-
-        public string Text => this.myExpression;
-
-        public ExpressionInfo Info1 => this.myInfo;
-
-        ExpressionInfo IExpression.Info => Info1;
-
-        public object Owner
-        {
-            get { return this.myOwner; }
-            set
-            {
-                this.ValidateOwner(value);
-                this.myOwner = value;
-            }
-        }
-
-        public ExpressionContext Context => this.myContext;
     }
 }

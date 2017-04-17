@@ -1,0 +1,10 @@
+C:\dev\Flee\ConsoleTester\obj\Debug\ConsoleTester.vbprojResolveAssemblyReference.cache
+C:\dev\Flee\ConsoleTester\bin\Debug\ConsoleTester.exe.config
+C:\dev\Flee\ConsoleTester\bin\Debug\ConsoleTester.exe
+C:\dev\Flee\ConsoleTester\bin\Debug\ConsoleTester.pdb
+C:\dev\Flee\ConsoleTester\bin\Debug\Ciloci.Flee.dll
+C:\dev\Flee\ConsoleTester\bin\Debug\FleeCaseTester.dll
+C:\dev\Flee\ConsoleTester\bin\Debug\Ciloci.Flee.pdb
+C:\dev\Flee\ConsoleTester\bin\Debug\Ciloci.Flee.xml
+C:\dev\Flee\ConsoleTester\obj\Debug\ConsoleTester.exe
+C:\dev\Flee\ConsoleTester\obj\Debug\ConsoleTester.pdb

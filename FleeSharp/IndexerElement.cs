@@ -1,50 +1,33 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Reflection.Emit;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
+    using System.Reflection.Emit;
+
     internal class IndexerElement : MemberElement
     {
-        private ExpressionElement myIndexerElement;
-
         private readonly ArgumentList myIndexerElements;
-
-        private Type ArrayType
-        {
-            get
-            {
-                var isArray = this.IsArray;
-                var arrayType = isArray ? this.myPrevious.TargetType : null;
-                return arrayType;
-            }
-        }
-
-        private bool IsArray => this.myPrevious.TargetType.IsArray;
-
-        protected override bool RequiresAddress => !this.IsArray;
-
-        public override Type ResultType
-        {
-            get
-            {
-                var isArray = this.IsArray;
-                var resultType = isArray ? this.ArrayType.GetElementType() : this.myIndexerElement.ResultType;
-                return resultType;
-            }
-        }
-
-        protected override bool IsPublic
-        {
-            get
-            {
-                var isArray = this.IsArray;
-                return isArray || IsElementPublic((MemberElement)this.myIndexerElement);
-            }
-        }
-
-        public override bool IsStatic => false;
+        private ExpressionElement myIndexerElement;
 
         public IndexerElement(ArgumentList indexer)
         {
@@ -64,11 +47,8 @@ namespace Flee
                 var flag = !this.FindIndexer(target);
                 if (flag)
                 {
-                    this.ThrowCompileException("TypeNotArrayAndHasNoIndexerOfType", CompileExceptionReason.TypeMismatch, new object[]
-                    {
-                        target.Name,
-                        this.myIndexerElements
-                    });
+                    this.ThrowCompileException("TypeNotArrayAndHasNoIndexerOfType", CompileExceptionReason.TypeMismatch, target.Name,
+                        this.myIndexerElements);
                 }
             }
         }
@@ -79,17 +59,14 @@ namespace Flee
             var flag = this.myIndexerElements.Count > 1;
             if (flag)
             {
-                this.ThrowCompileException("MultiArrayIndexNotSupported", CompileExceptionReason.TypeMismatch, new object[0]);
+                this.ThrowCompileException("MultiArrayIndexNotSupported", CompileExceptionReason.TypeMismatch);
             }
             else
             {
                 var flag2 = !ImplicitConverter.EmitImplicitConvert(this.myIndexerElement.ResultType, typeof(int), null);
                 if (flag2)
                 {
-                    this.ThrowCompileException("ArrayIndexersMustBeOfType", CompileExceptionReason.TypeMismatch, new object[]
-                    {
-                        typeof(int).Name
-                    });
+                    this.ThrowCompileException("ArrayIndexersMustBeOfType", CompileExceptionReason.TypeMismatch, typeof(int).Name);
                 }
             }
         }
@@ -163,8 +140,43 @@ namespace Flee
 
         private void EmitIndexer(FleeIlGenerator ilg, IServiceProvider services)
         {
-            var func = (FunctionCallElement)this.myIndexerElement;
+            var func = (FunctionCallElement) this.myIndexerElement;
             func.EmitFunctionCall(this.NextRequiresAddress, ilg, services);
+        }
+
+        private Type ArrayType
+        {
+            get
+            {
+                var isArray = this.IsArray;
+                var arrayType = isArray ? this.myPrevious.TargetType : null;
+                return arrayType;
+            }
+        }
+
+        private bool IsArray => this.myPrevious.TargetType.IsArray;
+
+        protected override bool IsPublic
+        {
+            get
+            {
+                var isArray = this.IsArray;
+                return isArray || IsElementPublic((MemberElement) this.myIndexerElement);
+            }
+        }
+
+        public override bool IsStatic => false;
+
+        protected override bool RequiresAddress => !this.IsArray;
+
+        public override Type ResultType
+        {
+            get
+            {
+                var isArray = this.IsArray;
+                var resultType = isArray ? this.ArrayType.GetElementType() : this.myIndexerElement.ResultType;
+                return resultType;
+            }
         }
     }
 }

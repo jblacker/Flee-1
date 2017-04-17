@@ -1,41 +1,48 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
-using System.Reflection.Emit;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Reflection.Emit;
+
     internal class FleeIlGenerator
     {
         private readonly ILGenerator myIlGenerator;
 
-        private int myLength;
-
-        private int myLabelCount;
-
         private readonly Dictionary<Type, LocalBuilder> myTempLocals;
-
-        public int Length => this.myLength;
-
-        public int LabelCount => this.myLabelCount;
-
-        private int IlGeneratorLength => Utility.GetILGeneratorLength(this.myIlGenerator);
-
-        public bool IsTemp { get; set; }
 
         public FleeIlGenerator(ILGenerator ilg, int startLength = 0, bool isTemp = false)
         {
             this.myIlGenerator = ilg;
             this.myTempLocals = new Dictionary<Type, LocalBuilder>();
             this.IsTemp = isTemp;
-            this.myLength = startLength;
+            this.Length = startLength;
         }
 
         public int GetTempLocalIndex(Type localType)
         {
             LocalBuilder local = null;
-            bool flag = !this.myTempLocals.TryGetValue(localType, out local);
+            var flag = !this.myTempLocals.TryGetValue(localType, out local);
             if (flag)
             {
                 local = this.myIlGenerator.DeclareLocal(localType);
@@ -135,7 +142,7 @@ namespace Flee
 
         public Label DefineLabel()
         {
-            this.myLabelCount++;
+            this.LabelCount++;
             return this.myIlGenerator.DefineLabel();
         }
 
@@ -146,13 +153,13 @@ namespace Flee
 
         private void RecordOpcode(OpCode op)
         {
-            int operandLength = GetOpcodeOperandSize(op.OperandType);
-            this.myLength += op.Size + operandLength;
+            var operandLength = GetOpcodeOperandSize(op.OperandType);
+            this.Length += op.Size + operandLength;
         }
 
         private static int GetOpcodeOperandSize(OperandType operand)
         {
-            int getOpcodeOperandSize = 0;
+            var getOpcodeOperandSize = 0;
             switch (operand)
             {
                 case OperandType.InlineBrTarget:
@@ -191,5 +198,13 @@ namespace Flee
         {
             Debug.Assert(this.Length == this.IlGeneratorLength, "ILGenerator length mismatch");
         }
+
+        private int IlGeneratorLength => Utility.GetILGeneratorLength(this.myIlGenerator);
+
+        public bool IsTemp { get; set; }
+
+        public int LabelCount { get; private set; }
+
+        public int Length { get; private set; }
     }
 }

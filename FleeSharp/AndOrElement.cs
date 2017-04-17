@@ -1,22 +1,41 @@
-using System;
-using System.Collections;
-using System.Diagnostics;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
+    using System;
+    using System.Collections;
+    using System.Diagnostics;
+    using System.Reflection.Emit;
+    using System.Runtime.CompilerServices;
+
     internal class AndOrElement : BinaryExpressionElement
     {
-        private AndOrOperation myOperation;
         private static readonly object ourTrueTerminalKey = RuntimeHelpers.GetObjectValue(new object());
         private static readonly object ourFalseTerminalKey = RuntimeHelpers.GetObjectValue(new object());
 
         private static readonly object ourEndLabelKey = RuntimeHelpers.GetObjectValue(new object());
+        private AndOrOperation myOperation;
 
         protected override void GetOperation(object operation)
         {
-            this.myOperation = (AndOrOperation)operation;
+            this.myOperation = (AndOrOperation) operation;
         }
 
         protected override Type GetResultType(Type leftType, Type rightType)
@@ -90,7 +109,7 @@ namespace Flee
             info.Branches.GetLabel(RuntimeHelpers.GetObjectValue(ourEndLabelKey), ilg);
             this.PopulateData(info);
             EmitLogicalShortCircuit(ilg, info, services);
-            var terminalOperand = (ExpressionElement)info.Operands.Pop();
+            var terminalOperand = (ExpressionElement) info.Operands.Pop();
             EmitOperand(terminalOperand, info, ilg, services);
             var endLabel = info.Branches.FindLabel(RuntimeHelpers.GetObjectValue(ourEndLabelKey));
             ilg.Emit(OpCodes.Br_S, endLabel);
@@ -102,8 +121,8 @@ namespace Flee
         {
             while (info.Operators.Count != 0)
             {
-                var op = (AndOrElement)info.Operators.Pop();
-                var leftOperand = (ExpressionElement)info.Operands.Pop();
+                var op = (AndOrElement) info.Operators.Pop();
+                var leftOperand = (ExpressionElement) info.Operands.Pop();
                 EmitOperand(leftOperand, info, ilg, services);
                 var i = GetShortCircuitLabel(op, info, ilg);
                 EmitBranch(op, ilg, i, info);
@@ -148,13 +167,13 @@ namespace Flee
 
         private static Label GetShortCircuitLabel(AndOrElement current, ShortCircuitInfo info, FleeIlGenerator ilg)
         {
-            var cloneOperands = (Stack)info.Operands.Clone();
-            var cloneOperators = (Stack)info.Operators.Clone();
+            var cloneOperands = (Stack) info.Operands.Clone();
+            var cloneOperators = (Stack) info.Operators.Clone();
             current.PopRightChild(cloneOperands, cloneOperators);
             Label getShortCircuitLabel;
             while (cloneOperators.Count > 0)
             {
-                var top = (AndOrElement)cloneOperators.Pop();
+                var top = (AndOrElement) cloneOperators.Pop();
                 var flag = top.myOperation != current.myOperation;
                 if (flag)
                 {
@@ -201,7 +220,7 @@ namespace Flee
             {
                 andOrChild.Pop(operands, operators);
             }
-            andOrChild = (this.myRightChild as AndOrElement);
+            andOrChild = this.myRightChild as AndOrElement;
             var flag2 = andOrChild == null;
             if (flag2)
             {
@@ -213,7 +232,8 @@ namespace Flee
             }
         }
 
-        private static void EmitOperand(ExpressionElement operand, ShortCircuitInfo info, FleeIlGenerator ilg, IServiceProvider services)
+        private static void EmitOperand(ExpressionElement operand, ShortCircuitInfo info, FleeIlGenerator ilg,
+            IServiceProvider services)
         {
             var flag = info.Branches.HasLabel(operand);
             if (flag)
@@ -277,7 +297,7 @@ namespace Flee
                 andOrChild.PopulateData(info);
             }
             info.Operators.Push(this);
-            andOrChild = (this.myLeftChild as AndOrElement);
+            andOrChild = this.myLeftChild as AndOrElement;
             var flag2 = andOrChild == null;
             if (flag2)
             {

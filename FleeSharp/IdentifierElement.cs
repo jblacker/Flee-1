@@ -1,14 +1,34 @@
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
+    using System;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Reflection.Emit;
+    using System.Runtime.CompilerServices;
+
     internal class IdentifierElement : MemberElement
     {
+        private Type myCalcEngineReferenceType;
         private FieldInfo myField;
 
         private PropertyInfo myProperty;
@@ -16,220 +36,6 @@ namespace Flee
         private PropertyDescriptor myPropertyDescriptor;
 
         private Type myVariableType;
-
-        private Type myCalcEngineReferenceType;
-
-        private Type MemberOwnerType
-        {
-            get
-            {
-                var flag = this.myField != null;
-                Type memberOwnerType;
-                if (flag)
-                {
-                    memberOwnerType = this.myField.ReflectedType;
-                }
-                else
-                {
-                    var flag2 = this.myPropertyDescriptor != null;
-                    if (flag2)
-                    {
-                        memberOwnerType = this.myPropertyDescriptor.ComponentType;
-                    }
-                    else
-                    {
-                        var flag3 = this.myProperty != null;
-                        memberOwnerType = flag3 ? this.myProperty.ReflectedType : null;
-                    }
-                }
-                return memberOwnerType;
-            }
-        }
-
-        public override Type ResultType
-        {
-            get
-            {
-                var flag = this.myCalcEngineReferenceType != null;
-                Type resultType;
-                if (flag)
-                {
-                    resultType = this.myCalcEngineReferenceType;
-                }
-                else
-                {
-                    var flag2 = this.myVariableType != null;
-                    if (flag2)
-                    {
-                        resultType = this.myVariableType;
-                    }
-                    else
-                    {
-                        var flag3 = this.myPropertyDescriptor != null;
-                        if (flag3)
-                        {
-                            resultType = this.myPropertyDescriptor.PropertyType;
-                        }
-                        else
-                        {
-                            var flag4 = this.myField != null;
-                            if (flag4)
-                            {
-                                resultType = this.myField.FieldType;
-                            }
-                            else
-                            {
-                                var mi = this.myProperty.GetGetMethod(true);
-                                resultType = mi.ReturnType;
-                            }
-                        }
-                    }
-                }
-                return resultType;
-            }
-        }
-
-        protected override bool RequiresAddress => this.myPropertyDescriptor == null;
-
-        protected override bool IsPublic
-        {
-            get
-            {
-                var flag = this.myVariableType != null | this.myCalcEngineReferenceType != null;
-                bool isPublic;
-                if (flag)
-                {
-                    isPublic = true;
-                }
-                else
-                {
-                    var flag2 = this.myVariableType != null;
-                    if (flag2)
-                    {
-                        isPublic = true;
-                    }
-                    else
-                    {
-                        var flag3 = this.myPropertyDescriptor != null;
-                        if (flag3)
-                        {
-                            isPublic = true;
-                        }
-                        else
-                        {
-                            var flag4 = this.myField != null;
-                            if (flag4)
-                            {
-                                isPublic = this.myField.IsPublic;
-                            }
-                            else
-                            {
-                                var mi = this.myProperty.GetGetMethod(true);
-                                isPublic = mi.IsPublic;
-                            }
-                        }
-                    }
-                }
-                return isPublic;
-            }
-        }
-
-        protected override bool SupportsStatic
-        {
-            get
-            {
-                var flag = this.myVariableType != null;
-                bool supportsStatic;
-                if (flag)
-                {
-                    supportsStatic = false;
-                }
-                else
-                {
-                    var flag2 = this.myPropertyDescriptor != null;
-                    if (flag2)
-                    {
-                        supportsStatic = false;
-                    }
-                    else
-                    {
-                        var flag3 = this.myOptions.IsOwnerType(this.MemberOwnerType) && this.myPrevious == null;
-                        supportsStatic = (flag3 || this.myPrevious == null);
-                    }
-                }
-                return supportsStatic;
-            }
-        }
-
-        protected override bool SupportsInstance
-        {
-            get
-            {
-                var flag = this.myVariableType != null;
-                bool supportsInstance;
-                if (flag)
-                {
-                    supportsInstance = true;
-                }
-                else
-                {
-                    var flag2 = this.myPropertyDescriptor != null;
-                    if (flag2)
-                    {
-                        supportsInstance = true;
-                    }
-                    else
-                    {
-                        var flag3 = this.myOptions.IsOwnerType(this.MemberOwnerType) && this.myPrevious == null;
-                        supportsInstance = (flag3 || this.myPrevious != null);
-                    }
-                }
-                return supportsInstance;
-            }
-        }
-
-        public override bool IsStatic
-        {
-            get
-            {
-                var flag = this.myVariableType != null | this.myCalcEngineReferenceType != null;
-                bool isStatic;
-                if (flag)
-                {
-                    isStatic = false;
-                }
-                else
-                {
-                    var flag2 = this.myVariableType != null;
-                    if (flag2)
-                    {
-                        isStatic = false;
-                    }
-                    else
-                    {
-                        var flag3 = this.myField != null;
-                        if (flag3)
-                        {
-                            isStatic = this.myField.IsStatic;
-                        }
-                        else
-                        {
-                            var flag4 = this.myPropertyDescriptor != null;
-                            if (flag4)
-                            {
-                                isStatic = false;
-                            }
-                            else
-                            {
-                                var mi = this.myProperty.GetGetMethod(true);
-                                isStatic = mi.IsStatic;
-                            }
-                        }
-                    }
-                }
-                return isStatic;
-            }
-        }
 
         public IdentifierElement(string name)
         {
@@ -269,7 +75,8 @@ namespace Flee
                         }
                         else
                         {
-                            this.ThrowCompileException("NoIdentifierWithNameOnType", CompileExceptionReason.UndefinedName, this.myName, this.myPrevious.TargetType.Name);
+                            this.ThrowCompileException("NoIdentifierWithNameOnType", CompileExceptionReason.UndefinedName, this.myName,
+                                this.myPrevious.TargetType.Name);
                         }
                     }
                 }
@@ -281,7 +88,7 @@ namespace Flee
             var members = this.GetMembers(MemberTypes.Field | MemberTypes.Property);
             members = this.GetAccessibleMembers(members);
             var flag = members.Length == 0;
-            bool resolveFieldProperty = false;
+            var resolveFieldProperty = false;
             if (flag)
             {
                 resolveFieldProperty = this.ResolveVirtualProperty(previous);
@@ -298,12 +105,13 @@ namespace Flee
                     }
                     else
                     {
-                        this.ThrowCompileException("IdentifierIsAmbiguousOnType", CompileExceptionReason.AmbiguousMatch, this.myName, previous.TargetType.Name);
+                        this.ThrowCompileException("IdentifierIsAmbiguousOnType", CompileExceptionReason.AmbiguousMatch, this.myName,
+                            previous.TargetType.Name);
                     }
                 }
                 else
                 {
-                    this.myField = (members[0] as FieldInfo);
+                    this.myField = members[0] as FieldInfo;
                     var flag4 = this.myField != null;
                     if (flag4)
                     {
@@ -311,7 +119,7 @@ namespace Flee
                     }
                     else
                     {
-                        this.myProperty = (PropertyInfo)members[0];
+                        this.myProperty = (PropertyInfo) members[0];
                         resolveFieldProperty = true;
                     }
                 }
@@ -331,7 +139,7 @@ namespace Flee
             {
                 var coll = TypeDescriptor.GetProperties(previous.ResultType);
                 this.myPropertyDescriptor = coll.Find(this.myName, true);
-                resolveVirtualProperty = (this.myPropertyDescriptor != null);
+                resolveVirtualProperty = this.myPropertyDescriptor != null;
             }
             return resolveVirtualProperty;
         }
@@ -344,7 +152,7 @@ namespace Flee
                 var flag2 = this.myVariableType != null || this.myOptions.IsOwnerType(this.MemberOwnerType);
                 if (flag2)
                 {
-                    var info = (ExpressionInfo)this.myServices.GetService(typeof(ExpressionInfo));
+                    var info = (ExpressionInfo) this.myServices.GetService(typeof(ExpressionInfo));
                     info.AddReferencedVariable(this.myName);
                 }
             }
@@ -463,7 +271,7 @@ namespace Flee
             switch (Type.GetTypeCode(t))
             {
                 case TypeCode.Boolean:
-                    elem = new BooleanLiteralElement((bool)value);
+                    elem = new BooleanLiteralElement((bool) value);
                     goto IL_F4;
                 case TypeCode.Char:
                 case TypeCode.SByte:
@@ -474,22 +282,22 @@ namespace Flee
                     elem = new Int32LiteralElement(Convert.ToInt32(RuntimeHelpers.GetObjectValue(value)));
                     goto IL_F4;
                 case TypeCode.UInt32:
-                    elem = new UInt32LiteralElement((uint)value);
+                    elem = new UInt32LiteralElement((uint) value);
                     goto IL_F4;
                 case TypeCode.Int64:
-                    elem = new Int64LiteralElement((long)value);
+                    elem = new Int64LiteralElement((long) value);
                     goto IL_F4;
                 case TypeCode.UInt64:
-                    elem = new UInt64LiteralElement((ulong)value);
+                    elem = new UInt64LiteralElement((ulong) value);
                     goto IL_F4;
                 case TypeCode.Single:
-                    elem = new SingleLiteralElement((float)value);
+                    elem = new SingleLiteralElement((float) value);
                     goto IL_F4;
                 case TypeCode.Double:
-                    elem = new DoubleLiteralElement((double)value);
+                    elem = new DoubleLiteralElement((double) value);
                     goto IL_F4;
                 case TypeCode.String:
-                    elem = new StringLiteralElement((string)value);
+                    elem = new StringLiteralElement((string) value);
                     goto IL_F4;
             }
             elem = null;
@@ -514,6 +322,218 @@ namespace Flee
             ImplicitConverter.EmitImplicitConvert(this.myPrevious.ResultType, typeof(object), ilg);
             var mi = VariableCollection.GetVirtualPropertyLoadMethod(this.ResultType);
             this.EmitMethodCall(mi, ilg);
+        }
+
+        protected override bool IsPublic
+        {
+            get
+            {
+                var flag = (this.myVariableType != null) | (this.myCalcEngineReferenceType != null);
+                bool isPublic;
+                if (flag)
+                {
+                    isPublic = true;
+                }
+                else
+                {
+                    var flag2 = this.myVariableType != null;
+                    if (flag2)
+                    {
+                        isPublic = true;
+                    }
+                    else
+                    {
+                        var flag3 = this.myPropertyDescriptor != null;
+                        if (flag3)
+                        {
+                            isPublic = true;
+                        }
+                        else
+                        {
+                            var flag4 = this.myField != null;
+                            if (flag4)
+                            {
+                                isPublic = this.myField.IsPublic;
+                            }
+                            else
+                            {
+                                var mi = this.myProperty.GetGetMethod(true);
+                                isPublic = mi.IsPublic;
+                            }
+                        }
+                    }
+                }
+                return isPublic;
+            }
+        }
+
+        public override bool IsStatic
+        {
+            get
+            {
+                var flag = (this.myVariableType != null) | (this.myCalcEngineReferenceType != null);
+                bool isStatic;
+                if (flag)
+                {
+                    isStatic = false;
+                }
+                else
+                {
+                    var flag2 = this.myVariableType != null;
+                    if (flag2)
+                    {
+                        isStatic = false;
+                    }
+                    else
+                    {
+                        var flag3 = this.myField != null;
+                        if (flag3)
+                        {
+                            isStatic = this.myField.IsStatic;
+                        }
+                        else
+                        {
+                            var flag4 = this.myPropertyDescriptor != null;
+                            if (flag4)
+                            {
+                                isStatic = false;
+                            }
+                            else
+                            {
+                                var mi = this.myProperty.GetGetMethod(true);
+                                isStatic = mi.IsStatic;
+                            }
+                        }
+                    }
+                }
+                return isStatic;
+            }
+        }
+
+        private Type MemberOwnerType
+        {
+            get
+            {
+                var flag = this.myField != null;
+                Type memberOwnerType;
+                if (flag)
+                {
+                    memberOwnerType = this.myField.ReflectedType;
+                }
+                else
+                {
+                    var flag2 = this.myPropertyDescriptor != null;
+                    if (flag2)
+                    {
+                        memberOwnerType = this.myPropertyDescriptor.ComponentType;
+                    }
+                    else
+                    {
+                        var flag3 = this.myProperty != null;
+                        memberOwnerType = flag3 ? this.myProperty.ReflectedType : null;
+                    }
+                }
+                return memberOwnerType;
+            }
+        }
+
+        protected override bool RequiresAddress => this.myPropertyDescriptor == null;
+
+        public override Type ResultType
+        {
+            get
+            {
+                var flag = this.myCalcEngineReferenceType != null;
+                Type resultType;
+                if (flag)
+                {
+                    resultType = this.myCalcEngineReferenceType;
+                }
+                else
+                {
+                    var flag2 = this.myVariableType != null;
+                    if (flag2)
+                    {
+                        resultType = this.myVariableType;
+                    }
+                    else
+                    {
+                        var flag3 = this.myPropertyDescriptor != null;
+                        if (flag3)
+                        {
+                            resultType = this.myPropertyDescriptor.PropertyType;
+                        }
+                        else
+                        {
+                            var flag4 = this.myField != null;
+                            if (flag4)
+                            {
+                                resultType = this.myField.FieldType;
+                            }
+                            else
+                            {
+                                var mi = this.myProperty.GetGetMethod(true);
+                                resultType = mi.ReturnType;
+                            }
+                        }
+                    }
+                }
+                return resultType;
+            }
+        }
+
+        protected override bool SupportsInstance
+        {
+            get
+            {
+                var flag = this.myVariableType != null;
+                bool supportsInstance;
+                if (flag)
+                {
+                    supportsInstance = true;
+                }
+                else
+                {
+                    var flag2 = this.myPropertyDescriptor != null;
+                    if (flag2)
+                    {
+                        supportsInstance = true;
+                    }
+                    else
+                    {
+                        var flag3 = this.myOptions.IsOwnerType(this.MemberOwnerType) && this.myPrevious == null;
+                        supportsInstance = flag3 || this.myPrevious != null;
+                    }
+                }
+                return supportsInstance;
+            }
+        }
+
+        protected override bool SupportsStatic
+        {
+            get
+            {
+                var flag = this.myVariableType != null;
+                bool supportsStatic;
+                if (flag)
+                {
+                    supportsStatic = false;
+                }
+                else
+                {
+                    var flag2 = this.myPropertyDescriptor != null;
+                    if (flag2)
+                    {
+                        supportsStatic = false;
+                    }
+                    else
+                    {
+                        var flag3 = this.myOptions.IsOwnerType(this.MemberOwnerType) && this.myPrevious == null;
+                        supportsStatic = flag3 || this.myPrevious == null;
+                    }
+                }
+                return supportsStatic;
+            }
         }
     }
 }

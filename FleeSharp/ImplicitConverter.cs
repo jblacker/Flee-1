@@ -1,10 +1,28 @@
-using System;
-using System.Diagnostics;
-using System.Reflection;
-using System.Reflection.Emit;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
+    using System;
+    using System.Diagnostics;
+    using System.Reflection.Emit;
+
     internal class ImplicitConverter
     {
         private static readonly Type[,] ourBinaryResultTable;
@@ -13,7 +31,7 @@ namespace Flee
 
         static ImplicitConverter()
         {
-            Type[] types = new Type[]
+            Type[] types =
             {
                 typeof(char),
                 typeof(byte),
@@ -28,7 +46,7 @@ namespace Flee
                 typeof(double)
             };
             ourBinaryTypes = types;
-            Type[,] table = new Type[types.Length - 1 + 1, types.Length - 1 + 1];
+            var table = new Type[types.Length - 1 + 1, types.Length - 1 + 1];
             ourBinaryResultTable = table;
             FillIdentities(types, table);
             AddEntry(typeof(uint), typeof(ulong), typeof(ulong));
@@ -93,30 +111,30 @@ namespace Flee
 
         private static void FillIdentities(Type[] typeList, Type[,] table)
         {
-            int num = typeList.Length - 1;
-            for (int i = 0; i <= num; i++)
+            var num = typeList.Length - 1;
+            for (var i = 0; i <= num; i++)
             {
-                Type t = typeList[i];
+                var t = typeList[i];
                 table[i, i] = t;
             }
         }
 
         private static void AddEntry(Type t1, Type t2, Type result)
         {
-            int index = GetTypeIndex(t1);
-            int index2 = GetTypeIndex(t2);
+            var index = GetTypeIndex(t1);
+            var index2 = GetTypeIndex(t2);
             ourBinaryResultTable[index, index2] = result;
             ourBinaryResultTable[index2, index] = result;
         }
 
         private static int GetTypeIndex(Type t)
         {
-            return Array.IndexOf<Type>(ourBinaryTypes, t);
+            return Array.IndexOf(ourBinaryTypes, t);
         }
 
         public static bool EmitImplicitConvert(Type sourceType, Type destType, FleeIlGenerator ilg)
         {
-            bool flag = sourceType == destType;
+            var flag = sourceType == destType;
             bool emitImplicitConvert;
             if (flag)
             {
@@ -124,15 +142,15 @@ namespace Flee
             }
             else
             {
-                bool flag2 = EmitOverloadedImplicitConvert(sourceType, destType, ilg);
+                var flag2 = EmitOverloadedImplicitConvert(sourceType, destType, ilg);
                 if (flag2)
                 {
                     emitImplicitConvert = true;
                 }
                 else
                 {
-                    bool flag3 = ImplicitConvertToReferenceType(sourceType, destType, ilg);
-                    emitImplicitConvert = (flag3 || ImplicitConvertToValueType(sourceType, destType, ilg));
+                    var flag3 = ImplicitConvertToReferenceType(sourceType, destType, ilg);
+                    emitImplicitConvert = flag3 || ImplicitConvertToValueType(sourceType, destType, ilg);
                 }
             }
             return emitImplicitConvert;
@@ -140,8 +158,8 @@ namespace Flee
 
         private static bool EmitOverloadedImplicitConvert(Type sourceType, Type destType, FleeIlGenerator ilg)
         {
-            MethodInfo mi = Utility.GetSimpleOverloadedOperator("Implicit", sourceType, destType);
-            bool flag = mi == null;
+            var mi = Utility.GetSimpleOverloadedOperator("Implicit", sourceType, destType);
+            var flag = mi == null;
             bool emitOverloadedImplicitConvert;
             if (flag)
             {
@@ -149,7 +167,7 @@ namespace Flee
             }
             else
             {
-                bool flag2 = ilg != null;
+                var flag2 = ilg != null;
                 if (flag2)
                 {
                     ilg.Emit(OpCodes.Call, mi);
@@ -161,7 +179,7 @@ namespace Flee
 
         private static bool ImplicitConvertToReferenceType(Type sourceType, Type destType, FleeIlGenerator ilg)
         {
-            bool isValueType = destType.IsValueType;
+            var isValueType = destType.IsValueType;
             bool implicitConvertToReferenceType;
             if (isValueType)
             {
@@ -169,24 +187,24 @@ namespace Flee
             }
             else
             {
-                bool flag = sourceType == typeof(Null);
+                var flag = sourceType == typeof(Null);
                 if (flag)
                 {
                     implicitConvertToReferenceType = true;
                 }
                 else
                 {
-                    bool flag2 = !destType.IsAssignableFrom(sourceType);
+                    var flag2 = !destType.IsAssignableFrom(sourceType);
                     if (flag2)
                     {
                         implicitConvertToReferenceType = false;
                     }
                     else
                     {
-                        bool isValueType2 = sourceType.IsValueType;
+                        var isValueType2 = sourceType.IsValueType;
                         if (isValueType2)
                         {
-                            bool flag3 = ilg != null;
+                            var flag3 = ilg != null;
                             if (flag3)
                             {
                                 ilg.Emit(OpCodes.Box, sourceType);
@@ -201,7 +219,7 @@ namespace Flee
 
         private static bool ImplicitConvertToValueType(Type sourceType, Type destType, FleeIlGenerator ilg)
         {
-            bool flag = !sourceType.IsValueType & !destType.IsValueType;
+            var flag = !sourceType.IsValueType & !destType.IsValueType;
             bool implicitConvertToValueType;
             if (flag)
             {
@@ -209,15 +227,15 @@ namespace Flee
             }
             else
             {
-                bool flag2 = sourceType.IsEnum | destType.IsEnum;
-                implicitConvertToValueType = (!flag2 && EmitImplicitNumericConvert(sourceType, destType, ilg));
+                var flag2 = sourceType.IsEnum | destType.IsEnum;
+                implicitConvertToValueType = !flag2 && EmitImplicitNumericConvert(sourceType, destType, ilg);
             }
             return implicitConvertToValueType;
         }
 
         public static bool EmitImplicitNumericConvert(Type sourceType, Type destType, FleeIlGenerator ilg)
         {
-            TypeCode sourceTypeCode = Type.GetTypeCode(sourceType);
+            var sourceTypeCode = Type.GetTypeCode(sourceType);
             bool emitImplicitNumericConvert;
             switch (Type.GetTypeCode(destType))
             {
@@ -380,7 +398,7 @@ namespace Flee
                 case TypeCode.UInt64:
                     goto IL_49;
             }
-            bool implicitConvertToUInt64 = false;
+            var implicitConvertToUInt64 = false;
             return implicitConvertToUInt64;
             IL_49:
             implicitConvertToUInt64 = true;
@@ -389,7 +407,7 @@ namespace Flee
 
         private static void EmitConvert(FleeIlGenerator ilg, OpCode convertOpcode)
         {
-            bool flag = ilg != null;
+            var flag = ilg != null;
             if (flag)
             {
                 ilg.Emit(convertOpcode);
@@ -398,9 +416,9 @@ namespace Flee
 
         public static Type GetBinaryResultType(Type t1, Type t2)
         {
-            int index = GetTypeIndex(t1);
-            int index2 = GetTypeIndex(t2);
-            bool flag = index == -1 | index2 == -1;
+            var index = GetTypeIndex(t1);
+            var index2 = GetTypeIndex(t2);
+            var flag = (index == -1) | (index2 == -1);
             Type getBinaryResultType;
             if (flag)
             {
@@ -415,36 +433,36 @@ namespace Flee
 
         public static int GetImplicitConvertScore(Type sourceType, Type destType)
         {
-            bool flag = sourceType == destType;
-            int getImplicitConvertScore = 0;
+            var flag = sourceType == destType;
+            var getImplicitConvertScore = 0;
             if (flag)
             {
                 getImplicitConvertScore = 0;
             }
             else
             {
-                bool flag2 = sourceType == typeof(Null);
+                var flag2 = sourceType == typeof(Null);
                 if (flag2)
                 {
                     getImplicitConvertScore = GetInverseDistanceToObject(destType);
                 }
                 else
                 {
-                    bool flag3 = Utility.GetSimpleOverloadedOperator("Implicit", sourceType, destType) != null;
+                    var flag3 = Utility.GetSimpleOverloadedOperator("Implicit", sourceType, destType) != null;
                     if (flag3)
                     {
                         getImplicitConvertScore = 1;
                     }
                     else
                     {
-                        bool isValueType = sourceType.IsValueType;
+                        var isValueType = sourceType.IsValueType;
                         if (isValueType)
                         {
-                            bool isValueType2 = destType.IsValueType;
+                            var isValueType2 = destType.IsValueType;
                             if (isValueType2)
                             {
-                                int sourceScore = GetValueTypeImplicitConvertScore(sourceType);
-                                int destScore = GetValueTypeImplicitConvertScore(destType);
+                                var sourceScore = GetValueTypeImplicitConvertScore(sourceType);
+                                var destScore = GetValueTypeImplicitConvertScore(destType);
                                 getImplicitConvertScore = destScore - sourceScore;
                             }
                             else
@@ -454,7 +472,7 @@ namespace Flee
                         }
                         else
                         {
-                            bool isValueType3 = destType.IsValueType;
+                            var isValueType3 = destType.IsValueType;
                             if (isValueType3)
                             {
                                 Debug.Fail("No implicit conversion from reference type to value type");
@@ -527,7 +545,7 @@ namespace Flee
 
         private static int GetReferenceTypeImplicitConvertScore(Type sourceType, Type destType)
         {
-            bool isInterface = destType.IsInterface;
+            var isInterface = destType.IsInterface;
             int getReferenceTypeImplicitConvertScore;
             if (isInterface)
             {
@@ -542,8 +560,8 @@ namespace Flee
 
         private static int GetInheritanceDistance(Type sourceType, Type destType)
         {
-            int count = 0;
-            for (Type current = sourceType; current != destType; current = current.BaseType)
+            var count = 0;
+            for (var current = sourceType; current != destType; current = current.BaseType)
             {
                 count++;
             }
@@ -552,8 +570,8 @@ namespace Flee
 
         private static int GetInverseDistanceToObject(Type t)
         {
-            int score = 1000;
-            for (Type current = t.BaseType; current != null; current = current.BaseType)
+            var score = 1000;
+            for (var current = t.BaseType; current != null; current = current.BaseType)
             {
                 score -= 100;
             }

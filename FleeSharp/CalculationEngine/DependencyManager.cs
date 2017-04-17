@@ -1,3 +1,22 @@
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
+
 namespace Flee.CalculationEngine
 {
     using System;
@@ -9,48 +28,6 @@ namespace Flee.CalculationEngine
         private readonly Dictionary<T, Dictionary<T, object>> myDependentsMap;
         private readonly IEqualityComparer<T> myEqualityComparer;
         private readonly Dictionary<T, int> myPrecedentsMap;
-
-        public string Precedents
-        {
-            get
-            {
-                var list = new List<string>();
-
-                using (var enumerator = this.myPrecedentsMap.GetEnumerator())
-                {
-                    while (enumerator.MoveNext())
-                    {
-                        var pair = enumerator.Current;
-                        list.Add(pair.ToString());
-                    }
-                }
-                return string.Join(Environment.NewLine, list.ToArray());
-            }
-        }
-
-        public string DependencyGraph
-        {
-            get
-            {
-                var lines = new string[this.myDependentsMap.Count - 1 + 1];
-                using (var enumerator = this.myDependentsMap.GetEnumerator())
-                {
-                    int index = 0;
-                    while (enumerator.MoveNext())
-                    {
-                        var pair = enumerator.Current;
-                        var key = pair.Key;
-                        var s = this.FormatValues(pair.Value.Keys);
-
-                        lines[index] = $"{key} -> {s}";
-                        index++;
-                    }
-                }
-                return string.Join(Environment.NewLine, lines);
-            }
-        }
-
-        public int Count => this.myDependentsMap.Count;
 
         public DependencyManager(IEqualityComparer<T> comparer)
         {
@@ -139,7 +116,7 @@ namespace Flee.CalculationEngine
             var flag = !this.myDependentsMap.ContainsKey(tail);
             if (flag)
             {
-                this.myDependentsMap.Add(tail, (Dictionary<T, object>)this.CreateInnerDictionary());
+                this.myDependentsMap.Add(tail, (Dictionary<T, object>) this.CreateInnerDictionary());
             }
         }
 
@@ -187,13 +164,13 @@ namespace Flee.CalculationEngine
 
         public void GetDirectDependents(T tail, List<T> dest)
         {
-            var innerDict = (Dictionary<T, object>)this.GetInnerDictionary(tail);
+            var innerDict = (Dictionary<T, object>) this.GetInnerDictionary(tail);
             dest.AddRange(innerDict.Keys);
         }
 
         public T[] GetDependents(T tail)
         {
-            var dependents = (Dictionary<T, object>)this.CreateInnerDictionary();
+            var dependents = (Dictionary<T, object>) this.CreateInnerDictionary();
             this.GetDependentsRecursive(tail, dependents);
             var arr = new T[dependents.Count - 1 + 1];
             dependents.Keys.CopyTo(arr, 0);
@@ -203,7 +180,7 @@ namespace Flee.CalculationEngine
         private void GetDependentsRecursive(T tail, Dictionary<T, object> dependents)
         {
             dependents[tail] = null;
-            var directDependents = (Dictionary<T, object>)this.GetInnerDictionary(tail);
+            var directDependents = (Dictionary<T, object>) this.GetInnerDictionary(tail);
 
             foreach (var pair in directDependents.Keys)
             {
@@ -215,7 +192,7 @@ namespace Flee.CalculationEngine
         {
             foreach (var t in this.myDependentsMap.Keys)
             {
-                var innerDict = (Dictionary<T, object>)this.GetInnerDictionary(t);
+                var innerDict = (Dictionary<T, object>) this.GetInnerDictionary(t);
                 if (innerDict.ContainsKey(head))
                 {
                     dest.Add(t);
@@ -251,7 +228,7 @@ namespace Flee.CalculationEngine
 
         public bool HasDependents(T tail)
         {
-            var innerDict = (Dictionary<T, object>)this.GetInnerDictionary(tail);
+            var innerDict = (Dictionary<T, object>) this.GetInnerDictionary(tail);
             return innerDict.Count > 0;
         }
 
@@ -318,6 +295,48 @@ namespace Flee.CalculationEngine
             }
 
             return output;
+        }
+
+        public int Count => this.myDependentsMap.Count;
+
+        public string DependencyGraph
+        {
+            get
+            {
+                var lines = new string[this.myDependentsMap.Count - 1 + 1];
+                using (var enumerator = this.myDependentsMap.GetEnumerator())
+                {
+                    var index = 0;
+                    while (enumerator.MoveNext())
+                    {
+                        var pair = enumerator.Current;
+                        var key = pair.Key;
+                        var s = this.FormatValues(pair.Value.Keys);
+
+                        lines[index] = $"{key} -> {s}";
+                        index++;
+                    }
+                }
+                return string.Join(Environment.NewLine, lines);
+            }
+        }
+
+        public string Precedents
+        {
+            get
+            {
+                var list = new List<string>();
+
+                using (var enumerator = this.myPrecedentsMap.GetEnumerator())
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        var pair = enumerator.Current;
+                        list.Add(pair.ToString());
+                    }
+                }
+                return string.Join(Environment.NewLine, list.ToArray());
+            }
         }
     }
 }

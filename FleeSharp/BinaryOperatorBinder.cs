@@ -1,9 +1,28 @@
-using System;
-using System.Globalization;
-using System.Reflection;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
+    using System;
+    using System.Globalization;
+    using System.Reflection;
+
     internal class BinaryOperatorBinder : CustomBinder
     {
         private readonly Type myLeftType;
@@ -16,14 +35,15 @@ namespace Flee
             this.myRightType = rightType;
         }
 
-        public override MethodBase SelectMethod(BindingFlags bindingAttr, MethodBase[] match, Type[] types, ParameterModifier[] modifiers)
+        public override MethodBase SelectMethod(BindingFlags bindingAttr, MethodBase[] match, Type[] types,
+            ParameterModifier[] modifiers)
         {
             checked
             {
                 MethodBase selectMethod;
                 for (var i = 0; i < match.Length; i++)
                 {
-                    var mi = (MethodInfo)match[i];
+                    var mi = (MethodInfo) match[i];
                     var parameters = mi.GetParameters();
                     var leftValid = ImplicitConverter.EmitImplicitConvert(this.myLeftType, parameters[0].ParameterType, null);
                     var rightValid = ImplicitConverter.EmitImplicitConvert(this.myRightType, parameters[1].ParameterType, null);
@@ -51,7 +71,8 @@ namespace Flee
         /// <exception cref="T:System.Reflection.AmbiguousMatchException">For the default binder, <paramref name="match" /> contains multiple methods that are equally good matches for <paramref name="args" />. For example, <paramref name="args" /> contains a MyClass object that implements the IMyClass interface, and <paramref name="match" /> contains a method that takes MyClass and a method that takes IMyClass. </exception>
         /// <exception cref="T:System.MissingMethodException">For the default binder, <paramref name="match" /> contains no methods that can accept the arguments supplied in <paramref name="args" />.</exception>
         /// <exception cref="T:System.ArgumentException">For the default binder, <paramref name="match" /> is null or an empty array.</exception>
-        public override MethodBase BindToMethod(BindingFlags bindingAttr, MethodBase[] match, ref object[] args, ParameterModifier[] modifiers,
+        public override MethodBase BindToMethod(BindingFlags bindingAttr, MethodBase[] match, ref object[] args,
+            ParameterModifier[] modifiers,
             CultureInfo culture, string[] names, out object state)
         {
             throw new NotImplementedException();

@@ -1,10 +1,29 @@
-using System;
-using System.Diagnostics;
-using System.Reflection;
-using System.Reflection.Emit;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
+    using System;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Reflection.Emit;
+
     internal class ArithmeticElement : BinaryExpressionElement
     {
         private static readonly MethodInfo ourPowerMethodInfo;
@@ -14,26 +33,6 @@ namespace Flee
         private static readonly MethodInfo ourObjectConcatMethodInfo;
 
         private BinaryArithmeticOperation myOperation;
-
-        private bool IsOptimizablePower
-        {
-            get
-            {
-                var flag = this.myOperation != BinaryArithmeticOperation.Power;
-                bool isOptimizablePower;
-                if (flag)
-                {
-                    isOptimizablePower = false;
-                }
-                else
-                {
-                    var right = this.myRightChild as Int32LiteralElement;
-                    var flag2 = right == null;
-                    isOptimizablePower = (!flag2 && right.Value >= 0);
-                }
-                return isOptimizablePower;
-            }
-        }
 
         static ArithmeticElement()
         {
@@ -52,7 +51,7 @@ namespace Flee
 
         protected override void GetOperation(object operation)
         {
-            this.myOperation = (BinaryArithmeticOperation)operation;
+            this.myOperation = (BinaryArithmeticOperation) operation;
         }
 
         protected override Type GetResultType(Type leftType, Type rightType)
@@ -85,7 +84,7 @@ namespace Flee
 
         // ReSharper disable UnusedParameter
         private Type GetPowerResultType(Type leftType)
-        // ReSharper restore UnusedParameter
+            // ReSharper restore UnusedParameter
         {
             var isOptimizablePower = this.IsOptimizablePower;
             var getPowerResultType = isOptimizablePower ? leftType : typeof(double);
@@ -152,12 +151,12 @@ namespace Flee
 
         private static bool IsUnsignedForArithmetic(Type t)
         {
-            return t == typeof(uint) | t == typeof(ulong);
+            return (t == typeof(uint)) | (t == typeof(ulong));
         }
 
         private void EmitArithmeticOperation(BinaryArithmeticOperation op, FleeIlGenerator ilg, IServiceProvider services)
         {
-            var options = (ExpressionOptions)services.GetService(typeof(ExpressionOptions));
+            var options = (ExpressionOptions) services.GetService(typeof(ExpressionOptions));
             var unsigned = IsUnsignedForArithmetic(this.myLeftChild.ResultType) & IsUnsignedForArithmetic(this.myRightChild.ResultType);
             var integral = Utility.IsIntegralType(this.myLeftChild.ResultType) & Utility.IsIntegralType(this.myRightChild.ResultType);
             var emitOverflow = integral & options.Checked;
@@ -170,48 +169,48 @@ namespace Flee
             switch (op)
             {
                 case BinaryArithmeticOperation.Add:
+                {
+                    var flag2 = emitOverflow;
+                    if (flag2)
                     {
-                        var flag2 = emitOverflow;
-                        if (flag2)
-                        {
-                            var flag3 = unsigned;
-                            ilg.Emit(flag3 ? OpCodes.Add_Ovf_Un : OpCodes.Add_Ovf);
-                        }
-                        else
-                        {
-                            ilg.Emit(OpCodes.Add);
-                        }
-                        break;
+                        var flag3 = unsigned;
+                        ilg.Emit(flag3 ? OpCodes.Add_Ovf_Un : OpCodes.Add_Ovf);
                     }
+                    else
+                    {
+                        ilg.Emit(OpCodes.Add);
+                    }
+                    break;
+                }
                 case BinaryArithmeticOperation.Subtract:
+                {
+                    var flag4 = emitOverflow;
+                    if (flag4)
                     {
-                        var flag4 = emitOverflow;
-                        if (flag4)
-                        {
-                            var flag5 = unsigned;
-                            ilg.Emit(flag5 ? OpCodes.Sub_Ovf_Un : OpCodes.Sub_Ovf);
-                        }
-                        else
-                        {
-                            ilg.Emit(OpCodes.Sub);
-                        }
-                        break;
+                        var flag5 = unsigned;
+                        ilg.Emit(flag5 ? OpCodes.Sub_Ovf_Un : OpCodes.Sub_Ovf);
                     }
+                    else
+                    {
+                        ilg.Emit(OpCodes.Sub);
+                    }
+                    break;
+                }
                 case BinaryArithmeticOperation.Multiply:
                     this.EmitMultiply(ilg, emitOverflow, unsigned);
                     break;
                 case BinaryArithmeticOperation.Divide:
-                    {
-                        var flag6 = unsigned;
-                        ilg.Emit(flag6 ? OpCodes.Div_Un : OpCodes.Div);
-                        break;
-                    }
+                {
+                    var flag6 = unsigned;
+                    ilg.Emit(flag6 ? OpCodes.Div_Un : OpCodes.Div);
+                    break;
+                }
                 case BinaryArithmeticOperation.Mod:
-                    {
-                        var flag7 = unsigned;
-                        ilg.Emit(flag7 ? OpCodes.Rem_Un : OpCodes.Rem);
-                        break;
-                    }
+                {
+                    var flag7 = unsigned;
+                    ilg.Emit(flag7 ? OpCodes.Rem_Un : OpCodes.Rem);
+                    break;
+                }
                 case BinaryArithmeticOperation.Power:
                     this.EmitPower(ilg, emitOverflow, unsigned);
                     break;
@@ -236,7 +235,7 @@ namespace Flee
 
         private void EmitOptimizedPower(FleeIlGenerator ilg, bool emitOverflow, bool unsigned)
         {
-            var right = (Int32LiteralElement)this.myRightChild;
+            var right = (Int32LiteralElement) this.myRightChild;
             var flag = right.Value == 0;
             if (flag)
             {
@@ -296,6 +295,26 @@ namespace Flee
             this.myRightChild.Emit(ilg, services);
             ImplicitConverter.EmitImplicitConvert(this.myRightChild.ResultType, argType, ilg);
             ilg.Emit(OpCodes.Call, concatMethodInfo);
+        }
+
+        private bool IsOptimizablePower
+        {
+            get
+            {
+                var flag = this.myOperation != BinaryArithmeticOperation.Power;
+                bool isOptimizablePower;
+                if (flag)
+                {
+                    isOptimizablePower = false;
+                }
+                else
+                {
+                    var right = this.myRightChild as Int32LiteralElement;
+                    var flag2 = right == null;
+                    isOptimizablePower = !flag2 && right.Value >= 0;
+                }
+                return isOptimizablePower;
+            }
         }
     }
 }

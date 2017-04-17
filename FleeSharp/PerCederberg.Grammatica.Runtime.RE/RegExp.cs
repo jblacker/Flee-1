@@ -1,3 +1,22 @@
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
+
 namespace Flee.PerCederberg.Grammatica.Runtime.RE
 {
     using System;
@@ -13,13 +32,14 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
     {
         private readonly Element element;
 
-        private readonly string pattern;
-
         private readonly bool ignoreCase;
+
+        private readonly string pattern;
 
         private int pos;
 
-        public RegExp(string pattern) : this(pattern, false)
+        public RegExp(string pattern)
+            : this(pattern, false)
         {
         }
 
@@ -43,13 +63,13 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
         public Matcher Matcher(TextReader input)
         {
             var flag = input is LookAheadReader;
-            var matcher = flag ? this.Matcher((LookAheadReader)input) : this.Matcher(new LookAheadReader(input));
+            var matcher = flag ? this.Matcher((LookAheadReader) input) : this.Matcher(new LookAheadReader(input));
             return matcher;
         }
 
         private Matcher Matcher(LookAheadReader input)
         {
-            return new Matcher((Element)this.element.Clone(), input, this.ignoreCase);
+            return new Matcher((Element) this.element.Clone(), input, this.ignoreCase);
         }
 
         public override string ToString()
@@ -89,7 +109,7 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
 
         private Element ParseTerm()
         {
-            var list = new ArrayList { this.ParseFact() };
+            var list = new ArrayList {this.ParseFact()};
             while (true)
             {
                 var i = this.PeekChar(0);
@@ -171,13 +191,13 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
                 switch (c)
                 {
                     case '(':
-                        {
-                            this.ReadChar('(');
-                            var elem = this.ParseExpr();
-                            this.ReadChar(')');
-                            parseAtom = elem;
-                            return parseAtom;
-                        }
+                    {
+                        this.ReadChar('(');
+                        var elem = this.ParseExpr();
+                        this.ReadChar(')');
+                        parseAtom = elem;
+                        return parseAtom;
+                    }
                     case ')':
                     case '*':
                     case '+':
@@ -221,7 +241,6 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
                 }
             }
             throw new RegExpException(RegExpException.ErrorType.UnexpectedCharacter, this.pos, this.pattern);
-
         }
 
         private Element ParseAtomModifier(Element elem)
@@ -273,7 +292,7 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
                         }
                     }
                     this.ReadChar('}');
-                    var flag3 = max == 0 || (max > 0 && min > max);
+                    var flag3 = max == 0 || max > 0 && min > max;
                     if (flag3)
                     {
                         throw new RegExpException(RegExpException.ErrorType.InvalidRepeatCount, firstPos, this.pattern);
@@ -327,7 +346,8 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
                     if (start != ']')
                     {
                         this.ReadChar(start);
-                        var flag2 = this.PeekChar(0) == Convert.ToInt32('-') && this.PeekChar(1) > 0 && this.PeekChar(1) != Convert.ToInt32(']');
+                        var flag2 = this.PeekChar(0) == Convert.ToInt32('-') && this.PeekChar(1) > 0 &&
+                            this.PeekChar(1) != Convert.ToInt32(']');
                         if (flag2)
                         {
                             this.ReadChar('-');
@@ -350,11 +370,11 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
                     var flag3 = elem is StringElement;
                     if (flag3)
                     {
-                        charset.AddCharacters((StringElement)elem);
+                        charset.AddCharacters((StringElement) elem);
                     }
                     else
                     {
-                        charset.AddCharacterSet((CharacterSetElement)elem);
+                        charset.AddCharacterSet((CharacterSetElement) elem);
                     }
                 }
             }
@@ -381,7 +401,7 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
                 }
                 return parseChar;
             }
-           
+
             throw new RegExpException(RegExpException.ErrorType.UnsupportedSpecialCharacter, this.pos, this.pattern);
         }
 
@@ -457,61 +477,63 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
                         parseEscapeChar = new StringElement('\f');
                         return parseEscapeChar;
                     default:
+                    {
+                        string str;
+                        switch (c)
                         {
-                            string str;
-                            switch (c)
-                            {
-                                case 'n':
-                                    parseEscapeChar = new StringElement('\n');
-                                    return parseEscapeChar;
-                                case 'o':
-                                case 'p':
-                                case 'q':
-                                case 'v':
-                                    return this.ParseEscapeChar(c);
-                                case 'r':
-                                    parseEscapeChar = new StringElement('\r');
-                                    return parseEscapeChar;
-                                case 's':
-                                    parseEscapeChar = CharacterSetElement.WHITESPACE;
-                                    return parseEscapeChar;
-                                case 't':
-                                    parseEscapeChar = new StringElement('\t');
-                                    return parseEscapeChar;
-                                case 'u':
-                                    break;
-                                case 'w':
-                                    parseEscapeChar = CharacterSetElement.WORD;
-                                    return parseEscapeChar;
-                                case 'x':
-                                    str = this.ReadChar().ToString() + this.ReadChar().ToString();
-                                    try
-                                    {
-                                        var value = int.Parse(str, NumberStyles.AllowHexSpecifier);
-                                        parseEscapeChar = new StringElement(this.FixChar(Convert.ToChar(value)));
-                                        return parseEscapeChar;
-                                    }
-                                    catch (FormatException formatException)
-                                    {
-                                        ProjectData.SetProjectError(formatException);
-                                        throw new RegExpException(RegExpException.ErrorType.UnsupportedEscapeCharacter, this.pos - str.Length - 2, this.pattern);
-                                    }
-                                default:
-                                  return  this.ParseEscapeChar(c);
-                            }
-                            str = this.ReadChar().ToString() + this.ReadChar().ToString() + this.ReadChar().ToString() + this.ReadChar().ToString();
-                            try
-                            {
-                                var value = int.Parse(str, NumberStyles.AllowHexSpecifier);
-                                parseEscapeChar = new StringElement(this.FixChar(Convert.ToChar(value)));
+                            case 'n':
+                                parseEscapeChar = new StringElement('\n');
                                 return parseEscapeChar;
-                            }
-                            catch (FormatException formatException)
-                            {
-                                ProjectData.SetProjectError(formatException);
-                                throw new RegExpException(RegExpException.ErrorType.UnsupportedEscapeCharacter, this.pos - str.Length - 2, this.pattern);
-                            }
+                            case 'o':
+                            case 'p':
+                            case 'q':
+                            case 'v':
+                                return this.ParseEscapeChar(c);
+                            case 'r':
+                                parseEscapeChar = new StringElement('\r');
+                                return parseEscapeChar;
+                            case 's':
+                                parseEscapeChar = CharacterSetElement.WHITESPACE;
+                                return parseEscapeChar;
+                            case 't':
+                                parseEscapeChar = new StringElement('\t');
+                                return parseEscapeChar;
+                            case 'u':
+                                break;
+                            case 'w':
+                                parseEscapeChar = CharacterSetElement.WORD;
+                                return parseEscapeChar;
+                            case 'x':
+                                str = this.ReadChar() + this.ReadChar().ToString();
+                                try
+                                {
+                                    var value = int.Parse(str, NumberStyles.AllowHexSpecifier);
+                                    parseEscapeChar = new StringElement(this.FixChar(Convert.ToChar(value)));
+                                    return parseEscapeChar;
+                                }
+                                catch (FormatException formatException)
+                                {
+                                    ProjectData.SetProjectError(formatException);
+                                    throw new RegExpException(RegExpException.ErrorType.UnsupportedEscapeCharacter,
+                                        this.pos - str.Length - 2, this.pattern);
+                                }
+                            default:
+                                return this.ParseEscapeChar(c);
                         }
+                        str = this.ReadChar() + this.ReadChar().ToString() + this.ReadChar() + this.ReadChar();
+                        try
+                        {
+                            var value = int.Parse(str, NumberStyles.AllowHexSpecifier);
+                            parseEscapeChar = new StringElement(this.FixChar(Convert.ToChar(value)));
+                            return parseEscapeChar;
+                        }
+                        catch (FormatException formatException)
+                        {
+                            ProjectData.SetProjectError(formatException);
+                            throw new RegExpException(RegExpException.ErrorType.UnsupportedEscapeCharacter, this.pos - str.Length - 2,
+                                this.pattern);
+                        }
+                    }
                 }
             }
             parseEscapeChar = this.ParseEscapeChar(c);
@@ -520,7 +542,7 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
 
         private Element ParseEscapeChar(char c)
         {
-            var flag4 = ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
+            var flag4 = 'A' <= c && c <= 'Z' || 'a' <= c && c <= 'z';
             if (flag4)
             {
                 throw new RegExpException(RegExpException.ErrorType.UnsupportedEscapeCharacter, this.pos - 2, this.pattern);
@@ -590,16 +612,16 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
 
         private Element CombineElements(ArrayList list)
         {
-            var prev = (Element)list[0];
+            var prev = (Element) list[0];
             var num = list.Count - 2;
             Element elem;
             for (var i = 1; i <= num; i++)
             {
-                elem = (Element)list[i];
+                elem = (Element) list[i];
                 var flag = prev is StringElement && elem is StringElement;
                 if (flag)
                 {
-                    var str = ((StringElement)prev).GetString() + ((StringElement)elem).GetString();
+                    var str = ((StringElement) prev).GetString() + ((StringElement) elem).GetString();
                     elem = new StringElement(str);
                     list.RemoveAt(i);
                     list[i - 1] = elem;
@@ -607,11 +629,11 @@ namespace Flee.PerCederberg.Grammatica.Runtime.RE
                 }
                 prev = elem;
             }
-            elem = (Element)list[list.Count - 1];
+            elem = (Element) list[list.Count - 1];
             var num2 = list.Count - 2;
             for (var i = num2; i >= 0; i += -1)
             {
-                prev = (Element)list[i];
+                prev = (Element) list[i];
                 elem = new CombineElement(prev, elem);
             }
             return elem;

@@ -1,174 +1,183 @@
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
+
 namespace Flee.PerCederberg.Grammatica.Runtime
 {
     using System.Text;
 
     internal class Token : Node
-	{
-		private readonly TokenPattern tokenPattern;
+    {
+        private readonly int endLine;
 
-		private readonly string image;
+        private readonly int startColumn;
 
-		private readonly int startLine;
+        private readonly int startLine;
 
-		private readonly int startColumn;
+        private Token next;
 
-		private readonly int endLine;
+        private Token previous;
 
-	    private Token previous;
+        public Token(TokenPattern pattern, string image, int line, int col)
+        {
+            this.Pattern = pattern;
+            this.Image = image;
+            this.startLine = line;
+            this.startColumn = col;
+            this.endLine = line;
+            this.EndColumn = col + image.Length - 1;
+            var pos = 0;
+            while (image.IndexOf('\n', pos) >= 0)
+            {
+                pos = image.IndexOf('\n', pos) + 1;
+                this.endLine++;
+                this.EndColumn = image.Length - pos;
+            }
+        }
 
-		private Token next;
+        public string GetImage()
+        {
+            return this.Image;
+        }
 
-		public override int Id => this.tokenPattern.Id;
+        public Token GetPreviousToken()
+        {
+            return this.Previous;
+        }
 
-	    public override string Name => this.tokenPattern.Name;
+        public Token GetNextToken()
+        {
+            return this.Next;
+        }
 
-	    public override int StartLine => this.startLine;
+        public override string ToString()
+        {
+            var buffer = new StringBuilder();
+            var newline = this.Image.IndexOf('\n');
+            buffer.Append(this.Pattern.Name);
+            buffer.Append("(");
+            buffer.Append(this.Pattern.Id);
+            buffer.Append("): \"");
+            var flag = newline >= 0;
+            if (flag)
+            {
+                var flag2 = newline > 0 && this.Image[newline - 1] == '\r';
+                if (flag2)
+                {
+                    newline--;
+                }
+                buffer.Append(this.Image.Substring(0, newline));
+                buffer.Append("(...)");
+            }
+            else
+            {
+                buffer.Append(this.Image);
+            }
+            buffer.Append("\", line: ");
+            buffer.Append(this.startLine);
+            buffer.Append(", col: ");
+            buffer.Append(this.startColumn);
+            return buffer.ToString();
+        }
 
-	    public override int StartColumn => this.startColumn;
+        public string ToShortString()
+        {
+            var buffer = new StringBuilder();
+            var newline = this.Image.IndexOf('\n');
+            buffer.Append('"');
+            var flag = newline >= 0;
+            if (flag)
+            {
+                var flag2 = newline > 0 && this.Image[newline - 1] == '\r';
+                if (flag2)
+                {
+                    newline--;
+                }
+                buffer.Append(this.Image.Substring(0, newline));
+                buffer.Append("(...)");
+            }
+            else
+            {
+                buffer.Append(this.Image);
+            }
+            buffer.Append('"');
+            var flag3 = this.Pattern.Type == TokenPattern.PatternType.Regexp;
+            if (flag3)
+            {
+                buffer.Append(" <");
+                buffer.Append(this.Pattern.Name);
+                buffer.Append(">");
+            }
+            return buffer.ToString();
+        }
 
-	    public override int EndLine => this.endLine;
+        public override int EndColumn { get; }
 
-	    public override int EndColumn { get; }
+        public override int EndLine => this.endLine;
 
-	    public string Image => this.image;
+        public override int Id => this.Pattern.Id;
 
-	    internal TokenPattern Pattern => this.tokenPattern;
+        public string Image { get; }
 
-	    public Token Previous
-		{
-			get
-			{
-				return this.previous;
-			}
-			set
-			{
-				var flag = this.previous != null;
-				if (flag)
-				{
-					this.previous.Next = null;
-				}
-				this.previous = value;
-				var flag2 = this.previous != null;
-				if (flag2)
-				{
-					this.previous.Next = this;
-				}
-			}
-		}
+        public override string Name => this.Pattern.Name;
 
-		public Token Next
-		{
-			get
-			{
-				return this.next;
-			}
-			set
-			{
-				var flag = this.next != null;
-				if (flag)
-				{
-					this.next.Previous = null;
-				}
-				this.next = value;
-				var flag2 = this.next != null;
-				if (flag2)
-				{
-					this.next.Previous = this;
-				}
-			}
-		}
+        public Token Next
+        {
+            get { return this.next; }
+            set
+            {
+                var flag = this.next != null;
+                if (flag)
+                {
+                    this.next.Previous = null;
+                }
+                this.next = value;
+                var flag2 = this.next != null;
+                if (flag2)
+                {
+                    this.next.Previous = this;
+                }
+            }
+        }
 
-		public Token(TokenPattern pattern, string image, int line, int col)
-		{
-			this.tokenPattern = pattern;
-			this.image = image;
-			this.startLine = line;
-			this.startColumn = col;
-			this.endLine = line;
-			this.EndColumn = col + image.Length - 1;
-			var pos = 0;
-			while (image.IndexOf('\n', pos) >= 0)
-			{
-				pos = image.IndexOf('\n', pos) + 1;
-				this.endLine++;
-				this.EndColumn = image.Length - pos;
-			}
-		}
+        internal TokenPattern Pattern { get; }
 
-		public string GetImage()
-		{
-			return this.Image;
-		}
+        public Token Previous
+        {
+            get { return this.previous; }
+            set
+            {
+                var flag = this.previous != null;
+                if (flag)
+                {
+                    this.previous.Next = null;
+                }
+                this.previous = value;
+                var flag2 = this.previous != null;
+                if (flag2)
+                {
+                    this.previous.Next = this;
+                }
+            }
+        }
 
-		public Token GetPreviousToken()
-		{
-			return this.Previous;
-		}
+        public override int StartColumn => this.startColumn;
 
-		public Token GetNextToken()
-		{
-			return this.Next;
-		}
-
-		public override string ToString()
-		{
-			var buffer = new StringBuilder();
-			var newline = this.image.IndexOf('\n');
-			buffer.Append(this.tokenPattern.Name);
-			buffer.Append("(");
-			buffer.Append(this.tokenPattern.Id);
-			buffer.Append("): \"");
-			var flag = newline >= 0;
-			if (flag)
-			{
-				var flag2 = newline > 0 && this.image[newline - 1] == '\r';
-				if (flag2)
-				{
-					newline--;
-				}
-				buffer.Append(this.image.Substring(0, newline));
-				buffer.Append("(...)");
-			}
-			else
-			{
-				buffer.Append(this.image);
-			}
-			buffer.Append("\", line: ");
-			buffer.Append(this.startLine);
-			buffer.Append(", col: ");
-			buffer.Append(this.startColumn);
-			return buffer.ToString();
-		}
-
-		public string ToShortString()
-		{
-			var buffer = new StringBuilder();
-			var newline = this.image.IndexOf('\n');
-			buffer.Append('"');
-			var flag = newline >= 0;
-			if (flag)
-			{
-				var flag2 = newline > 0 && this.image[newline - 1] == '\r';
-				if (flag2)
-				{
-					newline--;
-				}
-				buffer.Append(this.image.Substring(0, newline));
-				buffer.Append("(...)");
-			}
-			else
-			{
-				buffer.Append(this.image);
-			}
-			buffer.Append('"');
-			var flag3 = this.tokenPattern.Type == TokenPattern.PatternType.Regexp;
-			if (flag3)
-			{
-				buffer.Append(" <");
-				buffer.Append(this.tokenPattern.Name);
-				buffer.Append(">");
-			}
-			return buffer.ToString();
-		}
-	}
+        public override int StartLine => this.startLine;
+    }
 }

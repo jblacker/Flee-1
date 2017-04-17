@@ -1,57 +1,47 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
-using System.Reflection.Emit;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Reflection.Emit;
+
     internal abstract class MemberElement : ExpressionElement
     {
-        protected string myName;
-
-        protected MemberElement myPrevious;
-
-        protected MemberElement myNext;
-
-        protected IServiceProvider myServices;
-
-        protected ExpressionOptions myOptions;
+        public const BindingFlags BindFlags =
+            BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
         protected ExpressionContext myContext;
 
         protected ImportBase myImport;
+        protected string myName;
 
-        public const BindingFlags BindFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+        protected MemberElement myNext;
 
-        public abstract bool IsStatic
-        {
-            get;
-        }
+        protected ExpressionOptions myOptions;
 
-        protected abstract bool IsPublic
-        {
-            get;
-        }
+        protected MemberElement myPrevious;
 
-        public string MemberName => this.myName;
-
-        protected bool NextRequiresAddress
-        {
-            get
-            {
-                var flag = this.myNext == null;
-                return !flag && this.myNext.RequiresAddress;
-            }
-        }
-
-        protected virtual bool RequiresAddress => false;
-
-        protected virtual bool SupportsInstance => true;
-
-        protected virtual bool SupportsStatic => false;
-
-        public Type TargetType => this.ResultType;
+        protected IServiceProvider myServices;
 
         public void Link(MemberElement nextElement)
         {
@@ -66,8 +56,8 @@ namespace Flee
         public void Resolve(IServiceProvider services)
         {
             this.myServices = services;
-            this.myOptions = (ExpressionOptions)services.GetService(typeof(ExpressionOptions));
-            this.myContext = (ExpressionContext)services.GetService(typeof(ExpressionContext));
+            this.myOptions = (ExpressionOptions) services.GetService(typeof(ExpressionOptions));
+            this.myContext = (ExpressionContext) services.GetService(typeof(ExpressionContext));
             this.ResolveInternal();
             this.Validate();
         }
@@ -87,14 +77,16 @@ namespace Flee
                 var flag2 = this.IsStatic && !this.SupportsStatic;
                 if (flag2)
                 {
-                    this.ThrowCompileException("StaticMemberCannotBeAccessedWithInstanceReference", CompileExceptionReason.TypeMismatch, this.myName);
+                    this.ThrowCompileException("StaticMemberCannotBeAccessedWithInstanceReference", CompileExceptionReason.TypeMismatch,
+                        this.myName);
                 }
                 else
                 {
                     var flag3 = !this.IsStatic && !this.SupportsInstance;
                     if (flag3)
                     {
-                        this.ThrowCompileException("ReferenceToNonSharedMemberRequiresObjectReference", CompileExceptionReason.TypeMismatch, this.myName);
+                        this.ThrowCompileException("ReferenceToNonSharedMemberRequiresObjectReference",
+                            CompileExceptionReason.TypeMismatch, this.myName);
                     }
                 }
             }
@@ -184,7 +176,7 @@ namespace Flee
         {
             var index = ilg.GetTempLocalIndex(targetType);
             Utility.EmitStoreLocal(ilg, index);
-            ilg.Emit(OpCodes.Ldloca_S, (byte)index);
+            ilg.Emit(OpCodes.Ldloca_S, (byte) index);
         }
 
         protected void EmitLoadOwner(FleeIlGenerator ilg)
@@ -208,7 +200,7 @@ namespace Flee
         {
             var fi = member as FieldInfo;
             var flag = fi != null;
-            bool isMemberPublic = false;
+            var isMemberPublic = false;
             if (flag)
             {
                 isMemberPublic = fi.IsPublic;
@@ -263,13 +255,15 @@ namespace Flee
             bool accessAllowed;
             if (flag)
             {
-                accessAllowed = ((options.OwnerMemberAccess & BindingFlags.Public) > BindingFlags.Default);
+                accessAllowed = (options.OwnerMemberAccess & BindingFlags.Public) > BindingFlags.Default;
             }
             else
             {
-                accessAllowed = ((options.OwnerMemberAccess & BindingFlags.NonPublic) > BindingFlags.Default);
+                accessAllowed = (options.OwnerMemberAccess & BindingFlags.NonPublic) > BindingFlags.Default;
             }
-            var attr = (ExpressionOwnerMemberAccessAttribute)Attribute.GetCustomAttribute(member, typeof(ExpressionOwnerMemberAccessAttribute));
+            var attr =
+                (ExpressionOwnerMemberAccessAttribute)
+                Attribute.GetCustomAttribute(member, typeof(ExpressionOwnerMemberAccessAttribute));
             var flag2 = attr == null;
             var isOwnerMemberAccessible = flag2 ? accessAllowed : attr.AllowAccess;
             return isOwnerMemberAccessible;
@@ -289,11 +283,14 @@ namespace Flee
             if (flag)
             {
                 var flag2 = this.myImport == null;
-                getMembers = flag2 ? this.GetDefaultNamespaceMembers(this.myName, targets) : this.myImport.FindMembers(this.myName, targets);
+                getMembers = flag2
+                    ? this.GetDefaultNamespaceMembers(this.myName, targets) : this.myImport.FindMembers(this.myName, targets);
             }
             else
             {
-                getMembers = this.myPrevious.TargetType.FindMembers(targets, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, this.myOptions.MemberFilter, this.myName);
+                getMembers = this.myPrevious.TargetType.FindMembers(targets,
+                    BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic,
+                    this.myOptions.MemberFilter, this.myName);
             }
             return getMembers;
         }
@@ -311,5 +308,28 @@ namespace Flee
         {
             return e.IsPublic;
         }
+
+        protected abstract bool IsPublic { get; }
+
+        public abstract bool IsStatic { get; }
+
+        public string MemberName => this.myName;
+
+        protected bool NextRequiresAddress
+        {
+            get
+            {
+                var flag = this.myNext == null;
+                return !flag && this.myNext.RequiresAddress;
+            }
+        }
+
+        protected virtual bool RequiresAddress => false;
+
+        protected virtual bool SupportsInstance => true;
+
+        protected virtual bool SupportsStatic => false;
+
+        public Type TargetType => this.ResultType;
     }
 }

@@ -15,7 +15,7 @@
 ' 
 ' Flee - Fast Lightweight Expression Evaluator
 ' Copyright © 2007 Eugene Ciloci
-'
+' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 Imports Ciloci.Flee.CalcEngine
 Imports System.IO

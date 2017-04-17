@@ -1,32 +1,50 @@
-using System;
-using System.Collections;
-using System.Diagnostics;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
+    using System;
+    using System.Collections;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Reflection.Emit;
+    using System.Runtime.CompilerServices;
+
     internal abstract class BinaryExpressionElement : ExpressionElement
     {
         protected ExpressionElement myLeftChild;
 
-        protected ExpressionElement myRightChild;
-
         private Type myResultType;
 
-        public sealed override Type ResultType => this.myResultType;
+        protected ExpressionElement myRightChild;
 
         public static BinaryExpressionElement CreateElement(IList childValues, Type elementType)
         {
-            var firstElement = (BinaryExpressionElement)Activator.CreateInstance(elementType);
-            firstElement.Configure((ExpressionElement)childValues[0], (ExpressionElement)childValues[2], RuntimeHelpers.GetObjectValue(childValues[1]));
+            var firstElement = (BinaryExpressionElement) Activator.CreateInstance(elementType);
+            firstElement.Configure((ExpressionElement) childValues[0], (ExpressionElement) childValues[2],
+                RuntimeHelpers.GetObjectValue(childValues[1]));
             var lastElement = firstElement;
             var num = childValues.Count - 1;
             for (var i = 3; i <= num; i += 2)
             {
-                var element = (BinaryExpressionElement)Activator.CreateInstance(elementType);
-                element.Configure(lastElement, (ExpressionElement)childValues[i + 1], RuntimeHelpers.GetObjectValue(childValues[i]));
+                var element = (BinaryExpressionElement) Activator.CreateInstance(elementType);
+                element.Configure(lastElement, (ExpressionElement) childValues[i + 1], RuntimeHelpers.GetObjectValue(childValues[i]));
                 lastElement = element;
             }
             return lastElement;
@@ -40,7 +58,8 @@ namespace Flee
             var flag = this.myResultType == null;
             if (flag)
             {
-                this.ThrowOperandTypeMismatch(RuntimeHelpers.GetObjectValue(op), this.myLeftChild.ResultType, this.myRightChild.ResultType);
+                this.ThrowOperandTypeMismatch(RuntimeHelpers.GetObjectValue(op), this.myLeftChild.ResultType,
+                    this.myRightChild.ResultType);
             }
         }
 
@@ -53,25 +72,13 @@ namespace Flee
             MethodInfo getOverloadedBinaryOperator;
             if (flag)
             {
-                getOverloadedBinaryOperator = Utility.GetOverloadedOperator(name, leftType, binder, new Type[]
-                {
-                    leftType,
-                    rightType
-                });
+                getOverloadedBinaryOperator = Utility.GetOverloadedOperator(name, leftType, binder, leftType, rightType);
             }
             else
             {
-                var leftMethod = Utility.GetOverloadedOperator(name, leftType, binder, new Type[]
-                {
-                    leftType,
-                    rightType
-                });
-                var rightMethod = Utility.GetOverloadedOperator(name, rightType, binder, new Type[]
-                {
-                    leftType,
-                    rightType
-                });
-                var flag2 = leftMethod == null & rightMethod == null;
+                var leftMethod = Utility.GetOverloadedOperator(name, leftType, binder, leftType, rightType);
+                var rightMethod = Utility.GetOverloadedOperator(name, rightType, binder, leftType, rightType);
+                var flag2 = (leftMethod == null) & (rightMethod == null);
                 if (flag2)
                 {
                     getOverloadedBinaryOperator = null;
@@ -113,17 +120,14 @@ namespace Flee
 
         protected void ThrowOperandTypeMismatch(object operation, Type leftType, Type rightType)
         {
-            this.ThrowCompileException("OperationNotDefinedForTypes", CompileExceptionReason.TypeMismatch, new object[]
-            {
-                operation,
-                leftType.Name,
-                rightType.Name
-            });
+            this.ThrowCompileException("OperationNotDefinedForTypes", CompileExceptionReason.TypeMismatch, operation, leftType.Name,
+                rightType.Name);
         }
 
         protected abstract Type GetResultType(Type leftType, Type rightType);
 
-        protected static void EmitChildWithConvert(ExpressionElement child, Type resultType, FleeIlGenerator ilg, IServiceProvider services)
+        protected static void EmitChildWithConvert(ExpressionElement child, Type resultType, FleeIlGenerator ilg,
+            IServiceProvider services)
         {
             child.Emit(ilg, services);
             var converted = ImplicitConverter.EmitImplicitConvert(child.ResultType, resultType, ilg);
@@ -152,5 +156,7 @@ namespace Flee
             this.GetOperation(RuntimeHelpers.GetObjectValue(op));
             this.ValidateInternal(RuntimeHelpers.GetObjectValue(op));
         }
+
+        public sealed override Type ResultType => this.myResultType;
     }
 }

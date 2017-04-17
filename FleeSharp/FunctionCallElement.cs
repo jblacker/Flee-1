@@ -1,12 +1,32 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
-using System.Reflection.Emit;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
+
+
 #pragma warning disable 612
 
 namespace Flee
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Reflection.Emit;
     using Extensions;
 
     internal class FunctionCallElement : MemberElement
@@ -15,27 +35,9 @@ namespace Flee
 
         private readonly ICollection<MethodInfo> myMethods;
 
-        private CustomMethodInfo myTargetMethodInfo;
-
         private Type myOnDemandFunctionReturnType;
 
-        private MethodInfo Method => this.myTargetMethodInfo.Target;
-
-        public override Type ResultType
-        {
-            get
-            {
-                var flag = this.myOnDemandFunctionReturnType != null;
-                var resultType = flag ? this.myOnDemandFunctionReturnType : this.Method.ReturnType;
-                return resultType;
-            }
-        }
-
-        protected override bool RequiresAddress => !IsGetTypeMethod(this.Method);
-
-        protected override bool IsPublic => this.Method.IsPublic;
-
-        public override bool IsStatic => this.Method.IsStatic;
+        private CustomMethodInfo myTargetMethodInfo;
 
         public FunctionCallElement(string name, ArgumentList arguments)
         {
@@ -83,20 +85,12 @@ namespace Flee
             var flag = previous == null;
             if (flag)
             {
-                this.ThrowCompileException("UndefinedFunction", CompileExceptionReason.UndefinedName, new object[]
-                {
-                    this.myName,
-                    this.myArguments
-                });
+                this.ThrowCompileException("UndefinedFunction", CompileExceptionReason.UndefinedName, this.myName, this.myArguments);
             }
             else
             {
-                this.ThrowCompileException("UndefinedFunctionOnType", CompileExceptionReason.UndefinedName, new object[]
-                {
-                    this.myName,
-                    this.myArguments,
-                    previous.TargetType.Name
-                });
+                this.ThrowCompileException("UndefinedFunctionOnType", CompileExceptionReason.UndefinedName, this.myName,
+                    this.myArguments, previous.TargetType.Name);
             }
         }
 
@@ -105,30 +99,18 @@ namespace Flee
             var flag = previous == null;
             if (flag)
             {
-                this.ThrowCompileException("NoAccessibleMatches", CompileExceptionReason.AccessDenied, new object[]
-                {
-                    this.myName,
-                    this.myArguments
-                });
+                this.ThrowCompileException("NoAccessibleMatches", CompileExceptionReason.AccessDenied, this.myName, this.myArguments);
             }
             else
             {
-                this.ThrowCompileException("NoAccessibleMatchesOnType", CompileExceptionReason.AccessDenied, new object[]
-                {
-                    this.myName,
-                    this.myArguments,
-                    previous.TargetType.Name
-                });
+                this.ThrowCompileException("NoAccessibleMatchesOnType", CompileExceptionReason.AccessDenied, this.myName,
+                    this.myArguments, previous.TargetType.Name);
             }
         }
 
         private void ThrowAmbiguousMethodCallException()
         {
-            this.ThrowCompileException("AmbiguousCallOfFunction", CompileExceptionReason.AmbiguousMatch, new object[]
-            {
-                this.myName,
-                this.myArguments
-            });
+            this.ThrowCompileException("AmbiguousCallOfFunction", CompileExceptionReason.AmbiguousMatch, this.myName, this.myArguments);
         }
 
         private void BindToMethod(ICollection<MethodInfo> methods, MemberElement previous, Type[] argTypes)
@@ -229,7 +211,7 @@ namespace Flee
                 for (var i = 0; i < infos.Length; i++)
                 {
                     var cmi = infos[i];
-                    var flag = ((IEquatable<CustomMethodInfo>)cmi).Equals(first);
+                    var flag = ((IEquatable<CustomMethodInfo>) cmi).Equals(first);
                     if (flag)
                     {
                         sameScores.Add(cmi);
@@ -252,10 +234,7 @@ namespace Flee
                 var flag2 = this.Method.ReturnType == typeof(void);
                 if (flag2)
                 {
-                    this.ThrowCompileException("FunctionHasNoReturnValue", CompileExceptionReason.FunctionHasNoReturnValue, new object[]
-                    {
-                        this.myName
-                    });
+                    this.ThrowCompileException("FunctionHasNoReturnValue", CompileExceptionReason.FunctionHasNoReturnValue, this.myName);
                 }
             }
         }
@@ -290,7 +269,8 @@ namespace Flee
             this.EmitMethodCall(mi, ilg);
         }
 
-        private void EmitParamArrayArguments(ParameterInfo[] parameters, ExpressionElement[] elements, FleeIlGenerator ilg, IServiceProvider services)
+        private void EmitParamArrayArguments(ParameterInfo[] parameters, ExpressionElement[] elements, FleeIlGenerator ilg,
+            IServiceProvider services)
         {
             var fixedParameters = new ParameterInfo[this.myTargetMethodInfo.myFixedArgTypes.Length - 1 + 1];
             Array.Copy(parameters, fixedParameters, fixedParameters.Length);
@@ -302,7 +282,8 @@ namespace Flee
             EmitElementArrayLoad(paramArrayElements, this.myTargetMethodInfo.paramArrayElementType, ilg, services);
         }
 
-        private static void EmitElementArrayLoad(ExpressionElement[] elements, Type arrayElementType, FleeIlGenerator ilg, IServiceProvider services)
+        private static void EmitElementArrayLoad(ExpressionElement[] elements, Type arrayElementType, FleeIlGenerator ilg,
+            IServiceProvider services)
         {
             LiteralElement.EmitLoad(elements.Length, ilg);
             ilg.Emit(OpCodes.Newarr, arrayElementType);
@@ -338,7 +319,8 @@ namespace Flee
             EmitMethodCall(this.ResultType, nextRequiresAddress, this.Method, ilg);
         }
 
-        private void EmitRegularFunctionInternal(ParameterInfo[] parameters, ExpressionElement[] elements, FleeIlGenerator ilg, IServiceProvider services)
+        private void EmitRegularFunctionInternal(ParameterInfo[] parameters, ExpressionElement[] elements, FleeIlGenerator ilg,
+            IServiceProvider services)
         {
             Debug.Assert(parameters.Length == elements.Length, "argument count mismatch");
             var num = parameters.Length - 1;
@@ -349,6 +331,24 @@ namespace Flee
                 element.Emit(ilg, services);
                 var success = ImplicitConverter.EmitImplicitConvert(element.ResultType, pi.ParameterType, ilg);
                 Debug.Assert(success, "conversion failed");
+            }
+        }
+
+        protected override bool IsPublic => this.Method.IsPublic;
+
+        public override bool IsStatic => this.Method.IsStatic;
+
+        private MethodInfo Method => this.myTargetMethodInfo.Target;
+
+        protected override bool RequiresAddress => !IsGetTypeMethod(this.Method);
+
+        public override Type ResultType
+        {
+            get
+            {
+                var flag = this.myOnDemandFunctionReturnType != null;
+                var resultType = flag ? this.myOnDemandFunctionReturnType : this.Method.ReturnType;
+                return resultType;
             }
         }
     }

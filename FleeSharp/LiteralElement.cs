@@ -1,28 +1,43 @@
-using System.Diagnostics;
-using System.Reflection.Emit;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
     using System;
+    using System.Diagnostics;
+    using System.Reflection.Emit;
 
     internal abstract class LiteralElement : ExpressionElement
     {
         protected void OnParseOverflow(string image)
         {
-            this.ThrowCompileException("ValueNotRepresentableInType", CompileExceptionReason.ConstantOverflow, new object[]
-            {
-                image,
-                this.ResultType.Name
-            });
+            this.ThrowCompileException("ValueNotRepresentableInType", CompileExceptionReason.ConstantOverflow, image,
+                this.ResultType.Name);
         }
 
         public static void EmitLoad(int value, FleeIlGenerator ilg)
         {
-            if (value >= -1 & value <= 8)
+            if ((value >= -1) & (value <= 8))
             {
                 EmitSuperShort(value, ilg);
             }
-            else if (value >= sbyte.MinValue & value <= sbyte.MaxValue)
+            else if ((value >= sbyte.MinValue) & (value <= sbyte.MaxValue))
             {
                 ilg.Emit(OpCodes.Ldc_I4_S, Convert.ToSByte(value));
             }
@@ -34,12 +49,12 @@ namespace Flee
 
         protected static void EmitLoad(long value, FleeIlGenerator ilg)
         {
-            if (value >= int.MinValue & value <= int.MaxValue)
+            if ((value >= int.MinValue) & (value <= int.MaxValue))
             {
                 EmitLoad(Convert.ToInt32(value), ilg);
                 ilg.Emit(OpCodes.Conv_I8);
             }
-            else if (value >= 0 & value <= uint.MaxValue)
+            else if ((value >= 0) & (value <= uint.MaxValue))
             {
                 EmitLoad(Convert.ToInt32(value), ilg);
                 ilg.Emit(OpCodes.Conv_U8);
@@ -64,7 +79,7 @@ namespace Flee
 
         private static void EmitSuperShort(int value, FleeIlGenerator ilg)
         {
-            OpCode ldcOpcode = default(OpCode);
+            var ldcOpcode = default(OpCode);
             switch (value)
             {
                 case -1:

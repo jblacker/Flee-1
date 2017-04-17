@@ -1,3 +1,22 @@
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
+
 namespace Flee
 {
     using System;
@@ -22,8 +41,8 @@ namespace Flee
         {
             var betweenBranches = new List<BranchInfo>();
 
-            for (int i = 0; i < this.myBranchInfos.Count; i++)
-                {
+            for (var i = 0; i < this.myBranchInfos.Count; i++)
+            {
                 betweenBranches.Clear();
                 this.FindBetweenBranches(this.myBranchInfos[i], betweenBranches);
                 var longBranchesBetween = this.CountLongBranches(betweenBranches);
@@ -31,11 +50,11 @@ namespace Flee
             }
             var longBranchCount = 0;
 
-            for (int i = 0; i < this.myBranchInfos.Count; i++)
+            for (var i = 0; i < this.myBranchInfos.Count; i++)
             {
-                myBranchInfos[i].BakeIsLongBranch();
-                myBranchInfos[i].AdjustForLongBranches(longBranchCount);
-                longBranchCount += Convert.ToInt32(myBranchInfos[i].IsLongBranch);
+                this.myBranchInfos[i].BakeIsLongBranch();
+                this.myBranchInfos[i].AdjustForLongBranches(longBranchCount);
+                longBranchCount += Convert.ToInt32(this.myBranchInfos[i].IsLongBranch);
             }
         }
 
@@ -65,7 +84,7 @@ namespace Flee
 
         private void FindBetweenBranches(BranchInfo target, ICollection<BranchInfo> dest)
         {
-            myBranchInfos.Each(m =>
+            this.myBranchInfos.Each(m =>
             {
                 if (m.IsBetween(target))
                 {

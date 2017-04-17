@@ -1,39 +1,50 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-using Microsoft.VisualBasic.CompilerServices;
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
 namespace Flee
 {
+    using System;
+    using System.Collections;
+    using System.Diagnostics;
+    using System.Globalization;
     using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Text.RegularExpressions;
     using Extensions;
+    using Microsoft.VisualBasic.CompilerServices;
     using PerCederberg.Grammatica.Runtime;
 
     internal class FleeExpressionAnalyzer : ExpressionAnalyzer
     {
+        private bool myInUnaryNegate;
+
+        private Regex myRegularEscapeRegex;
         private IServiceProvider myServices;
 
         private Regex myUnicodeEscapeRegex;
-
-        private Regex myRegularEscapeRegex;
-
-        private bool myInUnaryNegate;
-
-        private ExpressionContext Context => (ExpressionContext)this.myServices.GetService(typeof(ExpressionContext));
-
-        internal FleeExpressionAnalyzer()
-        {
-        }
 
         public void SetServices(IServiceProvider services)
         {
             this.myServices = services;
             this.myUnicodeEscapeRegex = new Regex("\\\\u[0-9a-f]{4}", RegexOptions.IgnoreCase);
-            this.myRegularEscapeRegex = new Regex(string.Format("\\\\[\\\\{0}'trn]", this.Context.ParserOptions.StringQuote), RegexOptions.IgnoreCase);
+            this.myRegularEscapeRegex = new Regex(string.Format("\\\\[\\\\{0}'trn]", this.Context.ParserOptions.StringQuote),
+                RegexOptions.IgnoreCase);
         }
 
         public void Reset()
@@ -110,19 +121,19 @@ namespace Flee
         public override Node ExitNegateExpression(Production node)
         {
             IList childValues = this.GetChildValues(node);
-            var childElement = (ExpressionElement)childValues[childValues.Count - 1];
-            var flag = childElement.GetType() == typeof(Int32LiteralElement) & childValues.Count == 2;
+            var childElement = (ExpressionElement) childValues[childValues.Count - 1];
+            var flag = (childElement.GetType() == typeof(Int32LiteralElement)) & (childValues.Count == 2);
             if (flag)
             {
-                ((Int32LiteralElement)childElement).Negate();
+                ((Int32LiteralElement) childElement).Negate();
                 node.AddValue(childElement);
             }
             else
             {
-                var flag2 = childElement.GetType() == typeof(Int64LiteralElement) & childValues.Count == 2;
+                var flag2 = (childElement.GetType() == typeof(Int64LiteralElement)) & (childValues.Count == 2);
                 if (flag2)
                 {
-                    ((Int64LiteralElement)childElement).Negate();
+                    ((Int64LiteralElement) childElement).Negate();
                     node.AddValue(childElement);
                 }
                 else
@@ -175,7 +186,8 @@ namespace Flee
         public override Node ExitIfExpression(Production node)
         {
             IList childValues = this.GetChildValues(node);
-            var op = new ConditionalElement((ExpressionElement)childValues[0], (ExpressionElement)childValues[1], (ExpressionElement)childValues[2]);
+            var op = new ConditionalElement((ExpressionElement) childValues[0], (ExpressionElement) childValues[1],
+                (ExpressionElement) childValues[2]);
             node.AddValue(op);
             return node;
         }
@@ -192,14 +204,14 @@ namespace Flee
             }
             else
             {
-                var operand = (ExpressionElement)childValues[0];
+                var operand = (ExpressionElement) childValues[0];
                 childValues.RemoveAt(0);
                 var second = RuntimeHelpers.GetObjectValue(childValues[0]);
                 var flag2 = second is IList;
                 InElement op;
                 if (flag2)
                 {
-                    op = new InElement(operand, (IList)second);
+                    op = new InElement(operand, (IList) second);
                 }
                 else
                 {
@@ -228,9 +240,9 @@ namespace Flee
         public override Node ExitCastExpression(Production node)
         {
             IList childValues = this.GetChildValues(node);
-            var destTypeParts = (string[])childValues[1];
-            var isArray = (bool)childValues[2];
-            var op = new CastElement((ExpressionElement)childValues[0], destTypeParts, isArray, this.myServices);
+            var destTypeParts = (string[]) childValues[1];
+            var isArray = (bool) childValues[2];
+            var op = new CastElement((ExpressionElement) childValues[0], destTypeParts, isArray, this.myServices);
             node.AddValue(op);
             return node;
         }
@@ -276,7 +288,7 @@ namespace Flee
 
         public override Node ExitFieldPropertyExpression(Production node)
         {
-            var name = (string)node.GetChildAt(0).GetValue(0);
+            var name = (string) node.GetChildAt(0).GetValue(0);
             var elem = new IdentifierElement(name);
             node.AddValue(elem);
             return node;
@@ -285,7 +297,7 @@ namespace Flee
         public override Node ExitFunctionCallExpression(Production node)
         {
             IList childValues = this.GetChildValues(node);
-            var name = (string)childValues[0];
+            var name = (string) childValues[0];
             childValues.RemoveAt(0);
             var args = new ArgumentList(childValues);
             var funcCall = new FunctionCallElement(name, args);
@@ -323,8 +335,8 @@ namespace Flee
             var flag = childValues.Count == 2;
             if (flag)
             {
-                var element = (UnaryElement)Activator.CreateInstance(elementType);
-                element.SetChild((ExpressionElement)childValues[1]);
+                var element = (UnaryElement) Activator.CreateInstance(elementType);
+                element.SetChild((ExpressionElement) childValues[1]);
                 node.AddValue(element);
             }
             else
@@ -413,7 +425,7 @@ namespace Flee
 
         public override Node ExitDatetime(Token node)
         {
-            var context = (ExpressionContext)this.myServices.GetService(typeof(ExpressionContext));
+            var context = (ExpressionContext) this.myServices.GetService(typeof(ExpressionContext));
             var image = node.Image.Substring(1, node.Image.Length - 2);
             var element = new DateTimeLiteralElement(image, context);
             node.AddValue(element);
@@ -431,8 +443,8 @@ namespace Flee
         private string DoEscapes(string image)
         {
             image = image.Substring(1, image.Length - 2);
-            image = this.myUnicodeEscapeRegex.Replace(image, new MatchEvaluator(this.UnicodeEscapeMatcher));
-            image = this.myRegularEscapeRegex.Replace(image, new MatchEvaluator(this.RegularEscapeMatcher));
+            image = this.myUnicodeEscapeRegex.Replace(image, this.UnicodeEscapeMatcher);
+            image = this.myRegularEscapeRegex.Replace(image, this.RegularEscapeMatcher);
             return image;
         }
 
@@ -441,7 +453,9 @@ namespace Flee
             var s = m.Value;
             s = s.Remove(0, 1);
             var left = s;
-            var flag = Operators.CompareString(left, "\\", false) == 0 || Operators.CompareString(left, Conversions.ToString(this.Context.ParserOptions.StringQuote), false) == 0 || Operators.CompareString(left, "'", false) == 0;
+            var flag = Operators.CompareString(left, "\\", false) == 0 ||
+                Operators.CompareString(left, Conversions.ToString(this.Context.ParserOptions.StringQuote), false) == 0 ||
+                Operators.CompareString(left, "'", false) == 0;
             string regularEscapeMatcher;
             if (flag)
             {
@@ -449,21 +463,21 @@ namespace Flee
             }
             else
             {
-                flag = (Operators.CompareString(left, "t", false) == 0 || Operators.CompareString(left, "T", false) == 0);
+                flag = Operators.CompareString(left, "t", false) == 0 || Operators.CompareString(left, "T", false) == 0;
                 if (flag)
                 {
                     regularEscapeMatcher = Convert.ToChar(9).ToString();
                 }
                 else
                 {
-                    flag = (Operators.CompareString(left, "n", false) == 0 || Operators.CompareString(left, "N", false) == 0);
+                    flag = Operators.CompareString(left, "n", false) == 0 || Operators.CompareString(left, "N", false) == 0;
                     if (flag)
                     {
                         regularEscapeMatcher = Convert.ToChar(10).ToString();
                     }
                     else
                     {
-                        flag = (Operators.CompareString(left, "r", false) == 0 || Operators.CompareString(left, "R", false) == 0);
+                        flag = Operators.CompareString(left, "r", false) == 0 || Operators.CompareString(left, "R", false) == 0;
                         if (flag)
                         {
                             regularEscapeMatcher = Convert.ToChar(13).ToString();
@@ -616,7 +630,9 @@ namespace Flee
         public override void Child(Production node, Node child)
         {
             base.Child(node, child);
-            this.myInUnaryNegate = (node.Id == 2014 & child.Id == 1002);
+            this.myInUnaryNegate = (node.Id == 2014) & (child.Id == 1002);
         }
+
+        private ExpressionContext Context => (ExpressionContext) this.myServices.GetService(typeof(ExpressionContext));
     }
 }

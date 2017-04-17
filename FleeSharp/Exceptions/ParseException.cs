@@ -1,3 +1,22 @@
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
+
 namespace Flee.Exceptions
 {
     using System;
@@ -21,98 +40,40 @@ namespace Flee.Exceptions
             Analysis
         }
 
-        private readonly ErrorType errorType;
-
-        private readonly string info;
-
         private readonly List<string> details;
 
-        private readonly int line;
-
-        private readonly int column;
-
-        public ErrorType Type => this.errorType;
-
-        public string Info => this.info;
-
-        public ICollection<string> Details => new List<string>(this.details);
-
-        public int Line => this.line;
-
-        public int Column => this.column;
-
-        public override string Message
-        {
-            get
-            {
-                var buffer = new StringBuilder();
-                buffer.AppendLine(this.ErrorMessage);
-                var flag = this.line > 0 && this.column > 0;
-                if (flag)
-                {
-                    var msg = FleeResourceManager.Instance.GetCompileErrorString("LineColumn");
-                    msg = string.Format(msg, this.line, this.column);
-                    buffer.AppendLine(msg);
-                }
-                return buffer.ToString();
-            }
-        }
-
-        public string ErrorMessage
-        {
-            get
-            {
-                var args = new List<string>();
-
-                switch (this.errorType)
-                {
-                    case ErrorType.Internal:
-                    case ErrorType.Io:
-                    case ErrorType.UnexpectedChar:
-                    case ErrorType.InvalidToken:
-                    case ErrorType.Analysis:
-                        args.Add(this.info);
-                        break;
-                    case ErrorType.UnexpectedToken:
-                        args.Add(this.info);
-                        args.Add(this.GetMessageDetails());
-                        break;
-                }
-                var msg = FleeResourceManager.Instance.GetCompileErrorString(this.errorType.ToString());
-                return string.Format(msg, args);
-            }
-        }
-
-        public ParseException(ErrorType type, string info, int line, int column) : this(type, info, null, line, column)
+        public ParseException(ErrorType type, string info, int line, int column)
+            : this(type, info, null, line, column)
         {
         }
 
         public ParseException(ErrorType type, string info, IEnumerable<string> details, int line, int column)
         {
-            this.errorType = type;
-            this.info = info;
+            this.Type = type;
+            this.Info = info;
             this.details = details.ToList();
-            this.line = line;
-            this.column = column;
+            this.Line = line;
+            this.Column = column;
         }
 
-        private ParseException(SerializationInfo info, StreamingContext context) : base(info, context)
+        private ParseException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
-            this.errorType = (ErrorType)info.GetInt32("Type");
-            this.info = info.GetString("Info");
-            this.details = (List<string>)info.GetValue("Details", typeof(List<string>));
-            this.line = info.GetInt32("Line");
-            this.column = info.GetInt32("Column");
+            this.Type = (ErrorType) info.GetInt32("Type");
+            this.Info = info.GetString("Info");
+            this.details = (List<string>) info.GetValue("Details", typeof(List<string>));
+            this.Line = info.GetInt32("Line");
+            this.Column = info.GetInt32("Column");
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
-            info.AddValue("Type", (int)this.errorType);
-            info.AddValue("Info", this.info);
+            info.AddValue("Type", (int) this.Type);
+            info.AddValue("Info", this.Info);
             info.AddValue("Details", this.details);
-            info.AddValue("Line", this.line);
-            info.AddValue("Column", this.column);
+            info.AddValue("Line", this.Line);
+            info.AddValue("Column", this.Column);
         }
 
         public ErrorType GetErrorType()
@@ -137,7 +98,7 @@ namespace Flee.Exceptions
 
         public int GetColumn()
         {
-            return this.column;
+            return this.Column;
         }
 
         public string GetMessage()
@@ -170,5 +131,57 @@ namespace Flee.Exceptions
             }
             return buffer.ToString();
         }
+
+        public int Column { get; }
+
+        public ICollection<string> Details => new List<string>(this.details);
+
+        public string ErrorMessage
+        {
+            get
+            {
+                var args = new List<string>();
+
+                switch (this.Type)
+                {
+                    case ErrorType.Internal:
+                    case ErrorType.Io:
+                    case ErrorType.UnexpectedChar:
+                    case ErrorType.InvalidToken:
+                    case ErrorType.Analysis:
+                        args.Add(this.Info);
+                        break;
+                    case ErrorType.UnexpectedToken:
+                        args.Add(this.Info);
+                        args.Add(this.GetMessageDetails());
+                        break;
+                }
+                var msg = FleeResourceManager.Instance.GetCompileErrorString(this.Type.ToString());
+                return string.Format(msg, args);
+            }
+        }
+
+        public string Info { get; }
+
+        public int Line { get; }
+
+        public override string Message
+        {
+            get
+            {
+                var buffer = new StringBuilder();
+                buffer.AppendLine(this.ErrorMessage);
+                var flag = this.Line > 0 && this.Column > 0;
+                if (flag)
+                {
+                    var msg = FleeResourceManager.Instance.GetCompileErrorString("LineColumn");
+                    msg = string.Format(msg, this.Line, this.Column);
+                    buffer.AppendLine(msg);
+                }
+                return buffer.ToString();
+            }
+        }
+
+        public ErrorType Type { get; }
     }
 }

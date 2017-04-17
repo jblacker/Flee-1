@@ -1,3 +1,22 @@
+// ' This library is free software; you can redistribute it and/or
+// ' modify it under the terms of the GNU Lesser General Public License
+// ' as published by the Free Software Foundation; either version 2.1
+// ' of the License, or (at your option) any later version.
+// ' 
+// ' This library is distributed in the hope that it will be useful,
+// ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+// ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// ' Lesser General Public License for more details.
+// ' 
+// ' You should have received a copy of the GNU Lesser General Public
+// ' License along with this library; if not, write to the Free
+// ' Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// ' MA 02111-1307, USA.
+// ' 
+// ' Flee - Fast Lightweight Expression Evaluator
+// ' Copyright © 2007 Eugene Ciloci
+// ' Updated to .net 4.6 Copyright 2017 Steven Hoff
+
 namespace Flee
 {
     using PerCederberg.Grammatica.Runtime;
@@ -6,217 +25,217 @@ namespace Flee
     {
         public override void Enter(Node node)
         {
-            int id = node.Id;
+            var id = node.Id;
             switch (id)
             {
                 case 1001:
-                    this.EnterAdd((Token)node);
+                    this.EnterAdd((Token) node);
                     break;
                 case 1002:
-                    this.EnterSub((Token)node);
+                    this.EnterSub((Token) node);
                     break;
                 case 1003:
-                    this.EnterMul((Token)node);
+                    this.EnterMul((Token) node);
                     break;
                 case 1004:
-                    this.EnterDiv((Token)node);
+                    this.EnterDiv((Token) node);
                     break;
                 case 1005:
-                    this.EnterPower((Token)node);
+                    this.EnterPower((Token) node);
                     break;
                 case 1006:
-                    this.EnterMod((Token)node);
+                    this.EnterMod((Token) node);
                     break;
                 case 1007:
-                    this.EnterLeftParen((Token)node);
+                    this.EnterLeftParen((Token) node);
                     break;
                 case 1008:
-                    this.EnterRightParen((Token)node);
+                    this.EnterRightParen((Token) node);
                     break;
                 case 1009:
-                    this.EnterLeftBrace((Token)node);
+                    this.EnterLeftBrace((Token) node);
                     break;
                 case 1010:
-                    this.EnterRightBrace((Token)node);
+                    this.EnterRightBrace((Token) node);
                     break;
                 case 1011:
-                    this.EnterEq((Token)node);
+                    this.EnterEq((Token) node);
                     break;
                 case 1012:
-                    this.EnterLt((Token)node);
+                    this.EnterLt((Token) node);
                     break;
                 case 1013:
-                    this.EnterGt((Token)node);
+                    this.EnterGt((Token) node);
                     break;
                 case 1014:
-                    this.EnterLte((Token)node);
+                    this.EnterLte((Token) node);
                     break;
                 case 1015:
-                    this.EnterGte((Token)node);
+                    this.EnterGte((Token) node);
                     break;
                 case 1016:
-                    this.EnterNe((Token)node);
+                    this.EnterNe((Token) node);
                     break;
                 case 1017:
-                    this.EnterAnd((Token)node);
+                    this.EnterAnd((Token) node);
                     break;
                 case 1018:
-                    this.EnterOr((Token)node);
+                    this.EnterOr((Token) node);
                     break;
                 case 1019:
-                    this.EnterXor((Token)node);
+                    this.EnterXor((Token) node);
                     break;
                 case 1020:
-                    this.EnterNot((Token)node);
+                    this.EnterNot((Token) node);
                     break;
                 case 1021:
-                    this.EnterIn((Token)node);
+                    this.EnterIn((Token) node);
                     break;
                 case 1022:
-                    this.EnterDot((Token)node);
+                    this.EnterDot((Token) node);
                     break;
                 case 1023:
-                    this.EnterArgumentSeparator((Token)node);
+                    this.EnterArgumentSeparator((Token) node);
                     break;
                 case 1024:
-                    this.EnterArrayBraces((Token)node);
+                    this.EnterArrayBraces((Token) node);
                     break;
                 case 1025:
-                    this.EnterLeftShift((Token)node);
+                    this.EnterLeftShift((Token) node);
                     break;
                 case 1026:
-                    this.EnterRightShift((Token)node);
+                    this.EnterRightShift((Token) node);
                     break;
                 case 1027:
                     break;
                 case 1028:
-                    this.EnterInteger((Token)node);
+                    this.EnterInteger((Token) node);
                     break;
                 case 1029:
-                    this.EnterReal((Token)node);
+                    this.EnterReal((Token) node);
                     break;
                 case 1030:
-                    this.EnterStringLiteral((Token)node);
+                    this.EnterStringLiteral((Token) node);
                     break;
                 case 1031:
-                    this.EnterCharLiteral((Token)node);
+                    this.EnterCharLiteral((Token) node);
                     break;
                 case 1032:
-                    this.EnterTrue((Token)node);
+                    this.EnterTrue((Token) node);
                     break;
                 case 1033:
-                    this.EnterFalse((Token)node);
+                    this.EnterFalse((Token) node);
                     break;
                 case 1034:
-                    this.EnterIdentifier((Token)node);
+                    this.EnterIdentifier((Token) node);
                     break;
                 case 1035:
-                    this.EnterHexLiteral((Token)node);
+                    this.EnterHexLiteral((Token) node);
                     break;
                 case 1036:
-                    this.EnterNullLiteral((Token)node);
+                    this.EnterNullLiteral((Token) node);
                     break;
                 case 1037:
-                    this.EnterTimespan((Token)node);
+                    this.EnterTimespan((Token) node);
                     break;
                 case 1038:
-                    this.EnterDatetime((Token)node);
+                    this.EnterDatetime((Token) node);
                     break;
                 case 1039:
-                    this.EnterIf((Token)node);
+                    this.EnterIf((Token) node);
                     break;
                 case 1040:
-                    this.EnterCast((Token)node);
+                    this.EnterCast((Token) node);
                     break;
                 default:
                     switch (id)
                     {
                         case 2001:
-                            this.EnterExpression((Production)node);
+                            this.EnterExpression((Production) node);
                             break;
                         case 2002:
-                            this.EnterXorExpression((Production)node);
+                            this.EnterXorExpression((Production) node);
                             break;
                         case 2003:
-                            this.EnterOrExpression((Production)node);
+                            this.EnterOrExpression((Production) node);
                             break;
                         case 2004:
-                            this.EnterAndExpression((Production)node);
+                            this.EnterAndExpression((Production) node);
                             break;
                         case 2005:
-                            this.EnterNotExpression((Production)node);
+                            this.EnterNotExpression((Production) node);
                             break;
                         case 2006:
-                            this.EnterInExpression((Production)node);
+                            this.EnterInExpression((Production) node);
                             break;
                         case 2007:
-                            this.EnterInTargetExpression((Production)node);
+                            this.EnterInTargetExpression((Production) node);
                             break;
                         case 2008:
-                            this.EnterInListTargetExpression((Production)node);
+                            this.EnterInListTargetExpression((Production) node);
                             break;
                         case 2009:
-                            this.EnterCompareExpression((Production)node);
+                            this.EnterCompareExpression((Production) node);
                             break;
                         case 2010:
-                            this.EnterShiftExpression((Production)node);
+                            this.EnterShiftExpression((Production) node);
                             break;
                         case 2011:
-                            this.EnterAdditiveExpression((Production)node);
+                            this.EnterAdditiveExpression((Production) node);
                             break;
                         case 2012:
-                            this.EnterMultiplicativeExpression((Production)node);
+                            this.EnterMultiplicativeExpression((Production) node);
                             break;
                         case 2013:
-                            this.EnterPowerExpression((Production)node);
+                            this.EnterPowerExpression((Production) node);
                             break;
                         case 2014:
-                            this.EnterNegateExpression((Production)node);
+                            this.EnterNegateExpression((Production) node);
                             break;
                         case 2015:
-                            this.EnterMemberExpression((Production)node);
+                            this.EnterMemberExpression((Production) node);
                             break;
                         case 2016:
-                            this.EnterMemberAccessExpression((Production)node);
+                            this.EnterMemberAccessExpression((Production) node);
                             break;
                         case 2017:
-                            this.EnterBasicExpression((Production)node);
+                            this.EnterBasicExpression((Production) node);
                             break;
                         case 2018:
-                            this.EnterMemberFunctionExpression((Production)node);
+                            this.EnterMemberFunctionExpression((Production) node);
                             break;
                         case 2019:
-                            this.EnterFieldPropertyExpression((Production)node);
+                            this.EnterFieldPropertyExpression((Production) node);
                             break;
                         case 2020:
-                            this.EnterSpecialFunctionExpression((Production)node);
+                            this.EnterSpecialFunctionExpression((Production) node);
                             break;
                         case 2021:
-                            this.EnterIfExpression((Production)node);
+                            this.EnterIfExpression((Production) node);
                             break;
                         case 2022:
-                            this.EnterCastExpression((Production)node);
+                            this.EnterCastExpression((Production) node);
                             break;
                         case 2023:
-                            this.EnterCastTypeExpression((Production)node);
+                            this.EnterCastTypeExpression((Production) node);
                             break;
                         case 2024:
-                            this.EnterIndexExpression((Production)node);
+                            this.EnterIndexExpression((Production) node);
                             break;
                         case 2025:
-                            this.EnterFunctionCallExpression((Production)node);
+                            this.EnterFunctionCallExpression((Production) node);
                             break;
                         case 2026:
-                            this.EnterArgumentList((Production)node);
+                            this.EnterArgumentList((Production) node);
                             break;
                         case 2027:
-                            this.EnterLiteralExpression((Production)node);
+                            this.EnterLiteralExpression((Production) node);
                             break;
                         case 2028:
-                            this.EnterBooleanLiteralExpression((Production)node);
+                            this.EnterBooleanLiteralExpression((Production) node);
                             break;
                         case 2029:
-                            this.EnterExpressionGroup((Production)node);
+                            this.EnterExpressionGroup((Production) node);
                             break;
                     }
                     break;
@@ -225,218 +244,218 @@ namespace Flee
 
         public override Node Exit(Node node)
         {
-            int id = node.Id;
+            var id = node.Id;
             Node exitNode;
             switch (id)
             {
                 case 1001:
-                    exitNode = this.ExitAdd((Token)node);
+                    exitNode = this.ExitAdd((Token) node);
                     return exitNode;
                 case 1002:
-                    exitNode = this.ExitSub((Token)node);
+                    exitNode = this.ExitSub((Token) node);
                     return exitNode;
                 case 1003:
-                    exitNode = this.ExitMul((Token)node);
+                    exitNode = this.ExitMul((Token) node);
                     return exitNode;
                 case 1004:
-                    exitNode = this.ExitDiv((Token)node);
+                    exitNode = this.ExitDiv((Token) node);
                     return exitNode;
                 case 1005:
-                    exitNode = this.ExitPower((Token)node);
+                    exitNode = this.ExitPower((Token) node);
                     return exitNode;
                 case 1006:
-                    exitNode = this.ExitMod((Token)node);
+                    exitNode = this.ExitMod((Token) node);
                     return exitNode;
                 case 1007:
-                    exitNode = this.ExitLeftParen((Token)node);
+                    exitNode = this.ExitLeftParen((Token) node);
                     return exitNode;
                 case 1008:
-                    exitNode = this.ExitRightParen((Token)node);
+                    exitNode = this.ExitRightParen((Token) node);
                     return exitNode;
                 case 1009:
-                    exitNode = this.ExitLeftBrace((Token)node);
+                    exitNode = this.ExitLeftBrace((Token) node);
                     return exitNode;
                 case 1010:
-                    exitNode = this.ExitRightBrace((Token)node);
+                    exitNode = this.ExitRightBrace((Token) node);
                     return exitNode;
                 case 1011:
-                    exitNode = this.ExitEq((Token)node);
+                    exitNode = this.ExitEq((Token) node);
                     return exitNode;
                 case 1012:
-                    exitNode = this.ExitLt((Token)node);
+                    exitNode = this.ExitLt((Token) node);
                     return exitNode;
                 case 1013:
-                    exitNode = this.ExitGt((Token)node);
+                    exitNode = this.ExitGt((Token) node);
                     return exitNode;
                 case 1014:
-                    exitNode = this.ExitLte((Token)node);
+                    exitNode = this.ExitLte((Token) node);
                     return exitNode;
                 case 1015:
-                    exitNode = this.ExitGte((Token)node);
+                    exitNode = this.ExitGte((Token) node);
                     return exitNode;
                 case 1016:
-                    exitNode = this.ExitNe((Token)node);
+                    exitNode = this.ExitNe((Token) node);
                     return exitNode;
                 case 1017:
-                    exitNode = this.ExitAnd((Token)node);
+                    exitNode = this.ExitAnd((Token) node);
                     return exitNode;
                 case 1018:
-                    exitNode = this.ExitOr((Token)node);
+                    exitNode = this.ExitOr((Token) node);
                     return exitNode;
                 case 1019:
-                    exitNode = this.ExitXor((Token)node);
+                    exitNode = this.ExitXor((Token) node);
                     return exitNode;
                 case 1020:
-                    exitNode = this.ExitNot((Token)node);
+                    exitNode = this.ExitNot((Token) node);
                     return exitNode;
                 case 1021:
-                    exitNode = this.ExitIn((Token)node);
+                    exitNode = this.ExitIn((Token) node);
                     return exitNode;
                 case 1022:
-                    exitNode = this.ExitDot((Token)node);
+                    exitNode = this.ExitDot((Token) node);
                     return exitNode;
                 case 1023:
-                    exitNode = this.ExitArgumentSeparator((Token)node);
+                    exitNode = this.ExitArgumentSeparator((Token) node);
                     return exitNode;
                 case 1024:
-                    exitNode = this.ExitArrayBraces((Token)node);
+                    exitNode = this.ExitArrayBraces((Token) node);
                     return exitNode;
                 case 1025:
-                    exitNode = this.ExitLeftShift((Token)node);
+                    exitNode = this.ExitLeftShift((Token) node);
                     return exitNode;
                 case 1026:
-                    exitNode = this.ExitRightShift((Token)node);
+                    exitNode = this.ExitRightShift((Token) node);
                     return exitNode;
                 case 1027:
                     break;
                 case 1028:
-                    exitNode = this.ExitInteger((Token)node);
+                    exitNode = this.ExitInteger((Token) node);
                     return exitNode;
                 case 1029:
-                    exitNode = this.ExitReal((Token)node);
+                    exitNode = this.ExitReal((Token) node);
                     return exitNode;
                 case 1030:
-                    exitNode = this.ExitStringLiteral((Token)node);
+                    exitNode = this.ExitStringLiteral((Token) node);
                     return exitNode;
                 case 1031:
-                    exitNode = this.ExitCharLiteral((Token)node);
+                    exitNode = this.ExitCharLiteral((Token) node);
                     return exitNode;
                 case 1032:
-                    exitNode = this.ExitTrue((Token)node);
+                    exitNode = this.ExitTrue((Token) node);
                     return exitNode;
                 case 1033:
-                    exitNode = this.ExitFalse((Token)node);
+                    exitNode = this.ExitFalse((Token) node);
                     return exitNode;
                 case 1034:
-                    exitNode = this.ExitIdentifier((Token)node);
+                    exitNode = this.ExitIdentifier((Token) node);
                     return exitNode;
                 case 1035:
-                    exitNode = this.ExitHexLiteral((Token)node);
+                    exitNode = this.ExitHexLiteral((Token) node);
                     return exitNode;
                 case 1036:
-                    exitNode = this.ExitNullLiteral((Token)node);
+                    exitNode = this.ExitNullLiteral((Token) node);
                     return exitNode;
                 case 1037:
-                    exitNode = this.ExitTimespan((Token)node);
+                    exitNode = this.ExitTimespan((Token) node);
                     return exitNode;
                 case 1038:
-                    exitNode = this.ExitDatetime((Token)node);
+                    exitNode = this.ExitDatetime((Token) node);
                     return exitNode;
                 case 1039:
-                    exitNode = this.ExitIf((Token)node);
+                    exitNode = this.ExitIf((Token) node);
                     return exitNode;
                 case 1040:
-                    exitNode = this.ExitCast((Token)node);
+                    exitNode = this.ExitCast((Token) node);
                     return exitNode;
                 default:
                     switch (id)
                     {
                         case 2001:
-                            exitNode = this.ExitExpression((Production)node);
+                            exitNode = this.ExitExpression((Production) node);
                             return exitNode;
                         case 2002:
-                            exitNode = this.ExitXorExpression((Production)node);
+                            exitNode = this.ExitXorExpression((Production) node);
                             return exitNode;
                         case 2003:
-                            exitNode = this.ExitOrExpression((Production)node);
+                            exitNode = this.ExitOrExpression((Production) node);
                             return exitNode;
                         case 2004:
-                            exitNode = this.ExitAndExpression((Production)node);
+                            exitNode = this.ExitAndExpression((Production) node);
                             return exitNode;
                         case 2005:
-                            exitNode = this.ExitNotExpression((Production)node);
+                            exitNode = this.ExitNotExpression((Production) node);
                             return exitNode;
                         case 2006:
-                            exitNode = this.ExitInExpression((Production)node);
+                            exitNode = this.ExitInExpression((Production) node);
                             return exitNode;
                         case 2007:
-                            exitNode = this.ExitInTargetExpression((Production)node);
+                            exitNode = this.ExitInTargetExpression((Production) node);
                             return exitNode;
                         case 2008:
-                            exitNode = this.ExitInListTargetExpression((Production)node);
+                            exitNode = this.ExitInListTargetExpression((Production) node);
                             return exitNode;
                         case 2009:
-                            exitNode = this.ExitCompareExpression((Production)node);
+                            exitNode = this.ExitCompareExpression((Production) node);
                             return exitNode;
                         case 2010:
-                            exitNode = this.ExitShiftExpression((Production)node);
+                            exitNode = this.ExitShiftExpression((Production) node);
                             return exitNode;
                         case 2011:
-                            exitNode = this.ExitAdditiveExpression((Production)node);
+                            exitNode = this.ExitAdditiveExpression((Production) node);
                             return exitNode;
                         case 2012:
-                            exitNode = this.ExitMultiplicativeExpression((Production)node);
+                            exitNode = this.ExitMultiplicativeExpression((Production) node);
                             return exitNode;
                         case 2013:
-                            exitNode = this.ExitPowerExpression((Production)node);
+                            exitNode = this.ExitPowerExpression((Production) node);
                             return exitNode;
                         case 2014:
-                            exitNode = this.ExitNegateExpression((Production)node);
+                            exitNode = this.ExitNegateExpression((Production) node);
                             return exitNode;
                         case 2015:
-                            exitNode = this.ExitMemberExpression((Production)node);
+                            exitNode = this.ExitMemberExpression((Production) node);
                             return exitNode;
                         case 2016:
-                            exitNode = this.ExitMemberAccessExpression((Production)node);
+                            exitNode = this.ExitMemberAccessExpression((Production) node);
                             return exitNode;
                         case 2017:
-                            exitNode = this.ExitBasicExpression((Production)node);
+                            exitNode = this.ExitBasicExpression((Production) node);
                             return exitNode;
                         case 2018:
-                            exitNode = this.ExitMemberFunctionExpression((Production)node);
+                            exitNode = this.ExitMemberFunctionExpression((Production) node);
                             return exitNode;
                         case 2019:
-                            exitNode = this.ExitFieldPropertyExpression((Production)node);
+                            exitNode = this.ExitFieldPropertyExpression((Production) node);
                             return exitNode;
                         case 2020:
-                            exitNode = this.ExitSpecialFunctionExpression((Production)node);
+                            exitNode = this.ExitSpecialFunctionExpression((Production) node);
                             return exitNode;
                         case 2021:
-                            exitNode = this.ExitIfExpression((Production)node);
+                            exitNode = this.ExitIfExpression((Production) node);
                             return exitNode;
                         case 2022:
-                            exitNode = this.ExitCastExpression((Production)node);
+                            exitNode = this.ExitCastExpression((Production) node);
                             return exitNode;
                         case 2023:
-                            exitNode = this.ExitCastTypeExpression((Production)node);
+                            exitNode = this.ExitCastTypeExpression((Production) node);
                             return exitNode;
                         case 2024:
-                            exitNode = this.ExitIndexExpression((Production)node);
+                            exitNode = this.ExitIndexExpression((Production) node);
                             return exitNode;
                         case 2025:
-                            exitNode = this.ExitFunctionCallExpression((Production)node);
+                            exitNode = this.ExitFunctionCallExpression((Production) node);
                             return exitNode;
                         case 2026:
-                            exitNode = this.ExitArgumentList((Production)node);
+                            exitNode = this.ExitArgumentList((Production) node);
                             return exitNode;
                         case 2027:
-                            exitNode = this.ExitLiteralExpression((Production)node);
+                            exitNode = this.ExitLiteralExpression((Production) node);
                             return exitNode;
                         case 2028:
-                            exitNode = this.ExitBooleanLiteralExpression((Production)node);
+                            exitNode = this.ExitBooleanLiteralExpression((Production) node);
                             return exitNode;
                         case 2029:
-                            exitNode = this.ExitExpressionGroup((Production)node);
+                            exitNode = this.ExitExpressionGroup((Production) node);
                             return exitNode;
                     }
                     break;
