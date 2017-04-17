@@ -1,44 +1,34 @@
-using System;
-using System.Reflection;
-using System.Reflection.Emit;
-
 namespace Flee
 {
+    using System;
+    using System.Reflection.Emit;
+
     internal class TimeSpanLiteralElement : LiteralElement
     {
-        private TimeSpan MyValue;
-
-        public override Type ResultType
-        {
-            get
-            {
-                return typeof(TimeSpan);
-            }
-        }
+        private TimeSpan myValue;
 
         public TimeSpanLiteralElement(string image)
         {
-            bool flag = !TimeSpan.TryParse(image, out this.MyValue);
+            var flag = !TimeSpan.TryParse(image, out this.myValue);
             if (flag)
             {
-                this.ThrowCompileException("CannotParseType", CompileExceptionReason.InvalidFormat, new object[]
-                {
-                    typeof(TimeSpan).Name
-                });
+                this.ThrowCompileException("CannotParseType", CompileExceptionReason.InvalidFormat, typeof(TimeSpan).Name);
             }
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
-            int index = ilg.GetTempLocalIndex(typeof(TimeSpan));
+            var index = ilg.GetTempLocalIndex(typeof(TimeSpan));
             Utility.EmitLoadLocalAddress(ilg, index);
-            EmitLoad(this.MyValue.Ticks, ilg);
-            ConstructorInfo ci = typeof(TimeSpan).GetConstructor(new Type[]
+            EmitLoad(this.myValue.Ticks, ilg);
+            var ci = typeof(TimeSpan).GetConstructor(new[]
             {
                 typeof(long)
             });
             ilg.Emit(OpCodes.Call, ci);
             Utility.EmitLoadLocal(ilg, index);
         }
+
+        public override Type ResultType => typeof(TimeSpan);
     }
 }

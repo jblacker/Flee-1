@@ -25,7 +25,7 @@ namespace Flee
         }
 
 
-        public abstract void Emit(FleeILGenerator ilg, IServiceProvider services);
+        public abstract void Emit(FleeIlGenerator ilg, IServiceProvider services);
 
         public override string ToString()
         {
@@ -50,10 +50,10 @@ namespace Flee
             });
         }
 
-        protected FleeILGenerator CreateTempFleeIlGenerator(FleeILGenerator ilgCurrent)
+        protected FleeIlGenerator CreateTempFleeIlGenerator(FleeIlGenerator ilgCurrent)
         {
             var dm = new DynamicMethod("temp", typeof(int), null, this.GetType());
-            return new FleeILGenerator(dm.GetILGenerator(), ilgCurrent.Length, true);
+            return new FleeIlGenerator(dm.GetILGenerator(), ilgCurrent.Length, true);
         }
     }
 }

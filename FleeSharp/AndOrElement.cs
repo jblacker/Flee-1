@@ -36,7 +36,7 @@ namespace Flee
             return getResultType;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             var resultType = this.ResultType;
             var flag = resultType == typeof(bool);
@@ -54,7 +54,7 @@ namespace Flee
             }
         }
 
-        private static void EmitBitwiseOperation(FleeILGenerator ilg, AndOrOperation op)
+        private static void EmitBitwiseOperation(FleeIlGenerator ilg, AndOrOperation op)
         {
             if (op != AndOrOperation.And)
             {
@@ -73,7 +73,7 @@ namespace Flee
             }
         }
 
-        private void DoEmitLogical(FleeILGenerator ilg, IServiceProvider services)
+        private void DoEmitLogical(FleeIlGenerator ilg, IServiceProvider services)
         {
             var info = new ShortCircuitInfo();
             var ilgTemp = this.CreateTempFleeIlGenerator(ilg);
@@ -85,7 +85,7 @@ namespace Flee
             this.EmitLogical(ilg, info, services);
         }
 
-        private void EmitLogical(FleeILGenerator ilg, ShortCircuitInfo info, IServiceProvider services)
+        private void EmitLogical(FleeIlGenerator ilg, ShortCircuitInfo info, IServiceProvider services)
         {
             info.Branches.GetLabel(RuntimeHelpers.GetObjectValue(ourEndLabelKey), ilg);
             this.PopulateData(info);
@@ -98,7 +98,7 @@ namespace Flee
             ilg.MarkLabel(endLabel);
         }
 
-        private static void EmitLogicalShortCircuit(FleeILGenerator ilg, ShortCircuitInfo info, IServiceProvider services)
+        private static void EmitLogicalShortCircuit(FleeIlGenerator ilg, ShortCircuitInfo info, IServiceProvider services)
         {
             while (info.Operators.Count != 0)
             {
@@ -110,7 +110,7 @@ namespace Flee
             }
         }
 
-        private static void EmitBranch(AndOrElement op, FleeILGenerator ilg, Label target, ShortCircuitInfo info)
+        private static void EmitBranch(AndOrElement op, FleeIlGenerator ilg, Label target, ShortCircuitInfo info)
         {
             var isTemp = ilg.IsTemp;
             if (isTemp)
@@ -146,7 +146,7 @@ namespace Flee
             return getBranchOpcode;
         }
 
-        private static Label GetShortCircuitLabel(AndOrElement current, ShortCircuitInfo info, FleeILGenerator ilg)
+        private static Label GetShortCircuitLabel(AndOrElement current, ShortCircuitInfo info, FleeIlGenerator ilg)
         {
             var cloneOperands = (Stack)info.Operands.Clone();
             var cloneOperators = (Stack)info.Operators.Clone();
@@ -213,7 +213,7 @@ namespace Flee
             }
         }
 
-        private static void EmitOperand(ExpressionElement operand, ShortCircuitInfo info, FleeILGenerator ilg, IServiceProvider services)
+        private static void EmitOperand(ExpressionElement operand, ShortCircuitInfo info, FleeIlGenerator ilg, IServiceProvider services)
         {
             var flag = info.Branches.HasLabel(operand);
             if (flag)
@@ -225,7 +225,7 @@ namespace Flee
             operand.Emit(ilg, services);
         }
 
-        private static void EmitTerminals(ShortCircuitInfo info, FleeILGenerator ilg, Label endLabel)
+        private static void EmitTerminals(ShortCircuitInfo info, FleeIlGenerator ilg, Label endLabel)
         {
             var flag = info.Branches.HasLabel(RuntimeHelpers.GetObjectValue(ourFalseTerminalKey));
             if (flag)
@@ -250,7 +250,7 @@ namespace Flee
             }
         }
 
-        private static void MarkBranchTarget(ShortCircuitInfo info, Label target, FleeILGenerator ilg)
+        private static void MarkBranchTarget(ShortCircuitInfo info, Label target, FleeIlGenerator ilg)
         {
             var isTemp = ilg.IsTemp;
             if (isTemp)
@@ -259,7 +259,7 @@ namespace Flee
             }
         }
 
-        private static Label GetLabel(object key, FleeILGenerator ilg, ShortCircuitInfo info)
+        private static Label GetLabel(object key, FleeIlGenerator ilg, ShortCircuitInfo info)
         {
             return info.Branches.GetLabel(RuntimeHelpers.GetObjectValue(key), ilg);
         }

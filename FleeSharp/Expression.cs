@@ -75,7 +75,7 @@ namespace Flee
 
             var dm = this.CreateDynamicMethod();
 
-            var ilg = new FleeILGenerator(dm.GetILGenerator());
+            var ilg = new FleeIlGenerator(dm.GetILGenerator());
 
             // Emit the IL
             rootElement.Emit(ilg, services);
@@ -126,7 +126,7 @@ namespace Flee
             typeof(ExpressionContext),
             typeof(VariableCollection)
         });
-            var ilg = new FleeILGenerator(mb.GetILGenerator());
+            var ilg = new FleeIlGenerator(mb.GetILGenerator());
 
             rootElement.Emit(ilg, services);
 

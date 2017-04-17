@@ -5,44 +5,28 @@ namespace Flee
 {
     public class InvokeFunctionEventArgs : EventArgs
     {
-        private string MyName;
+        private object myFunctionResult;
 
-        private object[] MyArguments;
+        public string FunctionName { get; set; }
 
-        private object MyFunctionResult;
-
-        public string FunctionName
-        {
-            get
-            {
-                return this.MyName;
-            }
-        }
-
-        public object[] Arguments
-        {
-            get
-            {
-                return this.MyArguments;
-            }
-        }
+        public object[] Arguments { get; set; }
 
         public object Result
         {
             get
             {
-                return this.MyFunctionResult;
+                return this.myFunctionResult;
             }
             set
             {
-                this.MyFunctionResult = RuntimeHelpers.GetObjectValue(value);
+                this.myFunctionResult = RuntimeHelpers.GetObjectValue(value);
             }
         }
 
         internal InvokeFunctionEventArgs(string name, object[] arguments)
         {
-            this.MyName = name;
-            this.MyArguments = arguments;
+            this.FunctionName = name;
+            this.Arguments = arguments;
         }
     }
 }

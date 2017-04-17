@@ -7,59 +7,31 @@ namespace Flee
 {
     internal class IndexerElement : MemberElement
     {
-        private ExpressionElement MyIndexerElement;
+        private ExpressionElement myIndexerElement;
 
-        private ArgumentList MyIndexerElements;
+        private readonly ArgumentList myIndexerElements;
 
         private Type ArrayType
         {
             get
             {
-                bool isArray = this.IsArray;
-                Type ArrayType;
-                if (isArray)
-                {
-                    ArrayType = this.MyPrevious.TargetType;
-                }
-                else
-                {
-                    ArrayType = null;
-                }
-                return ArrayType;
+                var isArray = this.IsArray;
+                var arrayType = isArray ? this.myPrevious.TargetType : null;
+                return arrayType;
             }
         }
 
-        private bool IsArray
-        {
-            get
-            {
-                return this.MyPrevious.TargetType.IsArray;
-            }
-        }
+        private bool IsArray => this.myPrevious.TargetType.IsArray;
 
-        protected override bool RequiresAddress
-        {
-            get
-            {
-                return !this.IsArray;
-            }
-        }
+        protected override bool RequiresAddress => !this.IsArray;
 
         public override Type ResultType
         {
             get
             {
-                bool isArray = this.IsArray;
-                Type ResultType;
-                if (isArray)
-                {
-                    ResultType = this.ArrayType.GetElementType();
-                }
-                else
-                {
-                    ResultType = this.MyIndexerElement.ResultType;
-                }
-                return ResultType;
+                var isArray = this.IsArray;
+                var resultType = isArray ? this.ArrayType.GetElementType() : this.myIndexerElement.ResultType;
+                return resultType;
             }
         }
 
@@ -67,41 +39,35 @@ namespace Flee
         {
             get
             {
-                bool isArray = this.IsArray;
-                return isArray || IsElementPublic((MemberElement)this.MyIndexerElement);
+                var isArray = this.IsArray;
+                return isArray || IsElementPublic((MemberElement)this.myIndexerElement);
             }
         }
 
-        public override bool IsStatic
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool IsStatic => false;
 
         public IndexerElement(ArgumentList indexer)
         {
-            this.MyIndexerElements = indexer;
+            this.myIndexerElements = indexer;
         }
 
         protected override void ResolveInternal()
         {
-            Type target = this.MyPrevious.TargetType;
-            bool isArray = target.IsArray;
+            var target = this.myPrevious.TargetType;
+            var isArray = target.IsArray;
             if (isArray)
             {
                 this.SetupArrayIndexer();
             }
             else
             {
-                bool flag = !this.FindIndexer(target);
+                var flag = !this.FindIndexer(target);
                 if (flag)
                 {
                     this.ThrowCompileException("TypeNotArrayAndHasNoIndexerOfType", CompileExceptionReason.TypeMismatch, new object[]
                     {
                         target.Name,
-                        this.MyIndexerElements
+                        this.myIndexerElements
                     });
                 }
             }
@@ -109,15 +75,15 @@ namespace Flee
 
         private void SetupArrayIndexer()
         {
-            this.MyIndexerElement = this.MyIndexerElements[0];
-            bool flag = this.MyIndexerElements.Count > 1;
+            this.myIndexerElement = this.myIndexerElements[0];
+            var flag = this.myIndexerElements.Count > 1;
             if (flag)
             {
                 this.ThrowCompileException("MultiArrayIndexNotSupported", CompileExceptionReason.TypeMismatch, new object[0]);
             }
             else
             {
-                bool flag2 = !ImplicitConverter.EmitImplicitConvert(this.MyIndexerElement.ResultType, typeof(int), null);
+                var flag2 = !ImplicitConverter.EmitImplicitConvert(this.myIndexerElement.ResultType, typeof(int), null);
                 if (flag2)
                 {
                     this.ThrowCompileException("ArrayIndexersMustBeOfType", CompileExceptionReason.TypeMismatch, new object[]
@@ -130,32 +96,32 @@ namespace Flee
 
         private bool FindIndexer(Type targetType)
         {
-            MemberInfo[] members = targetType.GetDefaultMembers();
-            List<MethodInfo> methods = new List<MethodInfo>();
-            MemberInfo[] array = members;
+            var members = targetType.GetDefaultMembers();
+            var methods = new List<MethodInfo>();
+            var array = members;
             checked
             {
-                for (int i = 0; i < array.Length; i++)
+                for (var i = 0; i < array.Length; i++)
                 {
-                    MemberInfo mi = array[i];
-                    PropertyInfo pi = mi as PropertyInfo;
-                    bool flag = pi != null;
+                    var mi = array[i];
+                    var pi = mi as PropertyInfo;
+                    var flag = pi != null;
                     if (flag)
                     {
                         methods.Add(pi.GetGetMethod(true));
                     }
                 }
-                FunctionCallElement func = new FunctionCallElement("Indexer", methods.ToArray(), this.MyIndexerElements);
-                func.Resolve(this.MyServices);
-                this.MyIndexerElement = func;
+                var func = new FunctionCallElement("Indexer", methods.ToArray(), this.myIndexerElements);
+                func.Resolve(this.myServices);
+                this.myIndexerElement = func;
                 return true;
             }
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             base.Emit(ilg, services);
-            bool isArray = this.IsArray;
+            var isArray = this.IsArray;
             if (isArray)
             {
                 this.EmitArrayLoad(ilg, services);
@@ -166,12 +132,12 @@ namespace Flee
             }
         }
 
-        private void EmitArrayLoad(FleeILGenerator ilg, IServiceProvider services)
+        private void EmitArrayLoad(FleeIlGenerator ilg, IServiceProvider services)
         {
-            this.MyIndexerElement.Emit(ilg, services);
-            ImplicitConverter.EmitImplicitConvert(this.MyIndexerElement.ResultType, typeof(int), ilg);
-            Type elementType = this.ResultType;
-            bool flag = !elementType.IsValueType;
+            this.myIndexerElement.Emit(ilg, services);
+            ImplicitConverter.EmitImplicitConvert(this.myIndexerElement.ResultType, typeof(int), ilg);
+            var elementType = this.ResultType;
+            var flag = !elementType.IsValueType;
             if (flag)
             {
                 ilg.Emit(OpCodes.Ldelem_Ref);
@@ -182,9 +148,9 @@ namespace Flee
             }
         }
 
-        private void EmitValueTypeArrayLoad(FleeILGenerator ilg, Type elementType)
+        private void EmitValueTypeArrayLoad(FleeIlGenerator ilg, Type elementType)
         {
-            bool nextRequiresAddress = this.NextRequiresAddress;
+            var nextRequiresAddress = this.NextRequiresAddress;
             if (nextRequiresAddress)
             {
                 ilg.Emit(OpCodes.Ldelema, elementType);
@@ -195,9 +161,9 @@ namespace Flee
             }
         }
 
-        private void EmitIndexer(FleeILGenerator ilg, IServiceProvider services)
+        private void EmitIndexer(FleeIlGenerator ilg, IServiceProvider services)
         {
-            FunctionCallElement func = (FunctionCallElement)this.MyIndexerElement;
+            var func = (FunctionCallElement)this.myIndexerElement;
             func.EmitFunctionCall(this.NextRequiresAddress, ilg, services);
         }
     }

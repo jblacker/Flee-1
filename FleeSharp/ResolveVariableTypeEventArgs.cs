@@ -4,33 +4,13 @@ namespace Flee
 {
     public class ResolveVariableTypeEventArgs : EventArgs
     {
-        private string MyName;
+        public string VariableName { get; }
 
-        private Type MyType;
-
-        public string VariableName
-        {
-            get
-            {
-                return this.MyName;
-            }
-        }
-
-        public Type VariableType
-        {
-            get
-            {
-                return this.MyType;
-            }
-            set
-            {
-                this.MyType = value;
-            }
-        }
+        public Type VariableType { get; set; }
 
         internal ResolveVariableTypeEventArgs(string name)
         {
-            this.MyName = name;
+            this.VariableName = name;
         }
     }
 }

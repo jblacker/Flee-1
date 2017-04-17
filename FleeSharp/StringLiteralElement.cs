@@ -5,24 +5,18 @@ namespace Flee
 {
     internal class StringLiteralElement : LiteralElement
     {
-        private string MyValue;
+        private readonly string myValue;
 
-        public override Type ResultType
-        {
-            get
-            {
-                return typeof(string);
-            }
-        }
+        public override Type ResultType => typeof(string);
 
         public StringLiteralElement(string value)
         {
-            this.MyValue = value;
+            this.myValue = value;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
-            ilg.Emit(OpCodes.Ldstr, this.MyValue);
+            ilg.Emit(OpCodes.Ldstr, this.myValue);
         }
     }
 }

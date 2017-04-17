@@ -5,23 +5,23 @@ namespace Flee
 {
     internal class NotElement : UnaryElement
     {
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
-            bool flag = this.MyChild.ResultType == typeof(bool);
+            bool flag = this.myChild.ResultType == typeof(bool);
             if (flag)
             {
                 this.EmitLogical(ilg, services);
             }
             else
             {
-                this.MyChild.Emit(ilg, services);
+                this.myChild.Emit(ilg, services);
                 ilg.Emit(OpCodes.Not);
             }
         }
 
-        private void EmitLogical(FleeILGenerator ilg, IServiceProvider services)
+        private void EmitLogical(FleeIlGenerator ilg, IServiceProvider services)
         {
-            this.MyChild.Emit(ilg, services);
+            this.myChild.Emit(ilg, services);
             ilg.Emit(OpCodes.Ldc_I4_0);
             ilg.Emit(OpCodes.Ceq);
         }
@@ -29,24 +29,17 @@ namespace Flee
         protected override Type GetResultType(Type childType)
         {
             bool flag = childType == typeof(bool);
-            Type GetResultType;
+            Type getResultType;
             if (flag)
             {
-                GetResultType = typeof(bool);
+                getResultType = typeof(bool);
             }
             else
             {
                 bool flag2 = Utility.IsIntegralType(childType);
-                if (flag2)
-                {
-                    GetResultType = childType;
-                }
-                else
-                {
-                    GetResultType = null;
-                }
+                getResultType = flag2 ? childType : null;
             }
-            return GetResultType;
+            return getResultType;
         }
     }
 }

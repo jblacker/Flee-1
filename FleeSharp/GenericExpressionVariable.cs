@@ -4,39 +4,33 @@ namespace Flee
 {
     internal class GenericExpressionVariable<T> : IVariable, IGenericVariable<T>
     {
-        private IGenericExpression<T> MyExpression;
+        private IGenericExpression<T> myExpression;
 
         public object ValueAsObject
         {
             get
             {
-                return this.MyExpression;
+                return this.myExpression;
             }
             set
             {
-                this.MyExpression = (IGenericExpression<T>)value;
+                this.myExpression = (IGenericExpression<T>)value;
             }
         }
 
-        public Type VariableType
-        {
-            get
-            {
-                return this.MyExpression.Context.Options.ResultType;
-            }
-        }
+        public Type VariableType => this.myExpression.Context.Options.ResultType;
 
         public IVariable Clone()
         {
             return new GenericExpressionVariable<T>
             {
-                MyExpression = this.MyExpression
+                myExpression = this.myExpression
             };
         }
 
         public T GetValue()
         {
-            return this.MyExpression.Evaluate();
+            return this.myExpression.Evaluate();
         }
     }
 }

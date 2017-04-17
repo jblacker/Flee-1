@@ -6,44 +6,36 @@ namespace Flee
 {
     internal class FleeResourceManager
     {
-        private Dictionary<string, ResourceManager> MyResourceManagers;
+        private readonly Dictionary<string, ResourceManager> myResourceManagers;
 
-        private static FleeResourceManager OurInstance = new FleeResourceManager();
-
-        public static FleeResourceManager Instance
-        {
-            get
-            {
-                return OurInstance;
-            }
-        }
+        public static FleeResourceManager Instance { get; } = new FleeResourceManager();
 
         private FleeResourceManager()
         {
-            this.MyResourceManagers = new Dictionary<string, ResourceManager>(StringComparer.OrdinalIgnoreCase);
+            this.myResourceManagers = new Dictionary<string, ResourceManager>(StringComparer.OrdinalIgnoreCase);
         }
 
         private ResourceManager GetResourceManager(string resourceFile)
         {
-            ResourceManager GetResourceManager;
+            ResourceManager getResourceManager;
             lock (this)
             {
-                ResourceManager rm = null;
-                bool flag = !this.MyResourceManagers.TryGetValue(resourceFile, out rm);
+                ResourceManager rm;
+                var flag = !this.myResourceManagers.TryGetValue(resourceFile, out rm);
                 if (flag)
                 {
-                    Type t = typeof(FleeResourceManager);
-                    rm = new ResourceManager(string.Format("{0}.{1}", t.Namespace, resourceFile), t.Assembly);
-                    this.MyResourceManagers.Add(resourceFile, rm);
+                    var t = typeof(FleeResourceManager);
+                    rm = new ResourceManager($"{t.Namespace}.{resourceFile}", t.Assembly);
+                    this.myResourceManagers.Add(resourceFile, rm);
                 }
-                GetResourceManager = rm;
+                getResourceManager = rm;
             }
-            return GetResourceManager;
+            return getResourceManager;
         }
 
         private string GetResourceString(string resourceFile, string key)
         {
-            ResourceManager rm = this.GetResourceManager(resourceFile);
+            var rm = this.GetResourceManager(resourceFile);
             return rm.GetString(key);
         }
 

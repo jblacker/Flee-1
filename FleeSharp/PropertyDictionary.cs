@@ -8,44 +8,48 @@ namespace Flee
 {
     internal class PropertyDictionary
     {
-        private Dictionary<string, object> MyProperties;
+        private readonly Dictionary<string, object> myProperties;
 
         public PropertyDictionary()
         {
-            this.MyProperties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            this.myProperties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
         }
 
         public PropertyDictionary Clone()
         {
-            PropertyDictionary copy = new PropertyDictionary();
-            try
+            var copy = new PropertyDictionary();
+            foreach (var kvp in this.myProperties)
             {
-                Dictionary<string, object>.Enumerator enumerator = this.MyProperties.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    KeyValuePair<string, object> pair = enumerator.Current;
-                    copy.SetValue(pair.Key, RuntimeHelpers.GetObjectValue(pair.Value));
-                }
+                copy.SetValue(kvp.Key, RuntimeHelpers.GetObjectValue(kvp.Value));
             }
-            finally
-            {
-                Dictionary<string, object>.Enumerator enumerator;
-                ((IDisposable)enumerator).Dispose();
-            }
+
+            //try
+            //{
+            //    var enumerator = this.myProperties.GetEnumerator();
+            //    while (enumerator.MoveNext())
+            //    {
+            //        var pair = enumerator.Current;
+            //        copy.SetValue(pair.Key, RuntimeHelpers.GetObjectValue(pair.Value));
+            //    }
+            //}
+            //finally
+            //{
+            //    Dictionary<string, object>.Enumerator enumerator;
+            //    ((IDisposable)enumerator).Dispose();
+            //}
             return copy;
         }
 
         public T GetValue<T>(string name)
         {
-            T value = default(T);
-            Dictionary<string, object> arg_19_0 = this.MyProperties;
-            object value2 = value;
-            int arg_26_0 = arg_19_0.TryGetValue(name, out value2) ? 1 : 0;
-            value = Conversions.ToGenericParameter<T>(value2);
-            bool flag = arg_26_0 == 0;
+            var properties = this.myProperties;
+            object value2;
+            var propertyValue = properties.TryGetValue(name, out value2) ? 1 : 0;
+            var value = Conversions.ToGenericParameter<T>(value2);
+            var flag = propertyValue == 0;
             if (flag)
             {
-                Debug.Fail(string.Format("Unknown property '{0}'", name));
+                Debug.Fail($"Unknown property '{name}'");
             }
             return value;
         }
@@ -57,12 +61,12 @@ namespace Flee
 
         public void SetValue(string name, object value)
         {
-            this.MyProperties[name] = RuntimeHelpers.GetObjectValue(value);
+            this.myProperties[name] = RuntimeHelpers.GetObjectValue(value);
         }
 
         public bool Contains(string name)
         {
-            return this.MyProperties.ContainsKey(name);
+            return this.myProperties.ContainsKey(name);
         }
     }
 }

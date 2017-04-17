@@ -3,127 +3,98 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
+#pragma warning disable 612
 
 namespace Flee
 {
+    using Extensions;
+
     internal class FunctionCallElement : MemberElement
     {
-        private ArgumentList MyArguments;
+        private readonly ArgumentList myArguments;
 
-        private ICollection<MethodInfo> MyMethods;
+        private readonly ICollection<MethodInfo> myMethods;
 
-        private CustomMethodInfo MyTargetMethodInfo;
+        private CustomMethodInfo myTargetMethodInfo;
 
-        private Type MyOnDemandFunctionReturnType;
+        private Type myOnDemandFunctionReturnType;
 
-        private MethodInfo Method
-        {
-            get
-            {
-                return this.MyTargetMethodInfo.Target;
-            }
-        }
+        private MethodInfo Method => this.myTargetMethodInfo.Target;
 
         public override Type ResultType
         {
             get
             {
-                bool flag = this.MyOnDemandFunctionReturnType != null;
-                Type ResultType;
-                if (flag)
-                {
-                    ResultType = this.MyOnDemandFunctionReturnType;
-                }
-                else
-                {
-                    ResultType = this.Method.ReturnType;
-                }
-                return ResultType;
+                var flag = this.myOnDemandFunctionReturnType != null;
+                var resultType = flag ? this.myOnDemandFunctionReturnType : this.Method.ReturnType;
+                return resultType;
             }
         }
 
-        protected override bool RequiresAddress
-        {
-            get
-            {
-                return !IsGetTypeMethod(this.Method);
-            }
-        }
+        protected override bool RequiresAddress => !IsGetTypeMethod(this.Method);
 
-        protected override bool IsPublic
-        {
-            get
-            {
-                return this.Method.IsPublic;
-            }
-        }
+        protected override bool IsPublic => this.Method.IsPublic;
 
-        public override bool IsStatic
-        {
-            get
-            {
-                return this.Method.IsStatic;
-            }
-        }
+        public override bool IsStatic => this.Method.IsStatic;
 
         public FunctionCallElement(string name, ArgumentList arguments)
         {
-            this.MyName = name;
-            this.MyArguments = arguments;
+            this.myName = name;
+            this.myArguments = arguments;
         }
 
         internal FunctionCallElement(string name, ICollection<MethodInfo> methods, ArgumentList arguments)
         {
-            this.MyName = name;
-            this.MyArguments = arguments;
-            this.MyMethods = methods;
+            this.myName = name;
+            this.myArguments = arguments;
+            this.myMethods = methods;
         }
 
         protected override void ResolveInternal()
         {
-            Type[] argTypes = this.MyArguments.GetArgumentTypes();
-            ICollection<MethodInfo> methods = this.MyMethods;
-            bool flag = methods == null;
+            var argTypes = this.myArguments.GetArgumentTypes();
+            var methods = this.myMethods;
+            var flag = methods == null;
             if (flag)
             {
-                MemberInfo[] arr = this.GetMembers(MemberTypes.Method);
-                MethodInfo[] arr2 = new MethodInfo[arr.Length - 1 + 1];
+                var arr = this.GetMembers(MemberTypes.Method);
+                var arr2 = new MethodInfo[arr.Length - 1 + 1];
                 Array.Copy(arr, arr2, arr.Length);
                 methods = arr2;
             }
-            bool flag2 = methods.Count > 0;
+            var flag2 = methods.Count > 0;
             if (flag2)
             {
-                this.BindToMethod(methods, this.MyPrevious, argTypes);
+                this.BindToMethod(methods, this.myPrevious, argTypes);
             }
             else
             {
-                this.MyOnDemandFunctionReturnType = this.MyContext.Variables.ResolveOnDemandFunction(this.MyName, argTypes);
-                bool flag3 = this.MyOnDemandFunctionReturnType == null;
+                this.myOnDemandFunctionReturnType = this.myContext.Variables.ResolveOnDemandFunction(this.myName, argTypes);
+                var flag3 = this.myOnDemandFunctionReturnType == null;
                 if (flag3)
                 {
-                    this.ThrowFunctionNotFoundException(this.MyPrevious);
+                    this.ThrowFunctionNotFoundException(this.myPrevious);
                 }
             }
         }
 
         private void ThrowFunctionNotFoundException(MemberElement previous)
         {
-            bool flag = previous == null;
+            var flag = previous == null;
             if (flag)
             {
                 this.ThrowCompileException("UndefinedFunction", CompileExceptionReason.UndefinedName, new object[]
                 {
-                    this.MyName,
-                    this.MyArguments
+                    this.myName,
+                    this.myArguments
                 });
             }
             else
             {
                 this.ThrowCompileException("UndefinedFunctionOnType", CompileExceptionReason.UndefinedName, new object[]
                 {
-                    this.MyName,
-                    this.MyArguments,
+                    this.myName,
+                    this.myArguments,
                     previous.TargetType.Name
                 });
             }
@@ -131,21 +102,21 @@ namespace Flee
 
         private void ThrowNoAccessibleMethodsException(MemberElement previous)
         {
-            bool flag = previous == null;
+            var flag = previous == null;
             if (flag)
             {
                 this.ThrowCompileException("NoAccessibleMatches", CompileExceptionReason.AccessDenied, new object[]
                 {
-                    this.MyName,
-                    this.MyArguments
+                    this.myName,
+                    this.myArguments
                 });
             }
             else
             {
                 this.ThrowCompileException("NoAccessibleMatchesOnType", CompileExceptionReason.AccessDenied, new object[]
                 {
-                    this.MyName,
-                    this.MyArguments,
+                    this.myName,
+                    this.myArguments,
                     previous.TargetType.Name
                 });
             }
@@ -155,47 +126,49 @@ namespace Flee
         {
             this.ThrowCompileException("AmbiguousCallOfFunction", CompileExceptionReason.AmbiguousMatch, new object[]
             {
-                this.MyName,
-                this.MyArguments
+                this.myName,
+                this.myArguments
             });
         }
 
         private void BindToMethod(ICollection<MethodInfo> methods, MemberElement previous, Type[] argTypes)
         {
-            List<CustomMethodInfo> customInfos = new List<CustomMethodInfo>();
-            try
-            {
-                IEnumerator<MethodInfo> enumerator = methods.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    MethodInfo mi = enumerator.Current;
-                    CustomMethodInfo cmi = new CustomMethodInfo(mi);
-                    customInfos.Add(cmi);
-                }
-            }
-            finally
-            {
-                IEnumerator<MethodInfo> enumerator;
-                if (enumerator != null)
-                {
-                    enumerator.Dispose();
-                }
-            }
-            CustomMethodInfo[] arr = customInfos.ToArray();
+            var customInfos = new List<CustomMethodInfo>();
+            methods.Each(m => customInfos.Add(new CustomMethodInfo(m)));
+            //try
+            //{
+            //    var enumerator = methods.GetEnumerator();
+            //    while (enumerator.MoveNext())
+            //    {
+            //        var mi = enumerator.Current;
+            //        var cmi = new CustomMethodInfo(mi);
+            //        customInfos.Add(cmi);
+            //    }
+            //}
+            //finally
+            //{
+            //    IEnumerator<MethodInfo> enumerator;
+            //    if (enumerator != null)
+            //    {
+            //        enumerator.Dispose();
+            //    }
+            //}
+
+            var arr = customInfos.ToArray();
             customInfos.Clear();
-            CustomMethodInfo[] array = arr;
+            var array = arr;
             checked
             {
-                for (int i = 0; i < array.Length; i++)
+                for (var i = 0; i < array.Length; i++)
                 {
-                    CustomMethodInfo cmi2 = array[i];
-                    bool flag = cmi2.IsMatch(argTypes);
+                    var cmi2 = array[i];
+                    var flag = cmi2.IsMatch(argTypes);
                     if (flag)
                     {
                         customInfos.Add(cmi2);
                     }
                 }
-                bool flag2 = customInfos.Count == 0;
+                var flag2 = customInfos.Count == 0;
                 if (flag2)
                 {
                     this.ThrowFunctionNotFoundException(previous);
@@ -209,35 +182,35 @@ namespace Flee
 
         private void ResolveOverloads(CustomMethodInfo[] infos, MemberElement previous, Type[] argTypes)
         {
-            CustomMethodInfo[] array = infos;
+            var array = infos;
             checked
             {
-                for (int i = 0; i < array.Length; i++)
+                for (var i = 0; i < array.Length; i++)
                 {
-                    CustomMethodInfo cmi = array[i];
+                    var cmi = array[i];
                     cmi.ComputeScore(argTypes);
                 }
-                Array.Sort<CustomMethodInfo>(infos);
+                Array.Sort(infos);
                 infos = this.GetAccessibleInfos(infos);
-                bool flag = infos.Length == 0;
+                var flag = infos.Length == 0;
                 if (flag)
                 {
                     this.ThrowNoAccessibleMethodsException(previous);
                 }
                 this.DetectAmbiguousMatches(infos);
-                this.MyTargetMethodInfo = infos[0];
+                this.myTargetMethodInfo = infos[0];
             }
         }
 
         private CustomMethodInfo[] GetAccessibleInfos(CustomMethodInfo[] infos)
         {
-            List<CustomMethodInfo> accessible = new List<CustomMethodInfo>();
+            var accessible = new List<CustomMethodInfo>();
             checked
             {
-                for (int i = 0; i < infos.Length; i++)
+                for (var i = 0; i < infos.Length; i++)
                 {
-                    CustomMethodInfo cmi = infos[i];
-                    bool flag = cmi.IsAccessible(this);
+                    var cmi = infos[i];
+                    var flag = cmi.IsAccessible(this);
                     if (flag)
                     {
                         accessible.Add(cmi);
@@ -249,20 +222,20 @@ namespace Flee
 
         private void DetectAmbiguousMatches(CustomMethodInfo[] infos)
         {
-            List<CustomMethodInfo> sameScores = new List<CustomMethodInfo>();
-            CustomMethodInfo first = infos[0];
+            var sameScores = new List<CustomMethodInfo>();
+            var first = infos[0];
             checked
             {
-                for (int i = 0; i < infos.Length; i++)
+                for (var i = 0; i < infos.Length; i++)
                 {
-                    CustomMethodInfo cmi = infos[i];
-                    bool flag = ((IEquatable<CustomMethodInfo>)cmi).Equals(first);
+                    var cmi = infos[i];
+                    var flag = ((IEquatable<CustomMethodInfo>)cmi).Equals(first);
                     if (flag)
                     {
                         sameScores.Add(cmi);
                     }
                 }
-                bool flag2 = sameScores.Count > 1;
+                var flag2 = sameScores.Count > 1;
                 if (flag2)
                 {
                     this.ThrowAmbiguousMethodCallException();
@@ -273,33 +246,33 @@ namespace Flee
         protected override void Validate()
         {
             base.Validate();
-            bool flag = this.MyOnDemandFunctionReturnType != null;
+            var flag = this.myOnDemandFunctionReturnType != null;
             if (!flag)
             {
-                bool flag2 = this.Method.ReturnType == typeof(void);
+                var flag2 = this.Method.ReturnType == typeof(void);
                 if (flag2)
                 {
                     this.ThrowCompileException("FunctionHasNoReturnValue", CompileExceptionReason.FunctionHasNoReturnValue, new object[]
                     {
-                        this.MyName
+                        this.myName
                     });
                 }
             }
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             base.Emit(ilg, services);
-            ExpressionElement[] elements = this.MyArguments.ToArray();
-            bool flag = this.MyOnDemandFunctionReturnType != null;
+            var elements = this.myArguments.ToArray();
+            var flag = this.myOnDemandFunctionReturnType != null;
             if (flag)
             {
                 this.EmitOnDemandFunction(elements, ilg, services);
             }
             else
             {
-                bool isOwnerMember = this.MyOptions.IsOwnerType(this.Method.ReflectedType);
-                bool flag2 = this.MyPrevious == null && isOwnerMember && !this.IsStatic;
+                var isOwnerMember = this.myOptions.IsOwnerType(this.Method.ReflectedType);
+                var flag2 = this.myPrevious == null && isOwnerMember && !this.IsStatic;
                 if (flag2)
                 {
                     this.EmitLoadOwner(ilg);
@@ -308,40 +281,40 @@ namespace Flee
             }
         }
 
-        private void EmitOnDemandFunction(ExpressionElement[] elements, FleeILGenerator ilg, IServiceProvider services)
+        private void EmitOnDemandFunction(ExpressionElement[] elements, FleeIlGenerator ilg, IServiceProvider services)
         {
             EmitLoadVariables(ilg);
-            ilg.Emit(OpCodes.Ldstr, this.MyName);
+            ilg.Emit(OpCodes.Ldstr, this.myName);
             EmitElementArrayLoad(elements, typeof(object), ilg, services);
-            MethodInfo mi = VariableCollection.GetFunctionInvokeMethod(this.MyOnDemandFunctionReturnType);
+            var mi = VariableCollection.GetFunctionInvokeMethod(this.myOnDemandFunctionReturnType);
             this.EmitMethodCall(mi, ilg);
         }
 
-        private void EmitParamArrayArguments(ParameterInfo[] parameters, ExpressionElement[] elements, FleeILGenerator ilg, IServiceProvider services)
+        private void EmitParamArrayArguments(ParameterInfo[] parameters, ExpressionElement[] elements, FleeIlGenerator ilg, IServiceProvider services)
         {
-            ParameterInfo[] fixedParameters = new ParameterInfo[this.MyTargetMethodInfo.myFixedArgTypes.Length - 1 + 1];
+            var fixedParameters = new ParameterInfo[this.myTargetMethodInfo.myFixedArgTypes.Length - 1 + 1];
             Array.Copy(parameters, fixedParameters, fixedParameters.Length);
-            ExpressionElement[] fixedElements = new ExpressionElement[this.MyTargetMethodInfo.myFixedArgTypes.Length - 1 + 1];
+            var fixedElements = new ExpressionElement[this.myTargetMethodInfo.myFixedArgTypes.Length - 1 + 1];
             Array.Copy(elements, fixedElements, fixedElements.Length);
             this.EmitRegularFunctionInternal(fixedParameters, fixedElements, ilg, services);
-            ExpressionElement[] paramArrayElements = new ExpressionElement[elements.Length - fixedElements.Length - 1 + 1];
+            var paramArrayElements = new ExpressionElement[elements.Length - fixedElements.Length - 1 + 1];
             Array.Copy(elements, fixedElements.Length, paramArrayElements, 0, paramArrayElements.Length);
-            EmitElementArrayLoad(paramArrayElements, this.MyTargetMethodInfo.paramArrayElementType, ilg, services);
+            EmitElementArrayLoad(paramArrayElements, this.myTargetMethodInfo.paramArrayElementType, ilg, services);
         }
 
-        private static void EmitElementArrayLoad(ExpressionElement[] elements, Type arrayElementType, FleeILGenerator ilg, IServiceProvider services)
+        private static void EmitElementArrayLoad(ExpressionElement[] elements, Type arrayElementType, FleeIlGenerator ilg, IServiceProvider services)
         {
             LiteralElement.EmitLoad(elements.Length, ilg);
             ilg.Emit(OpCodes.Newarr, arrayElementType);
-            LocalBuilder local = ilg.DeclareLocal(arrayElementType.MakeArrayType());
-            int arrayLocalIndex = local.LocalIndex;
+            var local = ilg.DeclareLocal(arrayElementType.MakeArrayType());
+            var arrayLocalIndex = local.LocalIndex;
             Utility.EmitStoreLocal(ilg, arrayLocalIndex);
-            int num = elements.Length - 1;
-            for (int i = 0; i <= num; i++)
+            var num = elements.Length - 1;
+            for (var i = 0; i <= num; i++)
             {
                 Utility.EmitLoadLocal(ilg, arrayLocalIndex);
                 LiteralElement.EmitLoad(i, ilg);
-                ExpressionElement element = elements[i];
+                var element = elements[i];
                 element.Emit(ilg, services);
                 ImplicitConverter.EmitImplicitConvert(element.ResultType, arrayElementType, ilg);
                 Utility.EmitArrayStore(ilg, arrayElementType);
@@ -349,11 +322,11 @@ namespace Flee
             Utility.EmitLoadLocal(ilg, arrayLocalIndex);
         }
 
-        public void EmitFunctionCall(bool nextRequiresAddress, FleeILGenerator ilg, IServiceProvider services)
+        public void EmitFunctionCall(bool nextRequiresAddress, FleeIlGenerator ilg, IServiceProvider services)
         {
-            ParameterInfo[] parameters = this.Method.GetParameters();
-            ExpressionElement[] elements = this.MyArguments.ToArray();
-            bool flag = !this.MyTargetMethodInfo.isParamArray;
+            var parameters = this.Method.GetParameters();
+            var elements = this.myArguments.ToArray();
+            var flag = !this.myTargetMethodInfo.isParamArray;
             if (flag)
             {
                 this.EmitRegularFunctionInternal(parameters, elements, ilg, services);
@@ -365,16 +338,16 @@ namespace Flee
             EmitMethodCall(this.ResultType, nextRequiresAddress, this.Method, ilg);
         }
 
-        private void EmitRegularFunctionInternal(ParameterInfo[] parameters, ExpressionElement[] elements, FleeILGenerator ilg, IServiceProvider services)
+        private void EmitRegularFunctionInternal(ParameterInfo[] parameters, ExpressionElement[] elements, FleeIlGenerator ilg, IServiceProvider services)
         {
             Debug.Assert(parameters.Length == elements.Length, "argument count mismatch");
-            int num = parameters.Length - 1;
-            for (int i = 0; i <= num; i++)
+            var num = parameters.Length - 1;
+            for (var i = 0; i <= num; i++)
             {
-                ExpressionElement element = elements[i];
-                ParameterInfo pi = parameters[i];
+                var element = elements[i];
+                var pi = parameters[i];
                 element.Emit(ilg, services);
-                bool success = ImplicitConverter.EmitImplicitConvert(element.ResultType, pi.ParameterType, ilg);
+                var success = ImplicitConverter.EmitImplicitConvert(element.ResultType, pi.ParameterType, ilg);
                 Debug.Assert(success, "conversion failed");
             }
         }

@@ -1,51 +1,43 @@
-using System;
-using System.Collections;
-
 namespace Flee
 {
+    using System;
+    using System.Collections.Generic;
+
     internal class InvocationListElement : ExpressionElement
     {
-        private MemberElement MyTail;
+        private readonly MemberElement myTail;
 
-        public override Type ResultType
-        {
-            get
-            {
-                return this.MyTail.ResultType;
-            }
-        }
-
-        public InvocationListElement(IList elements, IServiceProvider services)
+        public InvocationListElement(IList<object> elements, IServiceProvider services)
         {
             this.HandleFirstElement(elements, services);
             LinkElements(elements);
             Resolve(elements, services);
-            this.MyTail = (MemberElement)elements[elements.Count - 1];
+            this.myTail = (MemberElement) elements[elements.Count - 1];
         }
 
-        private static void LinkElements(IList elements)
+        private static void LinkElements(IList<object> elements)
         {
-            int num = elements.Count - 1;
-            for (int i = 0; i <= num; i++)
+            var num = elements.Count - 1;
+            for (var i = 0; i <= num; i++)
             {
-                MemberElement current = (MemberElement)elements[i];
+                var current = (MemberElement) elements[i];
                 MemberElement nextElement = null;
-                bool flag = i + 1 < elements.Count;
+                var flag = i + 1 < elements.Count;
                 if (flag)
                 {
-                    nextElement = (MemberElement)elements[i + 1];
+                    nextElement = (MemberElement) elements[i + 1];
                 }
                 current.Link(nextElement);
             }
         }
 
-        private void HandleFirstElement(IList elements, IServiceProvider services)
+        private void HandleFirstElement(IList<object> elements, IServiceProvider services)
         {
-            ExpressionElement first = (ExpressionElement)elements[0];
-            bool flag = !(first is MemberElement);
+            var first = (ExpressionElement) elements[0];
+            var flag = !(first is MemberElement);
             if (flag)
             {
-                ExpressionMemberElement actualFirst = new ExpressionMemberElement(first);
+                var actualFirst = new ExpressionMemberElement(first);
                 elements[0] = actualFirst;
             }
             else
@@ -54,91 +46,89 @@ namespace Flee
             }
         }
 
-        private void ResolveNamespaces(IList elements, IServiceProvider services)
+        private void ResolveNamespaces(IList<object> elements, IServiceProvider services)
         {
-            ExpressionContext context = (ExpressionContext)services.GetService(typeof(ExpressionContext));
+            var context = (ExpressionContext) services.GetService(typeof(ExpressionContext));
             ImportBase currentImport = context.Imports.RootImport;
             while (true)
             {
-                string name = GetName(elements);
-                bool flag = name == null;
+                var name = GetName(elements);
+                var flag = name == null;
                 if (flag)
                 {
                     break;
                 }
-                ImportBase import = currentImport.FindImport(name);
-                bool flag2 = import == null;
+                var import = currentImport.FindImport(name);
+                var flag2 = import == null;
                 if (flag2)
                 {
                     break;
                 }
                 currentImport = import;
                 elements.RemoveAt(0);
-                bool flag3 = elements.Count > 0;
+                var flag3 = elements.Count > 0;
                 if (flag3)
                 {
-                    MemberElement newFirst = (MemberElement)elements[0];
+                    var newFirst = (MemberElement) elements[0];
                     newFirst.SetImport(currentImport);
                 }
             }
-            bool flag4 = elements.Count == 0;
+            var flag4 = elements.Count == 0;
             if (flag4)
             {
-                this.ThrowCompileException("NamespaceCannotBeUsedAsType", CompileExceptionReason.TypeMismatch, new object[]
-                {
-                    currentImport.Name
-                });
+                this.ThrowCompileException("NamespaceCannotBeUsedAsType", CompileExceptionReason.TypeMismatch, currentImport.Name);
             }
         }
 
-        private static string GetName(IList elements)
+        private static string GetName(IList<object> elements)
         {
-            bool flag = elements.Count == 0;
-            string GetName;
+            var flag = elements.Count == 0;
+            string getName;
             if (flag)
             {
-                GetName = null;
+                getName = null;
             }
             else
             {
-                IdentifierElement fpe = elements[0] as IdentifierElement;
-                bool flag2 = fpe == null;
-                if (flag2)
-                {
-                    GetName = null;
-                }
-                else
-                {
-                    GetName = fpe.MemberName;
-                }
+                var fpe = elements[0] as IdentifierElement;
+                var flag2 = fpe == null;
+                getName = flag2 ? null : fpe.MemberName;
             }
-            return GetName;
+            return getName;
         }
 
-        private static void Resolve(IList elements, IServiceProvider services)
+        private static void Resolve(IEnumerable<object> elements, IServiceProvider services)
         {
-            try
+            foreach (var element in elements)
             {
-                IEnumerator enumerator = elements.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    MemberElement element = (MemberElement)enumerator.Current;
-                    element.Resolve(services);
-                }
+                var member = (MemberElement) element;
+                member.Resolve(services);
             }
-            finally
-            {
-                IEnumerator enumerator;
-                if (enumerator is IDisposable)
-                {
-                    (enumerator as IDisposable).Dispose();
-                }
-            }
+
+            //try
+            //{
+            //    IEnumerator enumerator = elements.GetEnumerator();
+            //    while (enumerator.MoveNext())
+            //    {
+            //        MemberElement element = (MemberElement)enumerator.Current;
+            //        element.Resolve(services);
+            //    }
+            //}
+            //finally
+            //{
+            //    IEnumerator enumerator;
+            //    if (enumerator is IDisposable)
+            //    {
+            //        (enumerator as IDisposable).Dispose();
+            //    }
+            //}
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
-            this.MyTail.Emit(ilg, services);
+            this.myTail.Emit(ilg, services);
         }
+
+        public override Type ResultType => this.myTail.ResultType;
     }
 }

@@ -2,6 +2,9 @@ using System.Collections;
 
 namespace Flee
 {
+    using System.Diagnostics.CodeAnalysis;
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal class ShortCircuitInfo
     {
         public Stack Operands;

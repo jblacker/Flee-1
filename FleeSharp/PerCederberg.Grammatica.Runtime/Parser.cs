@@ -304,7 +304,7 @@ namespace Flee.PerCederberg.Grammatica.Runtime
 				}
 				return token;
 			}
-		    var list = new ArrayList(1) {this.tokenizer.GetPatternDescription(id)};
+		    var list = new List<string>(1) {this.tokenizer.GetPatternDescription(id)};
 		    throw new ParseException(ParseException.ErrorType.UnexpectedToken, token.ToShortString(), list, token.StartLine, token.StartColumn);
 		}
 

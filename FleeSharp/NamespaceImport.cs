@@ -4,101 +4,69 @@ using System.Reflection;
 
 namespace Flee
 {
+    using System.Linq;
+    using Extensions;
+
     public sealed class NamespaceImport : ImportBase, ICollection<ImportBase>
     {
-        private string MyNamespace;
+        private readonly string myNamespace;
 
-        private List<ImportBase> MyImports;
+        private readonly List<ImportBase> myImports;
 
         private ICollection<ImportBase> NonContainerImports
         {
             get
             {
-                List<ImportBase> found = new List<ImportBase>();
-                try
-                {
-                    List<ImportBase>.Enumerator enumerator = this.MyImports.GetEnumerator();
-                    while (enumerator.MoveNext())
-                    {
-                        ImportBase import = enumerator.Current;
-                        bool flag = !import.IsContainer;
-                        if (flag)
-                        {
-                            found.Add(import);
-                        }
-                    }
-                }
-                finally
-                {
-                    List<ImportBase>.Enumerator enumerator;
-                    ((IDisposable)enumerator).Dispose();
-                }
-                return found;
+                return this.myImports.Where(x => !IsContainer).ToList();
+
+                //var found = new List<ImportBase>();
+                //try
+                //{
+                //    List<ImportBase>.Enumerator enumerator = this.myImports.GetEnumerator();
+                //    while (enumerator.MoveNext())
+                //    {
+                //        ImportBase import = enumerator.Current;
+                //        bool flag = !import.IsContainer;
+                //        if (flag)
+                //        {
+                //            found.Add(import);
+                //        }
+                //    }
+                //}
+                //finally
+                //{
+                //    List<ImportBase>.Enumerator enumerator;
+                //    ((IDisposable)enumerator).Dispose();
+                //}
+                //return found;
             }
         }
 
-        public override bool IsContainer
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsContainer => true;
 
-        public override string Name
-        {
-            get
-            {
-                return this.MyNamespace;
-            }
-        }
+        public override string Name => this.myNamespace;
 
-        public int Count
-        {
-            get
-            {
-                return this.MyImports.Count;
-            }
-        }
+        public int Count => this.myImports.Count;
 
-        bool ICollection<ImportBase>.IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool ICollection<ImportBase>.IsReadOnly => false;
 
         public NamespaceImport(string importNamespace)
         {
             Utility.AssertNotNull(importNamespace, "importNamespace");
-            bool flag = importNamespace.Length == 0;
+            var flag = importNamespace.Length == 0;
             if (flag)
             {
-                string msg = Utility.GetGeneralErrorMessage("InvalidNamespaceName", new object[0]);
+                var msg = Utility.GetGeneralErrorMessage("InvalidNamespaceName", new object[0]);
                 throw new ArgumentException(msg);
             }
-            this.MyNamespace = importNamespace;
-            this.MyImports = new List<ImportBase>();
+            this.myNamespace = importNamespace;
+            this.myImports = new List<ImportBase>();
         }
 
         internal override void SetContext(ExpressionContext context)
         {
             base.SetContext(context);
-            try
-            {
-                List<ImportBase>.Enumerator enumerator = this.MyImports.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    ImportBase import = enumerator.Current;
-                    import.SetContext(context);
-                }
-            }
-            finally
-            {
-                List<ImportBase>.Enumerator enumerator;
-                ((IDisposable)enumerator).Dispose();
-            }
+            this.myImports.ForEach(c => c.SetContext(context));
         }
 
         internal override void Validate()
@@ -107,23 +75,25 @@ namespace Flee
 
         protected override void AddMembers(string memberName, MemberTypes memberType, ICollection<MemberInfo> dest)
         {
-            try
-            {
-                IEnumerator<ImportBase> enumerator = this.NonContainerImports.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    ImportBase import = enumerator.Current;
-                    AddImportMembers(import, memberName, memberType, dest);
-                }
-            }
-            finally
-            {
-                IEnumerator<ImportBase> enumerator;
-                if (enumerator != null)
-                {
-                    enumerator.Dispose();
-                }
-            }
+            this.NonContainerImports.Each(c => AddImportMembers(c, memberName, memberType, dest));
+
+            //try
+            //{
+            //    IEnumerator<ImportBase> enumerator = this.NonContainerImports.GetEnumerator();
+            //    while (enumerator.MoveNext())
+            //    {
+            //        ImportBase import = enumerator.Current;
+            //        AddImportMembers(import, memberName, memberType, dest);
+            //    }
+            //}
+            //finally
+            //{
+            //    IEnumerator<ImportBase> enumerator;
+            //    if (enumerator != null)
+            //    {
+            //        enumerator.Dispose();
+            //    }
+            //}
         }
 
         protected override void AddMembers(MemberTypes memberType, ICollection<MemberInfo> dest)
@@ -132,105 +102,123 @@ namespace Flee
 
         internal override Type FindType(string typeName)
         {
-            Type FindType;
-            try
+
+            foreach (var import in this.NonContainerImports)
             {
-                IEnumerator<ImportBase> enumerator = this.NonContainerImports.GetEnumerator();
-                while (enumerator.MoveNext())
+                var t = import.FindType(typeName);
+                if (t != null)
                 {
-                    ImportBase import = enumerator.Current;
-                    Type t = import.FindType(typeName);
-                    bool flag = t != null;
-                    if (flag)
-                    {
-                        FindType = t;
-                        return FindType;
-                    }
+                    return t;
                 }
             }
-            finally
-            {
-                IEnumerator<ImportBase> enumerator;
-                if (enumerator != null)
-                {
-                    enumerator.Dispose();
-                }
-            }
-            FindType = null;
-            return FindType;
+
+            return null;
+            //try
+            //{
+            //    IEnumerator<ImportBase> enumerator = this.NonContainerImports.GetEnumerator();
+            //    while (enumerator.MoveNext())
+            //    {
+            //        ImportBase import = enumerator.Current;
+            //        Type t = import.FindType(typeName);
+            //        bool flag = t != null;
+            //        if (flag)
+            //        {
+            //            FindType = t;
+            //            return FindType;
+            //        }
+            //    }
+            //}
+            //finally
+            //{
+            //    IEnumerator<ImportBase> enumerator;
+            //    if (enumerator != null)
+            //    {
+            //        enumerator.Dispose();
+            //    }
+            //}
+            //FindType = null;
+            //return null;
         }
 
         internal override ImportBase FindImport(string name)
         {
-            ImportBase FindImport;
-            try
+            foreach (var import in this.NonContainerImports)
             {
-                List<ImportBase>.Enumerator enumerator = this.MyImports.GetEnumerator();
-                while (enumerator.MoveNext())
+                if (import.IsMatch(name))
                 {
-                    ImportBase import = enumerator.Current;
-                    bool flag = import.IsMatch(name);
-                    if (flag)
-                    {
-                        FindImport = import;
-                        return FindImport;
-                    }
+                    return import;
                 }
             }
-            finally
-            {
-                List<ImportBase>.Enumerator enumerator;
-                ((IDisposable)enumerator).Dispose();
-            }
-            FindImport = null;
-            return FindImport;
+            return null;
+            //ImportBase FindImport;
+            //try
+            //{
+            //    var enumerator = this.myImports.GetEnumerator();
+            //    while (enumerator.MoveNext())
+            //    {
+            //        var import = enumerator.Current;
+            //        var flag = import.IsMatch(name);
+            //        if (flag)
+            //        {
+            //            FindImport = import;
+            //            return FindImport;
+            //        }
+            //    }
+            //}
+            //finally
+            //{
+            //    List<ImportBase>.Enumerator enumerator;
+            //    ((IDisposable)enumerator).Dispose();
+            //}
+            //FindImport = null;
+            //return FindImport;
         }
 
         internal override bool IsMatch(string name)
         {
-            return string.Equals(this.MyNamespace, name, this.Context.Options.MemberStringComparison);
+            return string.Equals(this.myNamespace, name, this.Context.Options.MemberStringComparison);
         }
 
         protected override bool EqualsInternal(ImportBase import)
         {
-            NamespaceImport otherSameType = import as NamespaceImport;
-            return otherSameType != null && this.MyNamespace.Equals(otherSameType.MyNamespace, this.Context.Options.MemberStringComparison);
+            var otherSameType = import as NamespaceImport;
+            return otherSameType != null && this.myNamespace.Equals(otherSameType.myNamespace, this.Context.Options.MemberStringComparison);
         }
 
         public void Add(ImportBase item)
         {
             Utility.AssertNotNull(item, "item");
-            bool flag = this.Context != null;
+            var flag = this.Context != null;
             if (flag)
             {
                 item.SetContext(this.Context);
             }
-            this.MyImports.Add(item);
+            this.myImports.Add(item);
         }
 
         public void Clear()
         {
-            this.MyImports.Clear();
+            this.myImports.Clear();
         }
 
         public bool Contains(ImportBase item)
         {
-            return this.MyImports.Contains(item);
+            return this.myImports.Contains(item);
         }
 
         public void CopyTo(ImportBase[] array, int arrayIndex)
         {
-            this.MyImports.CopyTo(array, arrayIndex);
+            this.myImports.CopyTo(array, arrayIndex);
         }
 
         public bool Remove(ImportBase item)
         {
-            return this.MyImports.Remove(item);
+            return this.myImports.Remove(item);
         }
 
         public override IEnumerator<ImportBase> GetEnumerator()
         {
-            return (IEnumerator<ImportBase>)this.MyImports.GetEnumerator();
+            return this.myImports.GetEnumerator();
         }
     }
 }

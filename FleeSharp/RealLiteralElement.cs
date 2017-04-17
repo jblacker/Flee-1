@@ -8,141 +8,133 @@ namespace Flee
         public static LiteralElement CreateFromInteger(string image, IServiceProvider services)
         {
             LiteralElement element = CreateSingle(image, services);
-            bool flag = element != null;
-            LiteralElement CreateFromInteger;
+            var flag = element != null;
+            LiteralElement createFromInteger;
             if (flag)
             {
-                CreateFromInteger = element;
+                createFromInteger = element;
             }
             else
             {
                 element = CreateDecimal(image, services);
-                bool flag2 = element != null;
+                var flag2 = element != null;
                 if (flag2)
                 {
-                    CreateFromInteger = element;
+                    createFromInteger = element;
                 }
                 else
                 {
-                    ExpressionOptions options = (ExpressionOptions)services.GetService(typeof(ExpressionOptions));
-                    bool integersAsDoubles = options.IntegersAsDoubles;
-                    if (integersAsDoubles)
-                    {
-                        CreateFromInteger = DoubleLiteralElement.Parse(image, services);
-                    }
-                    else
-                    {
-                        CreateFromInteger = null;
-                    }
+                    var options = (ExpressionOptions)services.GetService(typeof(ExpressionOptions));
+                    var integersAsDoubles = options.IntegersAsDoubles;
+                    createFromInteger = integersAsDoubles ? DoubleLiteralElement.Parse(image, services) : null;
                 }
             }
-            return CreateFromInteger;
+            return createFromInteger;
         }
 
         public static LiteralElement Create(string image, IServiceProvider services)
         {
             LiteralElement element = CreateSingle(image, services);
-            bool flag = element != null;
-            LiteralElement Create;
+            var flag = element != null;
+            LiteralElement create;
             if (flag)
             {
-                Create = element;
+                create = element;
             }
             else
             {
                 element = CreateDecimal(image, services);
-                bool flag2 = element != null;
+                var flag2 = element != null;
                 if (flag2)
                 {
-                    Create = element;
+                    create = element;
                 }
                 else
                 {
                     element = CreateDouble(image, services);
-                    bool flag3 = element != null;
+                    var flag3 = element != null;
                     if (flag3)
                     {
-                        Create = element;
+                        create = element;
                     }
                     else
                     {
                         element = CreateImplicitReal(image, services);
-                        Create = element;
+                        create = element;
                     }
                 }
             }
-            return Create;
+            return create;
         }
 
         private static LiteralElement CreateImplicitReal(string image, IServiceProvider services)
         {
-            ExpressionOptions options = (ExpressionOptions)services.GetService(typeof(ExpressionOptions));
-            LiteralElement CreateImplicitReal;
+            var options = (ExpressionOptions)services.GetService(typeof(ExpressionOptions));
+            LiteralElement createImplicitReal = null;
             switch (options.RealLiteralDataType)
             {
                 case RealLiteralDataType.Single:
-                    CreateImplicitReal = SingleLiteralElement.Parse(image, services);
+                    createImplicitReal = SingleLiteralElement.Parse(image, services);
                     break;
                 case RealLiteralDataType.Double:
-                    CreateImplicitReal = DoubleLiteralElement.Parse(image, services);
+                    createImplicitReal = DoubleLiteralElement.Parse(image, services);
                     break;
                 case RealLiteralDataType.Decimal:
-                    CreateImplicitReal = DecimalLiteralElement.Parse(image, services);
+                    createImplicitReal = DecimalLiteralElement.Parse(image, services);
                     break;
                 default:
                     Debug.Fail("Unknown value");
-                    CreateImplicitReal = null;
                     break;
             }
-            return CreateImplicitReal;
+            return createImplicitReal;
         }
 
         private static DoubleLiteralElement CreateDouble(string image, IServiceProvider services)
         {
-            bool flag = image.EndsWith("d", StringComparison.OrdinalIgnoreCase);
-            DoubleLiteralElement CreateDouble;
+            var flag = image.EndsWith("d", StringComparison.OrdinalIgnoreCase);
+            DoubleLiteralElement createDouble;
             if (flag)
             {
                 image = image.Remove(image.Length - 1);
-                CreateDouble = DoubleLiteralElement.Parse(image, services);
+                createDouble = DoubleLiteralElement.Parse(image, services);
             }
             else
             {
-                CreateDouble = null;
+                createDouble = null;
             }
-            return CreateDouble;
+            return createDouble;
         }
 
         private static SingleLiteralElement CreateSingle(string image, IServiceProvider services)
         {
-            bool flag = image.EndsWith("f", StringComparison.OrdinalIgnoreCase);
-            SingleLiteralElement CreateSingle;
+            var flag = image.EndsWith("f", StringComparison.OrdinalIgnoreCase);
+            SingleLiteralElement createSingle;
             if (flag)
             {
                 image = image.Remove(image.Length - 1);
-                CreateSingle = SingleLiteralElement.Parse(image, services);
+                createSingle = SingleLiteralElement.Parse(image, services);
             }
             else
             {
-                CreateSingle = null;
+                createSingle = null;
             }
-            return CreateSingle;
+            return createSingle;
         }
 
         private static DecimalLiteralElement CreateDecimal(string image, IServiceProvider services)
         {
-            bool flag = image.EndsWith("m", StringComparison.OrdinalIgnoreCase);
-            DecimalLiteralElement CreateDecimal;
+            var flag = image.EndsWith("m", StringComparison.OrdinalIgnoreCase);
+            DecimalLiteralElement createDecimal;
             if (flag)
             {
                 image = image.Remove(image.Length - 1);
-                CreateDecimal = DecimalLiteralElement.Parse(image, services);
+                createDecimal = DecimalLiteralElement.Parse(image, services);
             }
             else
             {
-                CreateDecimal = null;
+                createDecimal = null;
             }
-            return CreateDecimal;
+            return createDecimal;
         }
     }
 }

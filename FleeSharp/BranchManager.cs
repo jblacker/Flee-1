@@ -95,7 +95,7 @@ namespace Flee
             //}
         }
 
-        public bool IsLongBranch(FleeILGenerator ilg, Label target)
+        public bool IsLongBranch(FleeIlGenerator ilg, Label target)
         {
             var startLoc = new IlLocation(ilg.Length);
             var bi = new BranchInfo(startLoc, target);
@@ -104,7 +104,7 @@ namespace Flee
             return bi.IsLongBranch;
         }
 
-        public void AddBranch(FleeILGenerator ilg, Label target)
+        public void AddBranch(FleeIlGenerator ilg, Label target)
         {
             var startLoc = new IlLocation(ilg.Length);
             var bi = new BranchInfo(startLoc, target);
@@ -116,7 +116,7 @@ namespace Flee
             return this.myKeyLabelMap[RuntimeHelpers.GetObjectValue(key)];
         }
 
-        public Label GetLabel(object key, FleeILGenerator ilg)
+        public Label GetLabel(object key, FleeIlGenerator ilg)
         {
             Label lbl;
             var flag = !this.myKeyLabelMap.TryGetValue(RuntimeHelpers.GetObjectValue(key), out lbl);
@@ -133,7 +133,7 @@ namespace Flee
             return this.myKeyLabelMap.ContainsKey(RuntimeHelpers.GetObjectValue(key));
         }
 
-        public void MarkLabel(FleeILGenerator ilg, Label target)
+        public void MarkLabel(FleeIlGenerator ilg, Label target)
         {
             var pos = ilg.Length;
             this.myBranchInfos.Each(b => b.Mark(target, pos));

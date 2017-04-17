@@ -6,22 +6,18 @@ namespace Flee
 {
     internal class ShiftElement : BinaryExpressionElement
     {
-        private ShiftOperation MyOperation;
+        private ShiftOperation myOperation;
 
         protected override Type GetResultType(Type leftType, Type rightType)
         {
-            bool flag = !ImplicitConverter.EmitImplicitNumericConvert(rightType, typeof(int), null);
-            Type GetResultType;
-            if (flag)
+            var flag = !ImplicitConverter.EmitImplicitNumericConvert(rightType, typeof(int), null);
+            Type getResultType = null;
+            if (!flag)
             {
-                GetResultType = null;
-            }
-            else
-            {
-                bool flag2 = !Utility.IsIntegralType(leftType);
+                var flag2 = !Utility.IsIntegralType(leftType);
                 if (flag2)
                 {
-                    GetResultType = null;
+                    getResultType = null;
                 }
                 else
                 {
@@ -32,43 +28,42 @@ namespace Flee
                         case TypeCode.Int16:
                         case TypeCode.UInt16:
                         case TypeCode.Int32:
-                            GetResultType = typeof(int);
+                            getResultType = typeof(int);
                             break;
                         case TypeCode.UInt32:
-                            GetResultType = typeof(uint);
+                            getResultType = typeof(uint);
                             break;
                         case TypeCode.Int64:
-                            GetResultType = typeof(long);
+                            getResultType = typeof(long);
                             break;
                         case TypeCode.UInt64:
-                            GetResultType = typeof(ulong);
+                            getResultType = typeof(ulong);
                             break;
                         default:
                             Debug.Assert(false, "unknown left shift operand");
-                            GetResultType = null;
                             break;
                     }
                 }
             }
-            return GetResultType;
+            return getResultType;
         }
 
         protected override void GetOperation(object operation)
         {
-            this.MyOperation = (ShiftOperation)operation;
+            this.myOperation = (ShiftOperation)operation;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             this.myLeftChild.Emit(ilg, services);
             this.EmitShiftCount(ilg, services);
             this.EmitShift(ilg);
         }
 
-        private void EmitShiftCount(FleeILGenerator ilg, IServiceProvider services)
+        private void EmitShiftCount(FleeIlGenerator ilg, IServiceProvider services)
         {
             this.myRightChild.Emit(ilg, services);
-            TypeCode tc = Type.GetTypeCode(this.myLeftChild.ResultType);
+            var tc = Type.GetTypeCode(this.myLeftChild.ResultType);
             if (tc - TypeCode.SByte > 5)
             {
                 if (tc - TypeCode.Int64 > 1)
@@ -87,9 +82,9 @@ namespace Flee
             ilg.Emit(OpCodes.And);
         }
 
-        private void EmitShift(FleeILGenerator ilg)
+        private void EmitShift(FleeIlGenerator ilg)
         {
-            OpCode op;
+            var op = new OpCode();
             switch (Type.GetTypeCode(this.myLeftChild.ResultType))
             {
                 case TypeCode.SByte:
@@ -99,29 +94,15 @@ namespace Flee
                 case TypeCode.Int32:
                 case TypeCode.Int64:
                 {
-                    bool flag = this.MyOperation == ShiftOperation.LeftShift;
-                    if (flag)
-                    {
-                        op = OpCodes.Shl;
-                    }
-                    else
-                    {
-                        op = OpCodes.Shr;
-                    }
+                    var flag = this.myOperation == ShiftOperation.LeftShift;
+                    op = flag ? OpCodes.Shl : OpCodes.Shr;
                     break;
                 }
                 case TypeCode.UInt32:
                 case TypeCode.UInt64:
                 {
-                    bool flag2 = this.MyOperation == ShiftOperation.LeftShift;
-                    if (flag2)
-                    {
-                        op = OpCodes.Shl;
-                    }
-                    else
-                    {
-                        op = OpCodes.Shr_Un;
-                    }
+                    var flag2 = this.myOperation == ShiftOperation.LeftShift;
+                    op = flag2 ? OpCodes.Shl : OpCodes.Shr_Un;
                     break;
                 }
                 default:

@@ -1,25 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.VisualBasic.CompilerServices;
-
 namespace Flee
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
+
+    //using Microsoft.VisualBasic.CompilerServices;
+
     public sealed class ExpressionImports
     {
         private static readonly Dictionary<string, Type> ourBuiltinTypeMap = CreateBuiltinTypeMap();
 
-        private NamespaceImport myRootImport;
+        private ExpressionContext myContext;
 
         private TypeImport myOwnerImport;
 
-        private ExpressionContext myContext;
-
-        public NamespaceImport RootImport => this.myRootImport;
-
         internal ExpressionImports()
         {
-            this.myRootImport = new NamespaceImport(Conversions.ToString(true));
+            this.RootImport = new NamespaceImport("true");
         }
 
         private static Dictionary<string, Type> CreateBuiltinTypeMap()
@@ -92,27 +89,28 @@ namespace Flee
         internal void SetContext(ExpressionContext context)
         {
             this.myContext = context;
-            this.myRootImport.SetContext(context);
+            this.RootImport.SetContext(context);
         }
 
         internal ExpressionImports Clone()
         {
             return new ExpressionImports
             {
-                myRootImport = (NamespaceImport)this.myRootImport.Clone(),
+                RootImport = (NamespaceImport) this.RootImport.Clone(),
                 myOwnerImport = this.myOwnerImport
             };
         }
 
         internal void ImportOwner(Type ownerType)
         {
-            this.myOwnerImport = new TypeImport(ownerType, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, false);
+            this.myOwnerImport = new TypeImport(ownerType,
+                BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, false);
             this.myOwnerImport.SetContext(this.myContext);
         }
 
         internal bool HasNamespace(string ns)
         {
-            var import = this.myRootImport.FindImport(ns) as NamespaceImport;
+            var import = this.RootImport.FindImport(ns) as NamespaceImport;
             return import != null;
         }
 
@@ -122,16 +120,16 @@ namespace Flee
             NamespaceImport getImport;
             if (flag)
             {
-                getImport = this.myRootImport;
+                getImport = this.RootImport;
             }
             else
             {
-                var import = this.myRootImport.FindImport(ns) as NamespaceImport;
+                var import = this.RootImport.FindImport(ns) as NamespaceImport;
                 var flag2 = import == null;
                 if (flag2)
                 {
                     import = new NamespaceImport(ns);
-                    this.myRootImport.Add(import);
+                    this.RootImport.Add(import);
                 }
                 getImport = import;
             }
@@ -148,7 +146,7 @@ namespace Flee
             var namespaces = new string[typeNameParts.Length - 2 + 1];
             var typeName = typeNameParts[typeNameParts.Length - 1];
             Array.Copy(typeNameParts, namespaces, namespaces.Length);
-            ImportBase currentImport = this.myRootImport;
+            ImportBase currentImport = this.RootImport;
             var array = namespaces;
             checked
             {
@@ -163,32 +161,16 @@ namespace Flee
                     }
                 }
                 var flag2 = currentImport == null;
-                Type findType;
-                if (flag2)
-                {
-                    findType = null;
-                }
-                else
-                {
-                    findType = currentImport.FindType(typeName);
-                }
+                var findType = flag2 ? null : currentImport.FindType(typeName);
                 return findType;
             }
         }
 
         internal static Type GetBuiltinType(string name)
         {
-            Type t = null;
+            Type t;
             var flag = ourBuiltinTypeMap.TryGetValue(name, out t);
-            Type getBuiltinType;
-            if (flag)
-            {
-                getBuiltinType = t;
-            }
-            else
-            {
-                getBuiltinType = null;
-            }
+            var getBuiltinType = flag ? t : null;
             return getBuiltinType;
         }
 
@@ -215,11 +197,7 @@ namespace Flee
             var flag = mi == null;
             if (flag)
             {
-                var msg = Utility.GetGeneralErrorMessage("CouldNotFindPublicStaticMethodOnType", new object[]
-                {
-                    methodName,
-                    t.Name
-                });
+                var msg = Utility.GetGeneralErrorMessage("CouldNotFindPublicStaticMethodOnType", methodName, t.Name);
                 throw new ArgumentException(msg);
             }
             this.AddMethod(mi, ns);
@@ -233,7 +211,7 @@ namespace Flee
             var flag = !mi.IsStatic | !mi.IsPublic;
             if (flag)
             {
-                var msg = Utility.GetGeneralErrorMessage("OnlyPublicStaticMethodsCanBeImported", new object[0]);
+                var msg = Utility.GetGeneralErrorMessage("OnlyPublicStaticMethodsCanBeImported");
                 throw new ArgumentException(msg);
             }
             var import = this.GetImport(ns);
@@ -247,5 +225,7 @@ namespace Flee
                 this.AddType(kvp.Value, kvp.Key);
             }
         }
+
+        public NamespaceImport RootImport { get; private set; }
     }
 }

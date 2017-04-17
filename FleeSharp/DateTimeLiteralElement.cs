@@ -20,7 +20,7 @@ namespace Flee
             }
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             var index = ilg.GetTempLocalIndex(typeof(DateTime));
             Utility.EmitLoadLocalAddress(ilg, index);

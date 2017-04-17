@@ -6,45 +6,33 @@ namespace Flee
 {
     internal class Int32LiteralElement : IntegralLiteralElement
     {
-        private int MyValue;
+        private int myValue;
 
         private const string MinValue = "2147483648";
 
-        private bool MyIsMinValue;
+        private readonly bool myIsMinValue;
 
-        public override Type ResultType
-        {
-            get
-            {
-                return typeof(int);
-            }
-        }
+        public override Type ResultType => typeof(int);
 
-        public int Value
-        {
-            get
-            {
-                return this.MyValue;
-            }
-        }
+        public int Value => this.myValue;
 
         public Int32LiteralElement(int value)
         {
-            this.MyValue = value;
+            this.myValue = value;
         }
 
         private Int32LiteralElement()
         {
-            this.MyIsMinValue = true;
+            this.myIsMinValue = true;
         }
 
         public static Int32LiteralElement TryCreate(string image, bool isHex, bool negated)
         {
             bool flag = negated & Operators.CompareString(image, "2147483648", false) == 0;
-            Int32LiteralElement TryCreate;
+            Int32LiteralElement tryCreate;
             if (flag)
             {
-                TryCreate = new Int32LiteralElement();
+                tryCreate = new Int32LiteralElement();
             }
             else if (isHex)
             {
@@ -52,18 +40,18 @@ namespace Flee
                 bool flag2 = !int.TryParse(image, NumberStyles.AllowHexSpecifier, null, out value);
                 if (flag2)
                 {
-                    TryCreate = null;
+                    tryCreate = null;
                 }
                 else
                 {
-                    bool flag3 = value >= 0 & value <= 2147483647;
+                    bool flag3 = value >= 0 & true;
                     if (flag3)
                     {
-                        TryCreate = new Int32LiteralElement(value);
+                        tryCreate = new Int32LiteralElement(value);
                     }
                     else
                     {
-                        TryCreate = null;
+                        tryCreate = null;
                     }
                 }
             }
@@ -73,32 +61,32 @@ namespace Flee
                 bool flag4 = int.TryParse(image, out value2);
                 if (flag4)
                 {
-                    TryCreate = new Int32LiteralElement(value2);
+                    tryCreate = new Int32LiteralElement(value2);
                 }
                 else
                 {
-                    TryCreate = null;
+                    tryCreate = null;
                 }
             }
-            return TryCreate;
+            return tryCreate;
         }
 
         public void Negate()
         {
-            bool myIsMinValue = this.MyIsMinValue;
+            bool myIsMinValue = this.myIsMinValue;
             if (myIsMinValue)
             {
-                this.MyValue = -2147483648;
+                this.myValue = -2147483648;
             }
             else
             {
-                this.MyValue = -this.MyValue;
+                this.myValue = -this.myValue;
             }
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
-            EmitLoad(this.MyValue, ilg);
+            EmitLoad(this.myValue, ilg);
         }
     }
 }

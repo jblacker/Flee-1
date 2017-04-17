@@ -8,19 +8,19 @@ namespace Flee
 {
     internal abstract class MemberElement : ExpressionElement
     {
-        protected string MyName;
+        protected string myName;
 
-        protected MemberElement MyPrevious;
+        protected MemberElement myPrevious;
 
-        protected MemberElement MyNext;
+        protected MemberElement myNext;
 
-        protected IServiceProvider MyServices;
+        protected IServiceProvider myServices;
 
-        protected ExpressionOptions MyOptions;
+        protected ExpressionOptions myOptions;
 
-        protected ExpressionContext MyContext;
+        protected ExpressionContext myContext;
 
-        protected ImportBase MyImport;
+        protected ImportBase myImport;
 
         public const BindingFlags BindFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
@@ -34,130 +34,94 @@ namespace Flee
             get;
         }
 
-        public string MemberName
-        {
-            get
-            {
-                return this.MyName;
-            }
-        }
+        public string MemberName => this.myName;
 
         protected bool NextRequiresAddress
         {
             get
             {
-                bool flag = this.MyNext == null;
-                return !flag && this.MyNext.RequiresAddress;
+                var flag = this.myNext == null;
+                return !flag && this.myNext.RequiresAddress;
             }
         }
 
-        protected virtual bool RequiresAddress
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected virtual bool RequiresAddress => false;
 
-        protected virtual bool SupportsInstance
-        {
-            get
-            {
-                return true;
-            }
-        }
+        protected virtual bool SupportsInstance => true;
 
-        protected virtual bool SupportsStatic
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected virtual bool SupportsStatic => false;
 
-        public Type TargetType
-        {
-            get
-            {
-                return this.ResultType;
-            }
-        }
+        public Type TargetType => this.ResultType;
 
         public void Link(MemberElement nextElement)
         {
-            this.MyNext = nextElement;
-            bool flag = nextElement != null;
+            this.myNext = nextElement;
+            var flag = nextElement != null;
             if (flag)
             {
-                nextElement.MyPrevious = this;
+                nextElement.myPrevious = this;
             }
         }
 
         public void Resolve(IServiceProvider services)
         {
-            this.MyServices = services;
-            this.MyOptions = (ExpressionOptions)services.GetService(typeof(ExpressionOptions));
-            this.MyContext = (ExpressionContext)services.GetService(typeof(ExpressionContext));
+            this.myServices = services;
+            this.myOptions = (ExpressionOptions)services.GetService(typeof(ExpressionOptions));
+            this.myContext = (ExpressionContext)services.GetService(typeof(ExpressionContext));
             this.ResolveInternal();
             this.Validate();
         }
 
         public void SetImport(ImportBase import)
         {
-            this.MyImport = import;
+            this.myImport = import;
         }
 
         protected abstract void ResolveInternal();
 
         protected virtual void Validate()
         {
-            bool flag = this.MyPrevious == null;
+            var flag = this.myPrevious == null;
             if (!flag)
             {
-                bool flag2 = this.IsStatic && !this.SupportsStatic;
+                var flag2 = this.IsStatic && !this.SupportsStatic;
                 if (flag2)
                 {
-                    this.ThrowCompileException("StaticMemberCannotBeAccessedWithInstanceReference", CompileExceptionReason.TypeMismatch, new object[]
-                    {
-                        this.MyName
-                    });
+                    this.ThrowCompileException("StaticMemberCannotBeAccessedWithInstanceReference", CompileExceptionReason.TypeMismatch, this.myName);
                 }
                 else
                 {
-                    bool flag3 = !this.IsStatic && !this.SupportsInstance;
+                    var flag3 = !this.IsStatic && !this.SupportsInstance;
                     if (flag3)
                     {
-                        this.ThrowCompileException("ReferenceToNonSharedMemberRequiresObjectReference", CompileExceptionReason.TypeMismatch, new object[]
-                        {
-                            this.MyName
-                        });
+                        this.ThrowCompileException("ReferenceToNonSharedMemberRequiresObjectReference", CompileExceptionReason.TypeMismatch, this.myName);
                     }
                 }
             }
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
-            bool flag = this.MyPrevious != null;
+            var flag = this.myPrevious != null;
             if (flag)
             {
-                this.MyPrevious.Emit(ilg, services);
+                this.myPrevious.Emit(ilg, services);
             }
         }
 
-        protected static void EmitLoadVariables(FleeILGenerator ilg)
+        protected static void EmitLoadVariables(FleeIlGenerator ilg)
         {
             ilg.Emit(OpCodes.Ldarg_2);
         }
 
-        protected void EmitMethodCall(MethodInfo mi, FleeILGenerator ilg)
+        protected void EmitMethodCall(MethodInfo mi, FleeIlGenerator ilg)
         {
             EmitMethodCall(this.ResultType, this.NextRequiresAddress, mi, ilg);
         }
 
-        protected static void EmitMethodCall(Type resultType, bool nextRequiresAddress, MethodInfo mi, FleeILGenerator ilg)
+        protected static void EmitMethodCall(Type resultType, bool nextRequiresAddress, MethodInfo mi, FleeIlGenerator ilg)
         {
-            bool flag = !mi.ReflectedType.IsValueType;
+            var flag = mi.ReflectedType != null && !mi.ReflectedType.IsValueType;
             if (flag)
             {
                 EmitReferenceTypeMethodCall(mi, ilg);
@@ -166,7 +130,7 @@ namespace Flee
             {
                 EmitValueTypeMethodCall(mi, ilg);
             }
-            bool flag2 = resultType.IsValueType & nextRequiresAddress;
+            var flag2 = resultType.IsValueType & nextRequiresAddress;
             if (flag2)
             {
                 EmitValueTypeLoadAddress(ilg, resultType);
@@ -175,23 +139,23 @@ namespace Flee
 
         protected static bool IsGetTypeMethod(MethodInfo mi)
         {
-            MethodInfo miGetType = typeof(object).GetMethod("gettype", BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public);
+            var miGetType = typeof(object).GetMethod("gettype", BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public);
             return mi.MethodHandle.Equals(miGetType.MethodHandle);
         }
 
-        private static void EmitValueTypeMethodCall(MethodInfo mi, FleeILGenerator ilg)
+        private static void EmitValueTypeMethodCall(MethodInfo mi, FleeIlGenerator ilg)
         {
-            bool isStatic = mi.IsStatic;
+            var isStatic = mi.IsStatic;
             if (isStatic)
             {
                 ilg.Emit(OpCodes.Call, mi);
             }
             else
             {
-                bool flag = mi.DeclaringType != mi.ReflectedType;
+                var flag = mi.DeclaringType != mi.ReflectedType;
                 if (flag)
                 {
-                    bool flag2 = IsGetTypeMethod(mi);
+                    var flag2 = IsGetTypeMethod(mi);
                     if (flag2)
                     {
                         ilg.Emit(OpCodes.Box, mi.ReflectedType);
@@ -210,36 +174,29 @@ namespace Flee
             }
         }
 
-        private static void EmitReferenceTypeMethodCall(MethodInfo mi, FleeILGenerator ilg)
+        private static void EmitReferenceTypeMethodCall(MethodInfo mi, FleeIlGenerator ilg)
         {
-            bool isStatic = mi.IsStatic;
-            if (isStatic)
-            {
-                ilg.Emit(OpCodes.Call, mi);
-            }
-            else
-            {
-                ilg.Emit(OpCodes.Callvirt, mi);
-            }
+            var isStatic = mi.IsStatic;
+            ilg.Emit(isStatic ? OpCodes.Call : OpCodes.Callvirt, mi);
         }
 
-        protected static void EmitValueTypeLoadAddress(FleeILGenerator ilg, Type targetType)
+        protected static void EmitValueTypeLoadAddress(FleeIlGenerator ilg, Type targetType)
         {
-            int index = ilg.GetTempLocalIndex(targetType);
+            var index = ilg.GetTempLocalIndex(targetType);
             Utility.EmitStoreLocal(ilg, index);
             ilg.Emit(OpCodes.Ldloca_S, (byte)index);
         }
 
-        protected void EmitLoadOwner(FleeILGenerator ilg)
+        protected void EmitLoadOwner(FleeIlGenerator ilg)
         {
             ilg.Emit(OpCodes.Ldarg_0);
-            Type ownerType = this.MyOptions.OwnerType;
-            bool flag = !ownerType.IsValueType;
+            var ownerType = this.myOptions.OwnerType;
+            var flag = !ownerType.IsValueType;
             if (!flag)
             {
                 ilg.Emit(OpCodes.Unbox, ownerType);
                 ilg.Emit(OpCodes.Ldobj, ownerType);
-                bool requiresAddress = this.RequiresAddress;
+                var requiresAddress = this.RequiresAddress;
                 if (requiresAddress)
                 {
                     EmitValueTypeLoadAddress(ilg, ownerType);
@@ -249,49 +206,48 @@ namespace Flee
 
         private static bool IsMemberPublic(MemberInfo member)
         {
-            FieldInfo fi = member as FieldInfo;
-            bool flag = fi != null;
-            bool IsMemberPublic;
+            var fi = member as FieldInfo;
+            var flag = fi != null;
+            bool isMemberPublic = false;
             if (flag)
             {
-                IsMemberPublic = fi.IsPublic;
+                isMemberPublic = fi.IsPublic;
             }
             else
             {
-                PropertyInfo pi = member as PropertyInfo;
-                bool flag2 = pi != null;
+                var pi = member as PropertyInfo;
+                var flag2 = pi != null;
                 if (flag2)
                 {
-                    MethodInfo pmi = pi.GetGetMethod(true);
-                    IsMemberPublic = pmi.IsPublic;
+                    var pmi = pi.GetGetMethod(true);
+                    isMemberPublic = pmi.IsPublic;
                 }
                 else
                 {
-                    MethodInfo mi = member as MethodInfo;
-                    bool flag3 = mi != null;
+                    var mi = member as MethodInfo;
+                    var flag3 = mi != null;
                     if (flag3)
                     {
-                        IsMemberPublic = mi.IsPublic;
+                        isMemberPublic = mi.IsPublic;
                     }
                     else
                     {
                         Debug.Assert(false, "unknown member type");
-                        IsMemberPublic = false;
                     }
                 }
             }
-            return IsMemberPublic;
+            return isMemberPublic;
         }
 
         protected MemberInfo[] GetAccessibleMembers(MemberInfo[] members)
         {
-            List<MemberInfo> accessible = new List<MemberInfo>();
+            var accessible = new List<MemberInfo>();
             checked
             {
-                for (int i = 0; i < members.Length; i++)
+                for (var i = 0; i < members.Length; i++)
                 {
-                    MemberInfo mi = members[i];
-                    bool flag = this.IsMemberAccessible(mi);
+                    var mi = members[i];
+                    var flag = this.IsMemberAccessible(mi);
                     if (flag)
                     {
                         accessible.Add(mi);
@@ -303,7 +259,7 @@ namespace Flee
 
         protected static bool IsOwnerMemberAccessible(MemberInfo member, ExpressionOptions options)
         {
-            bool flag = IsMemberPublic(member);
+            var flag = IsMemberPublic(member);
             bool accessAllowed;
             if (flag)
             {
@@ -313,73 +269,42 @@ namespace Flee
             {
                 accessAllowed = ((options.OwnerMemberAccess & BindingFlags.NonPublic) > BindingFlags.Default);
             }
-            ExpressionOwnerMemberAccessAttribute attr = (ExpressionOwnerMemberAccessAttribute)Attribute.GetCustomAttribute(member, typeof(ExpressionOwnerMemberAccessAttribute));
-            bool flag2 = attr == null;
-            bool IsOwnerMemberAccessible;
-            if (flag2)
-            {
-                IsOwnerMemberAccessible = accessAllowed;
-            }
-            else
-            {
-                IsOwnerMemberAccessible = attr.AllowAccess;
-            }
-            return IsOwnerMemberAccessible;
+            var attr = (ExpressionOwnerMemberAccessAttribute)Attribute.GetCustomAttribute(member, typeof(ExpressionOwnerMemberAccessAttribute));
+            var flag2 = attr == null;
+            var isOwnerMemberAccessible = flag2 ? accessAllowed : attr.AllowAccess;
+            return isOwnerMemberAccessible;
         }
 
         public bool IsMemberAccessible(MemberInfo member)
         {
-            bool flag = this.MyOptions.IsOwnerType(member.ReflectedType);
-            bool IsMemberAccessible;
-            if (flag)
-            {
-                IsMemberAccessible = IsOwnerMemberAccessible(member, this.MyOptions);
-            }
-            else
-            {
-                IsMemberAccessible = IsMemberPublic(member);
-            }
-            return IsMemberAccessible;
+            var flag = this.myOptions.IsOwnerType(member.ReflectedType);
+            var isMemberAccessible = flag ? IsOwnerMemberAccessible(member, this.myOptions) : IsMemberPublic(member);
+            return isMemberAccessible;
         }
 
         protected MemberInfo[] GetMembers(MemberTypes targets)
         {
-            bool flag = this.MyPrevious == null;
-            MemberInfo[] GetMembers;
+            var flag = this.myPrevious == null;
+            MemberInfo[] getMembers;
             if (flag)
             {
-                bool flag2 = this.MyImport == null;
-                if (flag2)
-                {
-                    GetMembers = this.GetDefaultNamespaceMembers(this.MyName, targets);
-                }
-                else
-                {
-                    GetMembers = this.MyImport.FindMembers(this.MyName, targets);
-                }
+                var flag2 = this.myImport == null;
+                getMembers = flag2 ? this.GetDefaultNamespaceMembers(this.myName, targets) : this.myImport.FindMembers(this.myName, targets);
             }
             else
             {
-                GetMembers = this.MyPrevious.TargetType.FindMembers(targets, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, this.MyOptions.MemberFilter, this.MyName);
+                getMembers = this.myPrevious.TargetType.FindMembers(targets, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, this.myOptions.MemberFilter, this.myName);
             }
-            return GetMembers;
+            return getMembers;
         }
 
         protected MemberInfo[] GetDefaultNamespaceMembers(string name, MemberTypes memberType)
         {
-            MemberInfo[] members = this.MyContext.Imports.FindOwnerMembers(name, memberType);
+            var members = this.myContext.Imports.FindOwnerMembers(name, memberType);
             members = this.GetAccessibleMembers(members);
-            bool flag = members.Length > 0;
-            MemberInfo[] GetDefaultNamespaceMembers;
-            if (flag)
-            {
-                GetDefaultNamespaceMembers = members;
-            }
-            else
-            {
-                GetDefaultNamespaceMembers = this.MyContext.Imports.RootImport.FindMembers(name, memberType);
-            }
-            return GetDefaultNamespaceMembers;
+            var flag = members.Length > 0;
+            var getDefaultNamespaceMembers = flag ? members : this.myContext.Imports.RootImport.FindMembers(name, memberType);
+            return getDefaultNamespaceMembers;
         }
 
         protected static bool IsElementPublic(MemberElement e)

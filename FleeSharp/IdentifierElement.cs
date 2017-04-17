@@ -9,47 +9,40 @@ namespace Flee
 {
     internal class IdentifierElement : MemberElement
     {
-        private FieldInfo MyField;
+        private FieldInfo myField;
 
-        private PropertyInfo MyProperty;
+        private PropertyInfo myProperty;
 
-        private PropertyDescriptor MyPropertyDescriptor;
+        private PropertyDescriptor myPropertyDescriptor;
 
-        private Type MyVariableType;
+        private Type myVariableType;
 
-        private Type MyCalcEngineReferenceType;
+        private Type myCalcEngineReferenceType;
 
         private Type MemberOwnerType
         {
             get
             {
-                bool flag = this.MyField != null;
-                Type MemberOwnerType;
+                var flag = this.myField != null;
+                Type memberOwnerType;
                 if (flag)
                 {
-                    MemberOwnerType = this.MyField.ReflectedType;
+                    memberOwnerType = this.myField.ReflectedType;
                 }
                 else
                 {
-                    bool flag2 = this.MyPropertyDescriptor != null;
+                    var flag2 = this.myPropertyDescriptor != null;
                     if (flag2)
                     {
-                        MemberOwnerType = this.MyPropertyDescriptor.ComponentType;
+                        memberOwnerType = this.myPropertyDescriptor.ComponentType;
                     }
                     else
                     {
-                        bool flag3 = this.MyProperty != null;
-                        if (flag3)
-                        {
-                            MemberOwnerType = this.MyProperty.ReflectedType;
-                        }
-                        else
-                        {
-                            MemberOwnerType = null;
-                        }
+                        var flag3 = this.myProperty != null;
+                        memberOwnerType = flag3 ? this.myProperty.ReflectedType : null;
                     }
                 }
-                return MemberOwnerType;
+                return memberOwnerType;
             }
         }
 
@@ -57,93 +50,87 @@ namespace Flee
         {
             get
             {
-                bool flag = this.MyCalcEngineReferenceType != null;
-                Type ResultType;
+                var flag = this.myCalcEngineReferenceType != null;
+                Type resultType;
                 if (flag)
                 {
-                    ResultType = this.MyCalcEngineReferenceType;
+                    resultType = this.myCalcEngineReferenceType;
                 }
                 else
                 {
-                    bool flag2 = this.MyVariableType != null;
+                    var flag2 = this.myVariableType != null;
                     if (flag2)
                     {
-                        ResultType = this.MyVariableType;
+                        resultType = this.myVariableType;
                     }
                     else
                     {
-                        bool flag3 = this.MyPropertyDescriptor != null;
+                        var flag3 = this.myPropertyDescriptor != null;
                         if (flag3)
                         {
-                            ResultType = this.MyPropertyDescriptor.PropertyType;
+                            resultType = this.myPropertyDescriptor.PropertyType;
                         }
                         else
                         {
-                            bool flag4 = this.MyField != null;
+                            var flag4 = this.myField != null;
                             if (flag4)
                             {
-                                ResultType = this.MyField.FieldType;
+                                resultType = this.myField.FieldType;
                             }
                             else
                             {
-                                MethodInfo mi = this.MyProperty.GetGetMethod(true);
-                                ResultType = mi.ReturnType;
+                                var mi = this.myProperty.GetGetMethod(true);
+                                resultType = mi.ReturnType;
                             }
                         }
                     }
                 }
-                return ResultType;
+                return resultType;
             }
         }
 
-        protected override bool RequiresAddress
-        {
-            get
-            {
-                return this.MyPropertyDescriptor == null;
-            }
-        }
+        protected override bool RequiresAddress => this.myPropertyDescriptor == null;
 
         protected override bool IsPublic
         {
             get
             {
-                bool flag = this.MyVariableType != null | this.MyCalcEngineReferenceType != null;
-                bool IsPublic;
+                var flag = this.myVariableType != null | this.myCalcEngineReferenceType != null;
+                bool isPublic;
                 if (flag)
                 {
-                    IsPublic = true;
+                    isPublic = true;
                 }
                 else
                 {
-                    bool flag2 = this.MyVariableType != null;
+                    var flag2 = this.myVariableType != null;
                     if (flag2)
                     {
-                        IsPublic = true;
+                        isPublic = true;
                     }
                     else
                     {
-                        bool flag3 = this.MyPropertyDescriptor != null;
+                        var flag3 = this.myPropertyDescriptor != null;
                         if (flag3)
                         {
-                            IsPublic = true;
+                            isPublic = true;
                         }
                         else
                         {
-                            bool flag4 = this.MyField != null;
+                            var flag4 = this.myField != null;
                             if (flag4)
                             {
-                                IsPublic = this.MyField.IsPublic;
+                                isPublic = this.myField.IsPublic;
                             }
                             else
                             {
-                                MethodInfo mi = this.MyProperty.GetGetMethod(true);
-                                IsPublic = mi.IsPublic;
+                                var mi = this.myProperty.GetGetMethod(true);
+                                isPublic = mi.IsPublic;
                             }
                         }
                     }
                 }
-                return IsPublic;
+                return isPublic;
             }
         }
 
@@ -151,26 +138,26 @@ namespace Flee
         {
             get
             {
-                bool flag = this.MyVariableType != null;
-                bool SupportsStatic;
+                var flag = this.myVariableType != null;
+                bool supportsStatic;
                 if (flag)
                 {
-                    SupportsStatic = false;
+                    supportsStatic = false;
                 }
                 else
                 {
-                    bool flag2 = this.MyPropertyDescriptor != null;
+                    var flag2 = this.myPropertyDescriptor != null;
                     if (flag2)
                     {
-                        SupportsStatic = false;
+                        supportsStatic = false;
                     }
                     else
                     {
-                        bool flag3 = this.MyOptions.IsOwnerType(this.MemberOwnerType) && this.MyPrevious == null;
-                        SupportsStatic = (flag3 || this.MyPrevious == null);
+                        var flag3 = this.myOptions.IsOwnerType(this.MemberOwnerType) && this.myPrevious == null;
+                        supportsStatic = (flag3 || this.myPrevious == null);
                     }
                 }
-                return SupportsStatic;
+                return supportsStatic;
             }
         }
 
@@ -178,26 +165,26 @@ namespace Flee
         {
             get
             {
-                bool flag = this.MyVariableType != null;
-                bool SupportsInstance;
+                var flag = this.myVariableType != null;
+                bool supportsInstance;
                 if (flag)
                 {
-                    SupportsInstance = true;
+                    supportsInstance = true;
                 }
                 else
                 {
-                    bool flag2 = this.MyPropertyDescriptor != null;
+                    var flag2 = this.myPropertyDescriptor != null;
                     if (flag2)
                     {
-                        SupportsInstance = true;
+                        supportsInstance = true;
                     }
                     else
                     {
-                        bool flag3 = this.MyOptions.IsOwnerType(this.MemberOwnerType) && this.MyPrevious == null;
-                        SupportsInstance = (flag3 || this.MyPrevious != null);
+                        var flag3 = this.myOptions.IsOwnerType(this.MemberOwnerType) && this.myPrevious == null;
+                        supportsInstance = (flag3 || this.myPrevious != null);
                     }
                 }
-                return SupportsInstance;
+                return supportsInstance;
             }
         }
 
@@ -205,91 +192,84 @@ namespace Flee
         {
             get
             {
-                bool flag = this.MyVariableType != null | this.MyCalcEngineReferenceType != null;
-                bool IsStatic;
+                var flag = this.myVariableType != null | this.myCalcEngineReferenceType != null;
+                bool isStatic;
                 if (flag)
                 {
-                    IsStatic = false;
+                    isStatic = false;
                 }
                 else
                 {
-                    bool flag2 = this.MyVariableType != null;
+                    var flag2 = this.myVariableType != null;
                     if (flag2)
                     {
-                        IsStatic = false;
+                        isStatic = false;
                     }
                     else
                     {
-                        bool flag3 = this.MyField != null;
+                        var flag3 = this.myField != null;
                         if (flag3)
                         {
-                            IsStatic = this.MyField.IsStatic;
+                            isStatic = this.myField.IsStatic;
                         }
                         else
                         {
-                            bool flag4 = this.MyPropertyDescriptor != null;
+                            var flag4 = this.myPropertyDescriptor != null;
                             if (flag4)
                             {
-                                IsStatic = false;
+                                isStatic = false;
                             }
                             else
                             {
-                                MethodInfo mi = this.MyProperty.GetGetMethod(true);
-                                IsStatic = mi.IsStatic;
+                                var mi = this.myProperty.GetGetMethod(true);
+                                isStatic = mi.IsStatic;
                             }
                         }
                     }
                 }
-                return IsStatic;
+                return isStatic;
             }
         }
 
         public IdentifierElement(string name)
         {
-            this.MyName = name;
+            this.myName = name;
         }
 
         protected override void ResolveInternal()
         {
-            bool flag = this.ResolveFieldProperty(this.MyPrevious);
+            var flag = this.ResolveFieldProperty(this.myPrevious);
             if (flag)
             {
-                this.AddReferencedVariable(this.MyPrevious);
+                this.AddReferencedVariable(this.myPrevious);
             }
             else
             {
-                this.MyVariableType = this.MyContext.Variables.GetVariableTypeInternal(this.MyName);
-                bool flag2 = this.MyPrevious == null && this.MyVariableType != null;
+                this.myVariableType = this.myContext.Variables.GetVariableTypeInternal(this.myName);
+                var flag2 = this.myPrevious == null && this.myVariableType != null;
                 if (flag2)
                 {
-                    this.AddReferencedVariable(this.MyPrevious);
+                    this.AddReferencedVariable(this.myPrevious);
                 }
                 else
                 {
-                    CalculationEngine.CalculationEngine ce = this.MyContext.CalculationEngine;
-                    bool flag3 = ce != null;
+                    var ce = this.myContext.CalculationEngine;
+                    var flag3 = ce != null;
                     if (flag3)
                     {
-                        ce.AddDependency(this.MyName, this.MyContext);
-                        this.MyCalcEngineReferenceType = ce.ResolveTailType(this.MyName);
+                        ce.AddDependency(this.myName, this.myContext);
+                        this.myCalcEngineReferenceType = ce.ResolveTailType(this.myName);
                     }
                     else
                     {
-                        bool flag4 = this.MyPrevious == null;
+                        var flag4 = this.myPrevious == null;
                         if (flag4)
                         {
-                            this.ThrowCompileException("NoIdentifierWithName", CompileExceptionReason.UndefinedName, new object[]
-                            {
-                                this.MyName
-                            });
+                            this.ThrowCompileException("NoIdentifierWithName", CompileExceptionReason.UndefinedName, this.myName);
                         }
                         else
                         {
-                            this.ThrowCompileException("NoIdentifierWithNameOnType", CompileExceptionReason.UndefinedName, new object[]
-                            {
-                                this.MyName,
-                                this.MyPrevious.TargetType.Name
-                            });
+                            this.ThrowCompileException("NoIdentifierWithNameOnType", CompileExceptionReason.UndefinedName, this.myName, this.myPrevious.TargetType.Name);
                         }
                     }
                 }
@@ -298,144 +278,137 @@ namespace Flee
 
         private bool ResolveFieldProperty(MemberElement previous)
         {
-            MemberInfo[] members = this.GetMembers(MemberTypes.Field | MemberTypes.Property);
+            var members = this.GetMembers(MemberTypes.Field | MemberTypes.Property);
             members = this.GetAccessibleMembers(members);
-            bool flag = members.Length == 0;
-            bool ResolveFieldProperty;
+            var flag = members.Length == 0;
+            bool resolveFieldProperty = false;
             if (flag)
             {
-                ResolveFieldProperty = this.ResolveVirtualProperty(previous);
+                resolveFieldProperty = this.ResolveVirtualProperty(previous);
             }
             else
             {
-                bool flag2 = members.Length > 1;
+                var flag2 = members.Length > 1;
                 if (flag2)
                 {
-                    bool flag3 = previous == null;
+                    var flag3 = previous == null;
                     if (flag3)
                     {
-                        this.ThrowCompileException("IdentifierIsAmbiguous", CompileExceptionReason.AmbiguousMatch, new object[]
-                        {
-                            this.MyName
-                        });
+                        this.ThrowCompileException("IdentifierIsAmbiguous", CompileExceptionReason.AmbiguousMatch, this.myName);
                     }
                     else
                     {
-                        this.ThrowCompileException("IdentifierIsAmbiguousOnType", CompileExceptionReason.AmbiguousMatch, new object[]
-                        {
-                            this.MyName,
-                            previous.TargetType.Name
-                        });
+                        this.ThrowCompileException("IdentifierIsAmbiguousOnType", CompileExceptionReason.AmbiguousMatch, this.myName, previous.TargetType.Name);
                     }
                 }
                 else
                 {
-                    this.MyField = (members[0] as FieldInfo);
-                    bool flag4 = this.MyField != null;
+                    this.myField = (members[0] as FieldInfo);
+                    var flag4 = this.myField != null;
                     if (flag4)
                     {
-                        ResolveFieldProperty = true;
+                        resolveFieldProperty = true;
                     }
                     else
                     {
-                        this.MyProperty = (PropertyInfo)members[0];
-                        ResolveFieldProperty = true;
+                        this.myProperty = (PropertyInfo)members[0];
+                        resolveFieldProperty = true;
                     }
                 }
             }
-            return ResolveFieldProperty;
+            return resolveFieldProperty;
         }
 
         private bool ResolveVirtualProperty(MemberElement previous)
         {
-            bool flag = previous == null;
-            bool ResolveVirtualProperty;
+            var flag = previous == null;
+            bool resolveVirtualProperty;
             if (flag)
             {
-                ResolveVirtualProperty = false;
+                resolveVirtualProperty = false;
             }
             else
             {
-                PropertyDescriptorCollection coll = TypeDescriptor.GetProperties(previous.ResultType);
-                this.MyPropertyDescriptor = coll.Find(this.MyName, true);
-                ResolveVirtualProperty = (this.MyPropertyDescriptor != null);
+                var coll = TypeDescriptor.GetProperties(previous.ResultType);
+                this.myPropertyDescriptor = coll.Find(this.myName, true);
+                resolveVirtualProperty = (this.myPropertyDescriptor != null);
             }
-            return ResolveVirtualProperty;
+            return resolveVirtualProperty;
         }
 
         private void AddReferencedVariable(MemberElement previous)
         {
-            bool flag = previous != null;
+            var flag = previous != null;
             if (!flag)
             {
-                bool flag2 = this.MyVariableType != null || this.MyOptions.IsOwnerType(this.MemberOwnerType);
+                var flag2 = this.myVariableType != null || this.myOptions.IsOwnerType(this.MemberOwnerType);
                 if (flag2)
                 {
-                    ExpressionInfo info = (ExpressionInfo)this.MyServices.GetService(typeof(ExpressionInfo));
-                    info.AddReferencedVariable(this.MyName);
+                    var info = (ExpressionInfo)this.myServices.GetService(typeof(ExpressionInfo));
+                    info.AddReferencedVariable(this.myName);
                 }
             }
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             base.Emit(ilg, services);
             this.EmitFirst(ilg);
-            bool flag = this.MyCalcEngineReferenceType != null;
+            var flag = this.myCalcEngineReferenceType != null;
             if (flag)
             {
                 this.EmitReferenceLoad(ilg);
             }
             else
             {
-                bool flag2 = this.MyVariableType != null;
+                var flag2 = this.myVariableType != null;
                 if (flag2)
                 {
                     this.EmitVariableLoad(ilg);
                 }
                 else
                 {
-                    bool flag3 = this.MyField != null;
+                    var flag3 = this.myField != null;
                     if (flag3)
                     {
-                        this.EmitFieldLoad(this.MyField, ilg, services);
+                        this.EmitFieldLoad(this.myField, ilg, services);
                     }
                     else
                     {
-                        bool flag4 = this.MyPropertyDescriptor != null;
+                        var flag4 = this.myPropertyDescriptor != null;
                         if (flag4)
                         {
                             this.EmitVirtualPropertyLoad(ilg);
                         }
                         else
                         {
-                            this.EmitPropertyLoad(this.MyProperty, ilg);
+                            this.EmitPropertyLoad(this.myProperty, ilg);
                         }
                     }
                 }
             }
         }
 
-        private void EmitReferenceLoad(FleeILGenerator ilg)
+        private void EmitReferenceLoad(FleeIlGenerator ilg)
         {
             ilg.Emit(OpCodes.Ldarg_1);
-            this.MyContext.CalculationEngine.EmitLoad(this.MyName, ilg);
+            this.myContext.CalculationEngine.EmitLoad(this.myName, ilg);
         }
 
-        private void EmitFirst(FleeILGenerator ilg)
+        private void EmitFirst(FleeIlGenerator ilg)
         {
-            bool flag = this.MyPrevious != null;
+            var flag = this.myPrevious != null;
             if (!flag)
             {
-                bool isVariable = this.MyVariableType != null;
-                bool flag2 = isVariable;
+                var isVariable = this.myVariableType != null;
+                var flag2 = isVariable;
                 if (flag2)
                 {
                     EmitLoadVariables(ilg);
                 }
                 else
                 {
-                    bool flag3 = this.MyOptions.IsOwnerType(this.MemberOwnerType) & !this.IsStatic;
+                    var flag3 = this.myOptions.IsOwnerType(this.MemberOwnerType) & !this.IsStatic;
                     if (flag3)
                     {
                         this.EmitLoadOwner(ilg);
@@ -444,47 +417,33 @@ namespace Flee
             }
         }
 
-        private void EmitVariableLoad(FleeILGenerator ilg)
+        private void EmitVariableLoad(FleeIlGenerator ilg)
         {
-            MethodInfo mi = VariableCollection.GetVariableLoadMethod(this.MyVariableType);
-            ilg.Emit(OpCodes.Ldstr, this.MyName);
+            var mi = VariableCollection.GetVariableLoadMethod(this.myVariableType);
+            ilg.Emit(OpCodes.Ldstr, this.myName);
             this.EmitMethodCall(mi, ilg);
         }
 
-        private void EmitFieldLoad(FieldInfo fi, FleeILGenerator ilg, IServiceProvider services)
+        private void EmitFieldLoad(FieldInfo fi, FleeIlGenerator ilg, IServiceProvider services)
         {
-            bool isLiteral = fi.IsLiteral;
+            var isLiteral = fi.IsLiteral;
             if (isLiteral)
             {
                 EmitLiteral(fi, ilg, services);
             }
             else
             {
-                bool flag = this.ResultType.IsValueType & this.NextRequiresAddress;
-                if (flag)
-                {
-                    EmitLdfld(fi, true, ilg);
-                }
-                else
-                {
-                    EmitLdfld(fi, false, ilg);
-                }
+                var flag = this.ResultType.IsValueType & this.NextRequiresAddress;
+                EmitLdfld(fi, flag, ilg);
             }
         }
 
-        private static void EmitLdfld(FieldInfo fi, bool indirect, FleeILGenerator ilg)
+        private static void EmitLdfld(FieldInfo fi, bool indirect, FleeIlGenerator ilg)
         {
-            bool isStatic = fi.IsStatic;
+            var isStatic = fi.IsStatic;
             if (isStatic)
             {
-                if (indirect)
-                {
-                    ilg.Emit(OpCodes.Ldsflda, fi);
-                }
-                else
-                {
-                    ilg.Emit(OpCodes.Ldsfld, fi);
-                }
+                ilg.Emit(indirect ? OpCodes.Ldsflda : OpCodes.Ldsfld, fi);
             }
             else if (indirect)
             {
@@ -496,10 +455,10 @@ namespace Flee
             }
         }
 
-        private static void EmitLiteral(FieldInfo fi, FleeILGenerator ilg, IServiceProvider services)
+        private static void EmitLiteral(FieldInfo fi, FleeIlGenerator ilg, IServiceProvider services)
         {
-            object value = RuntimeHelpers.GetObjectValue(fi.GetValue(null));
-            Type t = value.GetType();
+            var value = RuntimeHelpers.GetObjectValue(fi.GetValue(null));
+            var t = value.GetType();
             LiteralElement elem;
             switch (Type.GetTypeCode(t))
             {
@@ -539,21 +498,21 @@ namespace Flee
             elem.Emit(ilg, services);
         }
 
-        private void EmitPropertyLoad(PropertyInfo pi, FleeILGenerator ilg)
+        private void EmitPropertyLoad(PropertyInfo pi, FleeIlGenerator ilg)
         {
-            MethodInfo getter = pi.GetGetMethod(true);
+            var getter = pi.GetGetMethod(true);
             this.EmitMethodCall(getter, ilg);
         }
 
-        private void EmitVirtualPropertyLoad(FleeILGenerator ilg)
+        private void EmitVirtualPropertyLoad(FleeIlGenerator ilg)
         {
-            int index = ilg.GetTempLocalIndex(this.MyPrevious.ResultType);
+            var index = ilg.GetTempLocalIndex(this.myPrevious.ResultType);
             Utility.EmitStoreLocal(ilg, index);
             EmitLoadVariables(ilg);
-            ilg.Emit(OpCodes.Ldstr, this.MyName);
+            ilg.Emit(OpCodes.Ldstr, this.myName);
             Utility.EmitLoadLocal(ilg, index);
-            ImplicitConverter.EmitImplicitConvert(this.MyPrevious.ResultType, typeof(object), ilg);
-            MethodInfo mi = VariableCollection.GetVirtualPropertyLoadMethod(this.ResultType);
+            ImplicitConverter.EmitImplicitConvert(this.myPrevious.ResultType, typeof(object), ilg);
+            var mi = VariableCollection.GetVirtualPropertyLoadMethod(this.ResultType);
             this.EmitMethodCall(mi, ilg);
         }
     }

@@ -22,7 +22,7 @@ namespace Flee
             this.MyIndex = index;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             Utility.EmitLoadLocal(ilg, this.MyIndex);
         }

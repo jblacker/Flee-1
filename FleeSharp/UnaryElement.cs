@@ -4,28 +4,22 @@ namespace Flee
 {
     internal abstract class UnaryElement : ExpressionElement
     {
-        protected ExpressionElement MyChild;
+        protected ExpressionElement myChild;
 
-        private Type MyResultType;
+        private Type myResultType;
 
-        public override Type ResultType
-        {
-            get
-            {
-                return this.MyResultType;
-            }
-        }
+        public override Type ResultType => this.myResultType;
 
         public void SetChild(ExpressionElement child)
         {
-            this.MyChild = child;
-            this.MyResultType = this.GetResultType(child.ResultType);
-            bool flag = this.MyResultType == null;
+            this.myChild = child;
+            this.myResultType = this.GetResultType(child.ResultType);
+            bool flag = this.myResultType == null;
             if (flag)
             {
                 this.ThrowCompileException("OperationNotDefinedForType", CompileExceptionReason.TypeMismatch, new object[]
                 {
-                    this.MyChild.ResultType.Name
+                    this.myChild.ResultType.Name
                 });
             }
         }

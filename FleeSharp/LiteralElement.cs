@@ -3,6 +3,8 @@ using System.Reflection.Emit;
 
 namespace Flee
 {
+    using System;
+
     internal abstract class LiteralElement : ExpressionElement
     {
         protected void OnParseOverflow(string image)
@@ -14,51 +16,41 @@ namespace Flee
             });
         }
 
-        public static void EmitLoad(int value, FleeILGenerator ilg)
+        public static void EmitLoad(int value, FleeIlGenerator ilg)
         {
-            bool flag = value >= -1 & value <= 8;
-            if (flag)
+            if (value >= -1 & value <= 8)
             {
                 EmitSuperShort(value, ilg);
             }
+            else if (value >= sbyte.MinValue & value <= sbyte.MaxValue)
+            {
+                ilg.Emit(OpCodes.Ldc_I4_S, Convert.ToSByte(value));
+            }
             else
             {
-                bool flag2 = value >= -128 & value <= 127;
-                if (flag2)
-                {
-                    ilg.Emit(OpCodes.Ldc_I4_S, (sbyte)value);
-                }
-                else
-                {
-                    ilg.Emit(OpCodes.Ldc_I4, value);
-                }
+                ilg.Emit(OpCodes.Ldc_I4, value);
             }
         }
 
-        protected static void EmitLoad(long value, FleeILGenerator ilg)
+        protected static void EmitLoad(long value, FleeIlGenerator ilg)
         {
-            bool flag = value >= -2147483648L & value <= 2147483647L;
-            if (flag)
+            if (value >= int.MinValue & value <= int.MaxValue)
             {
-                EmitLoad((int)value, ilg);
+                EmitLoad(Convert.ToInt32(value), ilg);
                 ilg.Emit(OpCodes.Conv_I8);
             }
+            else if (value >= 0 & value <= uint.MaxValue)
+            {
+                EmitLoad(Convert.ToInt32(value), ilg);
+                ilg.Emit(OpCodes.Conv_U8);
+            }
             else
             {
-                bool flag2 = value >= 0L & value <= (long)((ulong)-1);
-                if (flag2)
-                {
-                    EmitLoad((int)value, ilg);
-                    ilg.Emit(OpCodes.Conv_U8);
-                }
-                else
-                {
-                    ilg.Emit(OpCodes.Ldc_I8, value);
-                }
+                ilg.Emit(OpCodes.Ldc_I8, value);
             }
         }
 
-        protected static void EmitLoad(bool value, FleeILGenerator ilg)
+        protected static void EmitLoad(bool value, FleeIlGenerator ilg)
         {
             if (value)
             {
@@ -70,9 +62,9 @@ namespace Flee
             }
         }
 
-        private static void EmitSuperShort(int value, FleeILGenerator ilg)
+        private static void EmitSuperShort(int value, FleeIlGenerator ilg)
         {
-            OpCode ldcOpcode;
+            OpCode ldcOpcode = default(OpCode);
             switch (value)
             {
                 case -1:

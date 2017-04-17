@@ -128,7 +128,7 @@ namespace Flee
             return getOverloadedOperatorFunctionName;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             var overloadedMethod = this.GetOverloadedArithmeticOperator();
             var flag = overloadedMethod != null;
@@ -155,7 +155,7 @@ namespace Flee
             return t == typeof(uint) | t == typeof(ulong);
         }
 
-        private void EmitArithmeticOperation(BinaryArithmeticOperation op, FleeILGenerator ilg, IServiceProvider services)
+        private void EmitArithmeticOperation(BinaryArithmeticOperation op, FleeIlGenerator ilg, IServiceProvider services)
         {
             var options = (ExpressionOptions)services.GetService(typeof(ExpressionOptions));
             var unsigned = IsUnsignedForArithmetic(this.myLeftChild.ResultType) & IsUnsignedForArithmetic(this.myRightChild.ResultType);
@@ -221,7 +221,7 @@ namespace Flee
             }
         }
 
-        private void EmitPower(FleeILGenerator ilg, bool emitOverflow, bool unsigned)
+        private void EmitPower(FleeIlGenerator ilg, bool emitOverflow, bool unsigned)
         {
             var isOptimizablePower = this.IsOptimizablePower;
             if (isOptimizablePower)
@@ -234,7 +234,7 @@ namespace Flee
             }
         }
 
-        private void EmitOptimizedPower(FleeILGenerator ilg, bool emitOverflow, bool unsigned)
+        private void EmitOptimizedPower(FleeIlGenerator ilg, bool emitOverflow, bool unsigned)
         {
             var right = (Int32LiteralElement)this.myRightChild;
             var flag = right.Value == 0;
@@ -263,7 +263,7 @@ namespace Flee
             }
         }
 
-        private void EmitMultiply(FleeILGenerator ilg, bool emitOverflow, bool unsigned)
+        private void EmitMultiply(FleeIlGenerator ilg, bool emitOverflow, bool unsigned)
         {
             if (emitOverflow)
             {
@@ -275,7 +275,7 @@ namespace Flee
             }
         }
 
-        private void EmitStringConcat(FleeILGenerator ilg, IServiceProvider services)
+        private void EmitStringConcat(FleeIlGenerator ilg, IServiceProvider services)
         {
             var flag = this.AreBothChildrenOfType(typeof(string));
             MethodInfo concatMethodInfo;

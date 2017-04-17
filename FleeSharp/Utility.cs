@@ -22,7 +22,7 @@ namespace Flee
             }
         }
 
-        public static void EmitStoreLocal(FleeILGenerator ilg, int index)
+        public static void EmitStoreLocal(FleeIlGenerator ilg, int index)
         {
             bool flag = index >= 0 & index <= 3;
             if (flag)
@@ -50,7 +50,7 @@ namespace Flee
             }
         }
 
-        public static void EmitLoadLocal(FleeILGenerator ilg, int index)
+        public static void EmitLoadLocal(FleeIlGenerator ilg, int index)
         {
             Debug.Assert(index >= 0, "Invalid index");
             bool flag = index >= 0 & index <= 3;
@@ -79,7 +79,7 @@ namespace Flee
             }
         }
 
-        public static void EmitLoadLocalAddress(FleeILGenerator ilg, int index)
+        public static void EmitLoadLocalAddress(FleeIlGenerator ilg, int index)
         {
             Debug.Assert(index >= 0, "Invalid index");
             bool flag = index <= 255;
@@ -93,7 +93,7 @@ namespace Flee
             }
         }
 
-        public static void EmitArrayLoad(FleeILGenerator ilg, Type elementType)
+        public static void EmitArrayLoad(FleeIlGenerator ilg, Type elementType)
         {
             switch (Type.GetTypeCode(elementType))
             {
@@ -135,7 +135,7 @@ namespace Flee
             ilg.Emit(OpCodes.Ldobj, elementType);
         }
 
-        public static void EmitArrayStore(FleeILGenerator ilg, Type elementType)
+        public static void EmitArrayStore(FleeIlGenerator ilg, Type elementType)
         {
             switch (Type.GetTypeCode(elementType))
             {
@@ -170,7 +170,7 @@ namespace Flee
             ilg.Emit(OpCodes.Stelem, elementType);
         }
 
-        public static void SyncFleeILGeneratorLabels(FleeILGenerator source, FleeILGenerator target)
+        public static void SyncFleeILGeneratorLabels(FleeIlGenerator source, FleeIlGenerator target)
         {
             while (source.LabelCount != target.LabelCount)
             {
@@ -180,61 +180,50 @@ namespace Flee
 
         public static bool IsIntegralType(Type t)
         {
-            TypeCode tc = Type.GetTypeCode(t);
+            var tc = Type.GetTypeCode(t);
             return tc - TypeCode.SByte <= 7;
         }
 
         public static Type GetBitwiseOpType(Type leftType, Type rightType)
         {
             bool flag = !IsIntegralType(leftType) || !IsIntegralType(rightType);
-            Type GetBitwiseOpType;
-            if (flag)
-            {
-                GetBitwiseOpType = null;
-            }
-            else
-            {
-                GetBitwiseOpType = ImplicitConverter.GetBinaryResultType(leftType, rightType);
-            }
-            return GetBitwiseOpType;
+            var getBitwiseOpType = flag ? null : ImplicitConverter.GetBinaryResultType(leftType, rightType);
+            return getBitwiseOpType;
         }
 
         public static MethodInfo GetSimpleOverloadedOperator(string name, Type sourceType, Type destType)
         {
-            Hashtable data = new Hashtable();
-            data.Add("Name", "op_" + name);
-            data.Add("sourceType", sourceType);
-            data.Add("destType", destType);
-            MemberInfo[] members = sourceType.FindMembers(MemberTypes.Method, BindingFlags.Static | BindingFlags.Public, new MemberFilter(SimpleOverloadedOperatorFilter), data);
+            var data = new Hashtable {{"Name", "op_" + name}, {"sourceType", sourceType}, {"destType", destType}};
+            var members = sourceType.FindMembers(MemberTypes.Method, BindingFlags.Static | BindingFlags.Public, SimpleOverloadedOperatorFilter, data);
             bool flag = members.Length == 0;
             if (flag)
             {
-                members = destType.FindMembers(MemberTypes.Method, BindingFlags.Static | BindingFlags.Public, new MemberFilter(SimpleOverloadedOperatorFilter), data);
+                members = destType.FindMembers(MemberTypes.Method, BindingFlags.Static | BindingFlags.Public, SimpleOverloadedOperatorFilter, data);
             }
             Debug.Assert(members.Length < 2, "Multiple overloaded operators found");
             bool flag2 = members.Length == 0;
-            MethodInfo GetSimpleOverloadedOperator;
+            MethodInfo getSimpleOverloadedOperator;
             if (flag2)
             {
-                GetSimpleOverloadedOperator = null;
+                getSimpleOverloadedOperator = null;
             }
             else
             {
-                GetSimpleOverloadedOperator = (MethodInfo)members[0];
+                getSimpleOverloadedOperator = (MethodInfo)members[0];
             }
-            return GetSimpleOverloadedOperator;
+            return getSimpleOverloadedOperator;
         }
 
         private static bool SimpleOverloadedOperatorFilter(MemberInfo member, object value)
         {
-            IDictionary data = (IDictionary)value;
-            MethodInfo method = (MethodInfo)member;
+            var data = (IDictionary)value;
+            var method = (MethodInfo)member;
             bool nameMatch = method.IsSpecialName && method.Name.Equals((string)data["Name"], StringComparison.OrdinalIgnoreCase);
             bool flag = !nameMatch;
-            bool SimpleOverloadedOperatorFilter;
+            bool simpleOverloadedOperatorFilter;
             if (flag)
             {
-                SimpleOverloadedOperatorFilter = false;
+                simpleOverloadedOperatorFilter = false;
             }
             else
             {
@@ -242,38 +231,30 @@ namespace Flee
                 bool flag2 = !returnTypeMatch;
                 if (flag2)
                 {
-                    SimpleOverloadedOperatorFilter = false;
+                    simpleOverloadedOperatorFilter = false;
                 }
                 else
                 {
-                    ParameterInfo[] parameters = method.GetParameters();
+                    var parameters = method.GetParameters();
                     bool argumentMatch = parameters.Length > 0 && parameters[0].ParameterType == (Type)data["sourceType"];
-                    SimpleOverloadedOperatorFilter = argumentMatch;
+                    simpleOverloadedOperatorFilter = argumentMatch;
                 }
             }
-            return SimpleOverloadedOperatorFilter;
+            return simpleOverloadedOperatorFilter;
         }
 
         public static MethodInfo GetOverloadedOperator(string name, Type sourceType, Binder binder, params Type[] argumentTypes)
         {
             name = "op_" + name;
-            MethodInfo mi = sourceType.GetMethod(name, BindingFlags.Static | BindingFlags.Public, binder, CallingConventions.Any, argumentTypes, null);
+            var mi = sourceType.GetMethod(name, BindingFlags.Static | BindingFlags.Public, binder, CallingConventions.Any, argumentTypes, null);
             bool flag = mi == null || !mi.IsSpecialName;
-            MethodInfo GetOverloadedOperator;
-            if (flag)
-            {
-                GetOverloadedOperator = null;
-            }
-            else
-            {
-                GetOverloadedOperator = mi;
-            }
-            return GetOverloadedOperator;
+            var getOverloadedOperator = flag ? null : mi;
+            return getOverloadedOperator;
         }
 
         public static int GetILGeneratorLength(ILGenerator ilg)
         {
-            FieldInfo fi = typeof(ILGenerator).GetField("m_length", BindingFlags.Instance | BindingFlags.NonPublic);
+            var fi = typeof(ILGenerator).GetField("m_length", BindingFlags.Instance | BindingFlags.NonPublic);
             return (int)fi.GetValue(ilg);
         }
 

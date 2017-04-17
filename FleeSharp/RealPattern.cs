@@ -9,8 +9,8 @@ namespace Flee
     {
         protected override void ComputeToken(int id, string name, PatternType type, string pattern, ExpressionContext context)
         {
-            ExpressionParserOptions options = context.ParserOptions;
-            char digitsBeforePattern = Conversions.ToChar(Interaction.IIf(options.RequireDigitsBeforeDecimalPoint, '+', '*'));
+            var options = context.ParserOptions;
+            var digitsBeforePattern = Conversions.ToChar(Interaction.IIf(options.RequireDigitsBeforeDecimalPoint, '+', '*'));
             pattern = string.Format(pattern, digitsBeforePattern, options.DecimalSeparator);
             this.SetData(id, name, type, pattern);
         }

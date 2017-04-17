@@ -5,40 +5,26 @@ namespace Flee
 {
     internal class UInt32LiteralElement : IntegralLiteralElement
     {
-        private uint MyValue;
+        private readonly uint myValue;
 
-        public override Type ResultType
-        {
-            get
-            {
-                return typeof(uint);
-            }
-        }
+        public override Type ResultType => typeof(uint);
 
         public UInt32LiteralElement(uint value)
         {
-            this.MyValue = value;
+            this.myValue = value;
         }
 
         public static UInt32LiteralElement TryCreate(string image, NumberStyles ns)
         {
             uint value;
             bool flag = uint.TryParse(image, ns, null, out value);
-            UInt32LiteralElement TryCreate;
-            if (flag)
-            {
-                TryCreate = new UInt32LiteralElement(value);
-            }
-            else
-            {
-                TryCreate = null;
-            }
-            return TryCreate;
+            var tryCreate = flag ? new UInt32LiteralElement(value) : null;
+            return tryCreate;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
-            EmitLoad((int)this.MyValue, ilg);
+            EmitLoad((int)this.myValue, ilg);
         }
     }
 }

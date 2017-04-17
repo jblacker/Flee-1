@@ -11,40 +11,40 @@ namespace Flee
 {
     public sealed class ExpressionOptions
     {
-        private PropertyDictionary MyProperties;
+        private PropertyDictionary myProperties;
 
-        private Type MyOwnerType;
+        private Type myOwnerType;
 
-        private ExpressionContext MyOwner;
+        private readonly ExpressionContext myOwner;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
-        private EventHandler CaseSensitiveChangedEvent;
+        private EventHandler caseSensitiveChangedEvent;
 
         internal event EventHandler CaseSensitiveChanged
         {
             [CompilerGenerated]
             add
             {
-                EventHandler eventHandler = this.CaseSensitiveChangedEvent;
+                var eventHandler = this.caseSensitiveChangedEvent;
                 EventHandler eventHandler2;
                 do
                 {
                     eventHandler2 = eventHandler;
-                    EventHandler value2 = (EventHandler)Delegate.Combine(eventHandler2, value);
-                    eventHandler = Interlocked.CompareExchange<EventHandler>(ref this.CaseSensitiveChangedEvent, value2, eventHandler2);
+                    var value2 = (EventHandler)Delegate.Combine(eventHandler2, value);
+                    eventHandler = Interlocked.CompareExchange(ref this.caseSensitiveChangedEvent, value2, eventHandler2);
                 }
                 while (eventHandler != eventHandler2);
             }
             [CompilerGenerated]
             remove
             {
-                EventHandler eventHandler = this.CaseSensitiveChangedEvent;
+                var eventHandler = this.caseSensitiveChangedEvent;
                 EventHandler eventHandler2;
                 do
                 {
                     eventHandler2 = eventHandler;
-                    EventHandler value2 = (EventHandler)Delegate.Remove(eventHandler2, value);
-                    eventHandler = Interlocked.CompareExchange<EventHandler>(ref this.CaseSensitiveChangedEvent, value2, eventHandler2);
+                    var value2 = (EventHandler)Delegate.Remove(eventHandler2, value);
+                    eventHandler = Interlocked.CompareExchange<EventHandler>(ref this.caseSensitiveChangedEvent, value2, eventHandler2);
                 }
                 while (eventHandler != eventHandler2);
             }
@@ -54,12 +54,12 @@ namespace Flee
         {
             get
             {
-                return this.MyProperties.GetValue<Type>("ResultType");
+                return this.myProperties.GetValue<Type>("ResultType");
             }
             set
             {
                 Utility.AssertNotNull(value, "value");
-                this.MyProperties.SetValue("ResultType", value);
+                this.myProperties.SetValue("ResultType", value);
             }
         }
 
@@ -67,11 +67,11 @@ namespace Flee
         {
             get
             {
-                return this.MyProperties.GetValue<bool>("Checked");
+                return this.myProperties.GetValue<bool>("Checked");
             }
             set
             {
-                this.MyProperties.SetValue("Checked", value);
+                this.myProperties.SetValue("Checked", value);
             }
         }
 
@@ -79,11 +79,11 @@ namespace Flee
         {
             get
             {
-                return this.MyProperties.GetValue<StringComparison>("StringComparison");
+                return this.myProperties.GetValue<StringComparison>("StringComparison");
             }
             set
             {
-                this.MyProperties.SetValue("StringComparison", value);
+                this.myProperties.SetValue("StringComparison", value);
             }
         }
 
@@ -91,11 +91,11 @@ namespace Flee
         {
             get
             {
-                return this.MyProperties.GetValue<bool>("EmitToAssembly");
+                return this.myProperties.GetValue<bool>("EmitToAssembly");
             }
             set
             {
-                this.MyProperties.SetValue("EmitToAssembly", value);
+                this.myProperties.SetValue("EmitToAssembly", value);
             }
         }
 
@@ -103,11 +103,11 @@ namespace Flee
         {
             get
             {
-                return this.MyProperties.GetValue<BindingFlags>("OwnerMemberAccess");
+                return this.myProperties.GetValue<BindingFlags>("OwnerMemberAccess");
             }
             set
             {
-                this.MyProperties.SetValue("OwnerMemberAccess", value);
+                this.myProperties.SetValue("OwnerMemberAccess", value);
             }
         }
 
@@ -115,19 +115,16 @@ namespace Flee
         {
             get
             {
-                return this.MyProperties.GetValue<bool>("CaseSensitive");
+                return this.myProperties.GetValue<bool>("CaseSensitive");
             }
             set
             {
-                bool flag = this.CaseSensitive != value;
+                var flag = this.CaseSensitive != value;
                 if (flag)
                 {
-                    this.MyProperties.SetValue("CaseSensitive", value);
-                    EventHandler caseSensitiveChangedEvent = this.CaseSensitiveChangedEvent;
-                    if (caseSensitiveChangedEvent != null)
-                    {
-                        caseSensitiveChangedEvent(this, EventArgs.Empty);
-                    }
+                    this.myProperties.SetValue("CaseSensitive", value);
+                    var caseSensitiveCe = this.caseSensitiveChangedEvent;
+                    caseSensitiveCe?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -136,11 +133,11 @@ namespace Flee
         {
             get
             {
-                return this.MyProperties.GetValue<bool>("IntegersAsDoubles");
+                return this.myProperties.GetValue<bool>("IntegersAsDoubles");
             }
             set
             {
-                this.MyProperties.SetValue("IntegersAsDoubles", value);
+                this.myProperties.SetValue("IntegersAsDoubles", value);
             }
         }
 
@@ -148,17 +145,17 @@ namespace Flee
         {
             get
             {
-                return this.MyProperties.GetValue<CultureInfo>("ParseCulture");
+                return this.myProperties.GetValue<CultureInfo>("ParseCulture");
             }
             set
             {
                 Utility.AssertNotNull(value, "ParseCulture");
-                bool flag = value.LCID != this.ParseCulture.LCID;
+                var flag = value.LCID != this.ParseCulture.LCID;
                 if (flag)
                 {
-                    this.MyProperties.SetValue("ParseCulture", value);
+                    this.myProperties.SetValue("ParseCulture", value);
                     this.SetParseCulture(value);
-                    this.MyOwner.ParserOptions.RecreateParser();
+                    this.myOwner.ParserOptions.RecreateParser();
                 }
             }
         }
@@ -167,11 +164,11 @@ namespace Flee
         {
             get
             {
-                return this.MyProperties.GetValue<RealLiteralDataType>("RealLiteralDataType");
+                return this.myProperties.GetValue<RealLiteralDataType>("RealLiteralDataType");
             }
             set
             {
-                this.MyProperties.SetValue("RealLiteralDataType", value);
+                this.myProperties.SetValue("RealLiteralDataType", value);
             }
         }
 
@@ -179,17 +176,9 @@ namespace Flee
         {
             get
             {
-                bool caseSensitive = this.CaseSensitive;
-                IEqualityComparer<string> StringComparer;
-                if (caseSensitive)
-                {
-                    StringComparer = System.StringComparer.Ordinal;
-                }
-                else
-                {
-                    StringComparer = System.StringComparer.OrdinalIgnoreCase;
-                }
-                return StringComparer;
+                var caseSensitive = this.CaseSensitive;
+                IEqualityComparer<string> stringComparer = caseSensitive ? System.StringComparer.Ordinal : System.StringComparer.OrdinalIgnoreCase;
+                return stringComparer;
             }
         }
 
@@ -197,17 +186,9 @@ namespace Flee
         {
             get
             {
-                bool caseSensitive = this.CaseSensitive;
-                MemberFilter MemberFilter;
-                if (caseSensitive)
-                {
-                    MemberFilter = Type.FilterName;
-                }
-                else
-                {
-                    MemberFilter = Type.FilterNameIgnoreCase;
-                }
-                return MemberFilter;
+                var caseSensitive = this.CaseSensitive;
+                var memberFilter = caseSensitive ? Type.FilterName : Type.FilterNameIgnoreCase;
+                return memberFilter;
             }
         }
 
@@ -215,44 +196,30 @@ namespace Flee
         {
             get
             {
-                bool caseSensitive = this.CaseSensitive;
-                StringComparison MemberStringComparison;
-                if (caseSensitive)
-                {
-                    MemberStringComparison = StringComparison.Ordinal;
-                }
-                else
-                {
-                    MemberStringComparison = StringComparison.OrdinalIgnoreCase;
-                }
-                return MemberStringComparison;
+                var caseSensitive = this.CaseSensitive;
+                var memberStringComparison = caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+                return memberStringComparison;
             }
         }
 
-        internal Type OwnerType
-        {
-            get
-            {
-                return this.MyOwnerType;
-            }
-        }
+        internal Type OwnerType => this.myOwnerType;
 
         internal bool IsGeneric
         {
             get
             {
-                return this.MyProperties.GetValue<bool>("IsGeneric");
+                return this.myProperties.GetValue<bool>("IsGeneric");
             }
             set
             {
-                this.MyProperties.SetValue("IsGeneric", value);
+                this.myProperties.SetValue("IsGeneric", value);
             }
         }
 
         internal ExpressionOptions(ExpressionContext owner)
         {
-            this.MyOwner = owner;
-            this.MyProperties = new PropertyDictionary();
+            this.myOwner = owner;
+            this.myProperties = new PropertyDictionary();
             this.InitializeProperties();
         }
 
@@ -260,20 +227,20 @@ namespace Flee
         {
             this.StringComparison = StringComparison.Ordinal;
             this.OwnerMemberAccess = BindingFlags.Public;
-            this.MyProperties.SetToDefault<bool>("CaseSensitive");
-            this.MyProperties.SetToDefault<bool>("Checked");
-            this.MyProperties.SetToDefault<bool>("EmitToAssembly");
-            this.MyProperties.SetToDefault<Type>("ResultType");
-            this.MyProperties.SetToDefault<bool>("IsGeneric");
-            this.MyProperties.SetToDefault<bool>("IntegersAsDoubles");
-            this.MyProperties.SetValue("ParseCulture", CultureInfo.CurrentCulture);
+            this.myProperties.SetToDefault<bool>("CaseSensitive");
+            this.myProperties.SetToDefault<bool>("Checked");
+            this.myProperties.SetToDefault<bool>("EmitToAssembly");
+            this.myProperties.SetToDefault<Type>("ResultType");
+            this.myProperties.SetToDefault<bool>("IsGeneric");
+            this.myProperties.SetToDefault<bool>("IntegersAsDoubles");
+            this.myProperties.SetValue("ParseCulture", CultureInfo.CurrentCulture);
             this.SetParseCulture(this.ParseCulture);
-            this.MyProperties.SetValue("RealLiteralDataType", RealLiteralDataType.Double);
+            this.myProperties.SetValue("RealLiteralDataType", RealLiteralDataType.Double);
         }
 
         private void SetParseCulture(CultureInfo ci)
         {
-            ExpressionParserOptions po = this.MyOwner.ParserOptions;
+            var po = this.myOwner.ParserOptions;
             po.DecimalSeparator = Conversions.ToChar(ci.NumberFormat.NumberDecimalSeparator);
             po.FunctionArgumentSeparator = Conversions.ToChar(ci.TextInfo.ListSeparator);
             po.DateTimeFormat = ci.DateTimeFormat.ShortDatePattern;
@@ -281,19 +248,19 @@ namespace Flee
 
         internal ExpressionOptions Clone()
         {
-            ExpressionOptions clonedOptions = (ExpressionOptions)this.MemberwiseClone();
-            clonedOptions.MyProperties = this.MyProperties.Clone();
+            var clonedOptions = (ExpressionOptions)this.MemberwiseClone();
+            clonedOptions.myProperties = this.myProperties.Clone();
             return clonedOptions;
         }
 
         internal bool IsOwnerType(Type t)
         {
-            return this.MyOwnerType.IsAssignableFrom(t);
+            return this.myOwnerType.IsAssignableFrom(t);
         }
 
         internal void SetOwnerType(Type ownerType)
         {
-            this.MyOwnerType = ownerType;
+            this.myOwnerType = ownerType;
         }
     }
 }

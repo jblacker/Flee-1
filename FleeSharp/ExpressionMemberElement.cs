@@ -4,54 +4,30 @@ namespace Flee
 {
     internal class ExpressionMemberElement : MemberElement
     {
-        private ExpressionElement MyElement;
+        private readonly ExpressionElement myElement;
 
-        protected override bool SupportsInstance
-        {
-            get
-            {
-                return true;
-            }
-        }
+        protected override bool SupportsInstance => true;
 
-        protected override bool IsPublic
-        {
-            get
-            {
-                return true;
-            }
-        }
+        protected override bool IsPublic => true;
 
-        public override bool IsStatic
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool IsStatic => false;
 
-        public override Type ResultType
-        {
-            get
-            {
-                return this.MyElement.ResultType;
-            }
-        }
+        public override Type ResultType => this.myElement.ResultType;
 
         public ExpressionMemberElement(ExpressionElement element)
         {
-            this.MyElement = element;
+            this.myElement = element;
         }
 
         protected override void ResolveInternal()
         {
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             base.Emit(ilg, services);
-            this.MyElement.Emit(ilg, services);
-            bool isValueType = this.MyElement.ResultType.IsValueType;
+            this.myElement.Emit(ilg, services);
+            bool isValueType = this.myElement.ResultType.IsValueType;
             if (isValueType)
             {
                 EmitValueTypeLoadAddress(ilg, this.ResultType);

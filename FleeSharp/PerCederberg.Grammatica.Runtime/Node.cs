@@ -1,14 +1,16 @@
 namespace Flee.PerCederberg.Grammatica.Runtime
 {
     using System.Collections;
+    using System.Collections.Generic;
     using System.IO;
     using System.Runtime.CompilerServices;
+    using Extensions;
 
     internal abstract class Node
 	{
 		private Node parentNode;
 
-		private ArrayList valuesArrayList;
+		protected List<object> valuesArrayList;
 
 		public abstract int Id { get; }
 
@@ -104,21 +106,21 @@ namespace Flee.PerCederberg.Grammatica.Runtime
 
 	    public virtual Node this[int index] => null;
 
-	    public ArrayList ValuesArrayList
+	    public IList<object> ValuesArrayList
 		{
 			get
 			{
 				bool flag = this.valuesArrayList == null;
 				if (flag)
 				{
-					this.valuesArrayList = new ArrayList();
+					this.valuesArrayList = new List<object>();
 				}
 				return this.valuesArrayList;
 			}
-			set
-			{
-				this.valuesArrayList = value;
-			}
+			//set
+			//{
+			//	this.valuesArrayList = value;
+			//}
 		}
 
 		internal virtual bool IsHidden()
@@ -204,10 +206,10 @@ namespace Flee.PerCederberg.Grammatica.Runtime
 
 		public object GetValue(int pos)
 		{
-			return this.ValuesArrayList[pos];
+			return this.valuesArrayList[pos];
 		}
 
-		public ArrayList GetAllValues()
+		public ICollection GetAllValues()
 		{
 			return this.valuesArrayList;
 		}
@@ -217,16 +219,20 @@ namespace Flee.PerCederberg.Grammatica.Runtime
 			bool flag = value != null;
 			if (flag)
 			{
-				this.ValuesArrayList.Add(RuntimeHelpers.GetObjectValue(value));
+				this.valuesArrayList.Add(RuntimeHelpers.GetObjectValue(value));
 			}
 		}
 
-		public void AddValues(ArrayList values)
+		public void AddValues(IEnumerable<object> values)
 		{
 			bool flag = values != null;
 			if (flag)
 			{
-				this.ValuesArrayList.AddRange(values);
+			    foreach (var o in values)
+			    {
+			        this.valuesArrayList.Add(o);
+			    }
+				//this.valuesArrayList.AddRange(values);
 			}
 		}
 
@@ -252,4 +258,20 @@ namespace Flee.PerCederberg.Grammatica.Runtime
 			}
 		}
 	}
+
+
+    internal class NodeValue
+    {
+        private object t;
+
+        public void SetValue<T>(T t)
+        {
+            this.t = t;
+        }
+
+        public T GetValue<T>()
+        {
+            return (T) this.t;
+        }
+    }
 }

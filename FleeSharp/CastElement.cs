@@ -282,7 +282,7 @@ namespace Flee
             return getUnderlyingEnumType;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             this.myCastExpression.Emit(ilg, services);
             var sourceType = this.myCastExpression.ResultType;
@@ -290,7 +290,7 @@ namespace Flee
             this.EmitCast(ilg, sourceType, destType, services);
         }
 
-        private void EmitCast(FleeILGenerator ilg, Type sourceType, Type destType, IServiceProvider services)
+        private void EmitCast(FleeIlGenerator ilg, Type sourceType, Type destType, IServiceProvider services)
         {
             var explicitOperator = this.GetExplictOverloadedOperator(sourceType, destType);
             var flag = sourceType == destType;
@@ -349,7 +349,7 @@ namespace Flee
             }
         }
 
-        private void EmitEnumCast(FleeILGenerator ilg, Type sourceType, Type destType, IServiceProvider services)
+        private void EmitEnumCast(FleeIlGenerator ilg, Type sourceType, Type destType, IServiceProvider services)
         {
             var flag = !destType.IsValueType;
             if (flag)
@@ -372,7 +372,7 @@ namespace Flee
             }
         }
 
-        private static void EmitExplicitNumericCast(FleeILGenerator ilg, Type sourceType, Type destType, IServiceProvider services)
+        private static void EmitExplicitNumericCast(FleeIlGenerator ilg, Type sourceType, Type destType, IServiceProvider services)
         {
             var desttc = Type.GetTypeCode(destType);
             var sourcetc = Type.GetTypeCode(sourceType);

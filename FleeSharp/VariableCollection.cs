@@ -1,522 +1,42 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Threading;
-
 namespace Flee
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Runtime.CompilerServices;
+    using System.Threading;
+    using Extensions;
+
     public sealed class VariableCollection : IDictionary<string, object>
     {
-        private IDictionary<string, IVariable> myVariables;
-
         private readonly ExpressionContext myContext;
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
-        private EventHandler<ResolveVariableTypeEventArgs> resolveVariableTypeEvent;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
-        private EventHandler<ResolveVariableValueEventArgs> resolveVariableValueEvent;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
-        private EventHandler<ResolveFunctionEventArgs> resolveFunctionEvent;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [CompilerGenerated]
         private EventHandler<InvokeFunctionEventArgs> invokeFunctionEvent;
 
-        public event EventHandler<ResolveVariableTypeEventArgs> ResolveVariableType
-        {
-            [CompilerGenerated]
-            add
-            {
-                EventHandler<ResolveVariableTypeEventArgs> eventHandler = this.resolveVariableTypeEvent;
-                EventHandler<ResolveVariableTypeEventArgs> eventHandler2;
-                do
-                {
-                    eventHandler2 = eventHandler;
-                    EventHandler<ResolveVariableTypeEventArgs> value2 = (EventHandler<ResolveVariableTypeEventArgs>)Delegate.Combine(eventHandler2, value);
-                    eventHandler = Interlocked.CompareExchange<EventHandler<ResolveVariableTypeEventArgs>>(ref this.resolveVariableTypeEvent, value2, eventHandler2);
-                }
-                while (eventHandler != eventHandler2);
-            }
-            [CompilerGenerated]
-            remove
-            {
-                EventHandler<ResolveVariableTypeEventArgs> eventHandler = this.resolveVariableTypeEvent;
-                EventHandler<ResolveVariableTypeEventArgs> eventHandler2;
-                do
-                {
-                    eventHandler2 = eventHandler;
-                    EventHandler<ResolveVariableTypeEventArgs> value2 = (EventHandler<ResolveVariableTypeEventArgs>)Delegate.Remove(eventHandler2, value);
-                    eventHandler = Interlocked.CompareExchange<EventHandler<ResolveVariableTypeEventArgs>>(ref this.resolveVariableTypeEvent, value2, eventHandler2);
-                }
-                while (eventHandler != eventHandler2);
-            }
-        }
+        private IDictionary<string, IVariable> myVariables;
 
-        public event EventHandler<ResolveVariableValueEventArgs> ResolveVariableValue
-        {
-            [CompilerGenerated]
-            add
-            {
-                EventHandler<ResolveVariableValueEventArgs> eventHandler = this.resolveVariableValueEvent;
-                EventHandler<ResolveVariableValueEventArgs> eventHandler2;
-                do
-                {
-                    eventHandler2 = eventHandler;
-                    EventHandler<ResolveVariableValueEventArgs> value2 = (EventHandler<ResolveVariableValueEventArgs>)Delegate.Combine(eventHandler2, value);
-                    eventHandler = Interlocked.CompareExchange<EventHandler<ResolveVariableValueEventArgs>>(ref this.resolveVariableValueEvent, value2, eventHandler2);
-                }
-                while (eventHandler != eventHandler2);
-            }
-            [CompilerGenerated]
-            remove
-            {
-                EventHandler<ResolveVariableValueEventArgs> eventHandler = this.resolveVariableValueEvent;
-                EventHandler<ResolveVariableValueEventArgs> eventHandler2;
-                do
-                {
-                    eventHandler2 = eventHandler;
-                    EventHandler<ResolveVariableValueEventArgs> value2 = (EventHandler<ResolveVariableValueEventArgs>)Delegate.Remove(eventHandler2, value);
-                    eventHandler = Interlocked.CompareExchange<EventHandler<ResolveVariableValueEventArgs>>(ref this.resolveVariableValueEvent, value2, eventHandler2);
-                }
-                while (eventHandler != eventHandler2);
-            }
-        }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [CompilerGenerated]
+        private EventHandler<ResolveFunctionEventArgs> resolveFunctionEvent;
 
-        public event EventHandler<ResolveFunctionEventArgs> ResolveFunction
-        {
-            [CompilerGenerated]
-            add
-            {
-                EventHandler<ResolveFunctionEventArgs> eventHandler = this.resolveFunctionEvent;
-                EventHandler<ResolveFunctionEventArgs> eventHandler2;
-                do
-                {
-                    eventHandler2 = eventHandler;
-                    EventHandler<ResolveFunctionEventArgs> value2 = (EventHandler<ResolveFunctionEventArgs>)Delegate.Combine(eventHandler2, value);
-                    eventHandler = Interlocked.CompareExchange<EventHandler<ResolveFunctionEventArgs>>(ref this.resolveFunctionEvent, value2, eventHandler2);
-                }
-                while (eventHandler != eventHandler2);
-            }
-            [CompilerGenerated]
-            remove
-            {
-                EventHandler<ResolveFunctionEventArgs> eventHandler = this.resolveFunctionEvent;
-                EventHandler<ResolveFunctionEventArgs> eventHandler2;
-                do
-                {
-                    eventHandler2 = eventHandler;
-                    EventHandler<ResolveFunctionEventArgs> value2 = (EventHandler<ResolveFunctionEventArgs>)Delegate.Remove(eventHandler2, value);
-                    eventHandler = Interlocked.CompareExchange<EventHandler<ResolveFunctionEventArgs>>(ref this.resolveFunctionEvent, value2, eventHandler2);
-                }
-                while (eventHandler != eventHandler2);
-            }
-        }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [CompilerGenerated]
+        private EventHandler<ResolveVariableTypeEventArgs> resolveVariableTypeEvent;
 
-        public event EventHandler<InvokeFunctionEventArgs> InvokeFunction
-        {
-            [CompilerGenerated]
-            add
-            {
-                EventHandler<InvokeFunctionEventArgs> eventHandler = this.invokeFunctionEvent;
-                EventHandler<InvokeFunctionEventArgs> eventHandler2;
-                do
-                {
-                    eventHandler2 = eventHandler;
-                    EventHandler<InvokeFunctionEventArgs> value2 = (EventHandler<InvokeFunctionEventArgs>)Delegate.Combine(eventHandler2, value);
-                    eventHandler = Interlocked.CompareExchange<EventHandler<InvokeFunctionEventArgs>>(ref this.invokeFunctionEvent, value2, eventHandler2);
-                }
-                while (eventHandler != eventHandler2);
-            }
-            [CompilerGenerated]
-            remove
-            {
-                EventHandler<InvokeFunctionEventArgs> eventHandler = this.invokeFunctionEvent;
-                EventHandler<InvokeFunctionEventArgs> eventHandler2;
-                do
-                {
-                    eventHandler2 = eventHandler;
-                    EventHandler<InvokeFunctionEventArgs> value2 = (EventHandler<InvokeFunctionEventArgs>)Delegate.Remove(eventHandler2, value);
-                    eventHandler = Interlocked.CompareExchange<EventHandler<InvokeFunctionEventArgs>>(ref this.invokeFunctionEvent, value2, eventHandler2);
-                }
-                while (eventHandler != eventHandler2);
-            }
-        }
-
-        public int Count
-        {
-            get
-            {
-                return this.myVariables.Count;
-            }
-        }
-
-        bool ICollection<KeyValuePair<string, object>>.IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        public object this[string name]
-        {
-            get
-            {
-                IVariable v = this.GetVariable(name, true);
-                return v.ValueAsObject;
-            }
-            set
-            {
-                IVariable v = null;
-                bool flag = this.myVariables.TryGetValue(name, out v);
-                if (flag)
-                {
-                    v.ValueAsObject = RuntimeHelpers.GetObjectValue(value);
-                }
-                else
-                {
-                    this.Add(name, RuntimeHelpers.GetObjectValue(value));
-                }
-            }
-        }
-
-        public ICollection<string> Keys
-        {
-            get
-            {
-                return this.myVariables.Keys;
-            }
-        }
-
-        public ICollection<object> Values
-        {
-            get
-            {
-                Dictionary<string, object> dict = this.GetNameValueDictionary();
-                return dict.Values;
-            }
-        }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [CompilerGenerated]
+        private EventHandler<ResolveVariableValueEventArgs> resolveVariableValueEvent;
 
         internal VariableCollection(ExpressionContext context)
         {
             this.myContext = context;
             this.CreateDictionary();
             this.HookOptions();
-        }
-
-        private void HookOptions()
-        {
-            this.myContext.Options.CaseSensitiveChanged += new EventHandler(this.OnOptionsCaseSensitiveChanged);
-        }
-
-        private void CreateDictionary()
-        {
-            this.myVariables = new Dictionary<string, IVariable>(this.myContext.Options.StringComparer);
-        }
-
-        private void OnOptionsCaseSensitiveChanged(object sender, EventArgs e)
-        {
-            this.CreateDictionary();
-        }
-
-        internal void Copy(VariableCollection dest)
-        {
-            dest.CreateDictionary();
-            dest.HookOptions();
-            try
-            {
-                IEnumerator<KeyValuePair<string, IVariable>> enumerator = this.myVariables.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    KeyValuePair<string, IVariable> pair = enumerator.Current;
-                    IVariable copyVariable = pair.Value.Clone();
-                    dest.myVariables.Add(pair.Key, copyVariable);
-                }
-            }
-            finally
-            {
-                IEnumerator<KeyValuePair<string, IVariable>> enumerator;
-                if (enumerator != null)
-                {
-                    enumerator.Dispose();
-                }
-            }
-        }
-
-        internal void DefineVariableInternal(string name, Type variableType, object variableValue)
-        {
-            Utility.AssertNotNull(variableType, "variableType");
-            bool flag = this.myVariables.ContainsKey(name);
-            if (flag)
-            {
-                string msg = Utility.GetGeneralErrorMessage("VariableWithNameAlreadyDefined", new object[]
-                {
-                    name
-                });
-                throw new ArgumentException(msg);
-            }
-            IVariable v = this.CreateVariable(variableType, RuntimeHelpers.GetObjectValue(variableValue));
-            this.myVariables.Add(name, v);
-        }
-
-        internal Type GetVariableTypeInternal(string name)
-        {
-            IVariable value = null;
-            bool success = this.myVariables.TryGetValue(name, out value);
-            bool flag = success;
-            Type getVariableTypeInternal;
-            if (flag)
-            {
-                getVariableTypeInternal = value.VariableType;
-            }
-            else
-            {
-                ResolveVariableTypeEventArgs args = new ResolveVariableTypeEventArgs(name);
-                EventHandler<ResolveVariableTypeEventArgs> resolveVariableTypeEvent = this.resolveVariableTypeEvent;
-                if (resolveVariableTypeEvent != null)
-                {
-                    resolveVariableTypeEvent(this, args);
-                }
-                getVariableTypeInternal = args.VariableType;
-            }
-            return getVariableTypeInternal;
-        }
-
-        private IVariable GetVariable(string name, bool throwOnNotFound)
-        {
-            IVariable value = null;
-            bool success = this.myVariables.TryGetValue(name, out value);
-            bool flag = !success & throwOnNotFound;
-            if (flag)
-            {
-                string msg = Utility.GetGeneralErrorMessage("UndefinedVariable", new object[]
-                {
-                    name
-                });
-                throw new ArgumentException(msg);
-            }
-            return value;
-        }
-
-        private IVariable CreateVariable(Type variableValueType, object variableValue)
-        {
-            IExpression expression = variableValue as IExpression;
-            ExpressionOptions options = null;
-            bool flag = expression != null;
-            if (flag)
-            {
-                options = expression.Context.Options;
-                variableValueType = options.ResultType;
-            }
-            bool flag2 = expression != null;
-            Type variableType;
-            if (flag2)
-            {
-                bool flag3 = !options.IsGeneric;
-                if (flag3)
-                {
-                    variableType = typeof(DynamicExpressionVariable<>);
-                }
-                else
-                {
-                    variableType = typeof(GenericExpressionVariable<>);
-                }
-            }
-            else
-            {
-                this.myContext.AssertTypeIsAccessible(variableValueType);
-                variableType = typeof(GenericVariable<>);
-            }
-            variableType = variableType.MakeGenericType(new Type[]
-            {
-                variableValueType
-            });
-            return (IVariable)Activator.CreateInstance(variableType);
-        }
-
-        internal Type ResolveOnDemandFunction(string name, Type[] argumentTypes)
-        {
-            ResolveFunctionEventArgs args = new ResolveFunctionEventArgs(name, argumentTypes);
-            EventHandler<ResolveFunctionEventArgs> resolveFunctionEvent = this.resolveFunctionEvent;
-            if (resolveFunctionEvent != null)
-            {
-                resolveFunctionEvent(this, args);
-            }
-            return args.ReturnType;
-        }
-
-        private static T ReturnGenericValue<T>(object value)
-        {
-            bool flag = value == null;
-            T returnGenericValue;
-            if (flag)
-            {
-                returnGenericValue = default(T);
-            }
-            else
-            {
-                returnGenericValue = (T)((object)value);
-            }
-            return returnGenericValue;
-        }
-
-        private static void ValidateSetValueType(Type requiredType, object value)
-        {
-            bool flag = value == null;
-            if (!flag)
-            {
-                Type valueType = value.GetType();
-                bool flag2 = !requiredType.IsAssignableFrom(valueType);
-                if (flag2)
-                {
-                    string msg = Utility.GetGeneralErrorMessage("VariableValueNotAssignableToType", new object[]
-                    {
-                        valueType.Name,
-                        requiredType.Name
-                    });
-                    throw new ArgumentException(msg);
-                }
-            }
-        }
-
-        internal static MethodInfo GetVariableLoadMethod(Type variableType)
-        {
-            MethodInfo mi = typeof(VariableCollection).GetMethod("GetVariableValueInternal", BindingFlags.Instance | BindingFlags.Public);
-            return mi.MakeGenericMethod(new Type[]
-            {
-                variableType
-            });
-        }
-
-        internal static MethodInfo GetFunctionInvokeMethod(Type returnType)
-        {
-            MethodInfo mi = typeof(VariableCollection).GetMethod("GetFunctionResultInternal", BindingFlags.Instance | BindingFlags.Public);
-            return mi.MakeGenericMethod(new Type[]
-            {
-                returnType
-            });
-        }
-
-        internal static MethodInfo GetVirtualPropertyLoadMethod(Type returnType)
-        {
-            MethodInfo mi = typeof(VariableCollection).GetMethod("GetVirtualPropertyValueInternal", BindingFlags.Instance | BindingFlags.Public);
-            return mi.MakeGenericMethod(new Type[]
-            {
-                returnType
-            });
-        }
-
-        private Dictionary<string, object> GetNameValueDictionary()
-        {
-            Dictionary<string, object> dict = new Dictionary<string, object>();
-            try
-            {
-                IEnumerator<KeyValuePair<string, IVariable>> enumerator = this.myVariables.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    KeyValuePair<string, IVariable> pair = enumerator.Current;
-                    dict.Add(pair.Key, RuntimeHelpers.GetObjectValue(pair.Value.ValueAsObject));
-                }
-            }
-            finally
-            {
-                IEnumerator<KeyValuePair<string, IVariable>> enumerator;
-                if (enumerator != null)
-                {
-                    enumerator.Dispose();
-                }
-            }
-            return dict;
-        }
-
-        public Type GetVariableType(string name)
-        {
-            IVariable v = this.GetVariable(name, true);
-            return v.VariableType;
-        }
-
-        public void DefineVariable(string name, Type variableType)
-        {
-            this.DefineVariableInternal(name, variableType, null);
-        }
-
-        public T GetVariableValueInternal<T>(string name)
-        {
-            IGenericVariable<T> v = null;
-            IDictionary<string, IVariable> arg140 = this.myVariables;
-            IVariable variable = (IVariable)v;
-            bool flag = arg140.TryGetValue(name, out variable);
-            v = (IGenericVariable<T>)variable;
-            bool flag2 = flag;
-            T getVariableValueInternal;
-            if (flag2)
-            {
-                getVariableValueInternal = v.GetValue();
-            }
-            else
-            {
-                GenericVariable<T> vTemp = new GenericVariable<T>();
-                ResolveVariableValueEventArgs args = new ResolveVariableValueEventArgs(name, typeof(T));
-                EventHandler<ResolveVariableValueEventArgs> resolveVariableValueEvent = this.resolveVariableValueEvent;
-                if (resolveVariableValueEvent != null)
-                {
-                    resolveVariableValueEvent(this, args);
-                }
-                ValidateSetValueType(typeof(T), RuntimeHelpers.GetObjectValue(args.VariableValue));
-                vTemp.ValueAsObject = RuntimeHelpers.GetObjectValue(args.VariableValue);
-                v = vTemp;
-                getVariableValueInternal = v.GetValue();
-            }
-            return getVariableValueInternal;
-        }
-
-        public T GetVirtualPropertyValueInternal<T>(string name, object component)
-        {
-            PropertyDescriptorCollection coll = TypeDescriptor.GetProperties(RuntimeHelpers.GetObjectValue(component));
-            PropertyDescriptor pd = coll.Find(name, true);
-            object value = RuntimeHelpers.GetObjectValue(pd.GetValue(RuntimeHelpers.GetObjectValue(component)));
-            ValidateSetValueType(typeof(T), RuntimeHelpers.GetObjectValue(value));
-            return ReturnGenericValue<T>(RuntimeHelpers.GetObjectValue(value));
-        }
-
-        public T GetFunctionResultInternal<T>(string name, object[] arguments)
-        {
-            InvokeFunctionEventArgs args = new InvokeFunctionEventArgs(name, arguments);
-            EventHandler<InvokeFunctionEventArgs> invokeFunctionEvent = this.invokeFunctionEvent;
-            if (invokeFunctionEvent != null)
-            {
-                invokeFunctionEvent(this, args);
-            }
-            object result = RuntimeHelpers.GetObjectValue(args.Result);
-            ValidateSetValueType(typeof(T), RuntimeHelpers.GetObjectValue(result));
-            return ReturnGenericValue<T>(RuntimeHelpers.GetObjectValue(result));
-        }
-
-        //void ICollection<KeyValuePair<string, object>>.Add1(KeyValuePair<string, object> item)
-        //{
-        //	this.Add(item.Key, RuntimeHelpers.GetObjectValue(item.Value));
-        //}
-
-        public void Clear()
-        {
-            this.myVariables.Clear();
-        }
-
-        //bool ICollection<KeyValuePair<string, object>>.Contains1(KeyValuePair<string, object> item)
-        //{
-        //	return this.ContainsKey(item.Key);
-        //}
-
-        void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
-        {
-            Dictionary<string, object> dict = this.GetNameValueDictionary();
-            ICollection<KeyValuePair<string, object>> coll = dict;
-            coll.CopyTo(array, arrayIndex);
         }
 
         //bool ICollection<KeyValuePair<string, object>>.Remove1(KeyValuePair<string, object> item)
@@ -533,23 +53,56 @@ namespace Flee
             this[name] = RuntimeHelpers.GetObjectValue(value);
         }
 
+        /// <summary>Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
+        /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
+        /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
+        public void Add(KeyValuePair<string, object> item)
+        {
+            throw new NotImplementedException();
+        }
+
+        //void ICollection<KeyValuePair<string, object>>.Add1(KeyValuePair<string, object> item)
+        //{
+        //	this.Add(item.Key, RuntimeHelpers.GetObjectValue(item.Value));
+        //}
+
+        public void Clear()
+        {
+            this.myVariables.Clear();
+        }
+
+        /// <summary>Determines whether the <see cref="T:System.Collections.Generic.ICollection`1" /> contains a specific value.</summary>
+        /// <returns>true if <paramref name="item" /> is found in the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, false.</returns>
+        /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
+        public bool Contains(KeyValuePair<string, object> item)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool ContainsKey(string name)
         {
             return this.myVariables.ContainsKey(name);
         }
 
-        public bool Remove(string name)
+        //bool ICollection<KeyValuePair<string, object>>.Contains1(KeyValuePair<string, object> item)
+        //{
+        //	return this.ContainsKey(item.Key);
+        //}
+
+        void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
         {
-            this.myVariables.Remove(name);
-            bool remove;
-            return remove;
+            var dict = this.GetNameValueDictionary();
+            ICollection<KeyValuePair<string, object>> coll = dict;
+            coll.CopyTo(array, arrayIndex);
         }
+
+        public int Count => this.myVariables.Count;
 
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
-            Dictionary<string, object> dict = this.GetNameValueDictionary();
-            return (IEnumerator<KeyValuePair<string, object>>)dict.GetEnumerator();
+            var dict = this.GetNameValueDictionary();
+            return dict.GetEnumerator();
         }
 
 
@@ -560,20 +113,36 @@ namespace Flee
             return this.GetEnumerator();
         }
 
-        /// <summary>Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
-        /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-        /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
-        public void Add(KeyValuePair<string, object> item)
+        bool ICollection<KeyValuePair<string, object>>.IsReadOnly => false;
+
+        public object this[string name]
         {
-            throw new NotImplementedException();
+            get
+            {
+                var v = this.GetVariable(name, true);
+                return v.ValueAsObject;
+            }
+            set
+            {
+                IVariable v;
+                var flag = this.myVariables.TryGetValue(name, out v);
+                if (flag)
+                {
+                    v.ValueAsObject = RuntimeHelpers.GetObjectValue(value);
+                }
+                else
+                {
+                    this.Add(name, RuntimeHelpers.GetObjectValue(value));
+                }
+            }
         }
 
-        /// <summary>Determines whether the <see cref="T:System.Collections.Generic.ICollection`1" /> contains a specific value.</summary>
-        /// <returns>true if <paramref name="item" /> is found in the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, false.</returns>
-        /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-        public bool Contains(KeyValuePair<string, object> item)
+        public ICollection<string> Keys => this.myVariables.Keys;
+
+        public bool Remove(string name)
         {
-            throw new NotImplementedException();
+            this.myVariables.Remove(name);
+            return false;
         }
 
         /// <summary>Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1" />.</summary>
@@ -593,17 +162,386 @@ namespace Flee
         /// <paramref name="key" /> is null.</exception>
         public bool TryGetValue(string key, out object value)
         {
-            IVariable v = this.GetVariable(key, false);
-            bool flag = v != null;
+            var v = this.GetVariable(key, false);
+            var flag = v != null;
+            value = flag ? RuntimeHelpers.GetObjectValue(v.ValueAsObject) : null;
+            return v != null;
+        }
+
+        public ICollection<object> Values
+        {
+            get
+            {
+                var dict = this.GetNameValueDictionary();
+                return dict.Values;
+            }
+        }
+
+        public event EventHandler<ResolveVariableTypeEventArgs> ResolveVariableType
+        {
+            [CompilerGenerated]
+            add
+            {
+                var eventHandler = this.resolveVariableTypeEvent;
+                EventHandler<ResolveVariableTypeEventArgs> eventHandler2;
+                do
+                {
+                    eventHandler2 = eventHandler;
+                    var value2 = (EventHandler<ResolveVariableTypeEventArgs>) Delegate.Combine(eventHandler2, value);
+                    eventHandler = Interlocked.CompareExchange(ref this.resolveVariableTypeEvent, value2, eventHandler2);
+                } while (eventHandler != eventHandler2);
+            }
+            [CompilerGenerated]
+            remove
+            {
+                var eventHandler = this.resolveVariableTypeEvent;
+                EventHandler<ResolveVariableTypeEventArgs> eventHandler2;
+                do
+                {
+                    eventHandler2 = eventHandler;
+                    var value2 = (EventHandler<ResolveVariableTypeEventArgs>) Delegate.Remove(eventHandler2, value);
+                    eventHandler = Interlocked.CompareExchange(ref this.resolveVariableTypeEvent, value2, eventHandler2);
+                } while (eventHandler != eventHandler2);
+            }
+        }
+
+        public event EventHandler<ResolveVariableValueEventArgs> ResolveVariableValue
+        {
+            [CompilerGenerated]
+            add
+            {
+                var eventHandler = this.resolveVariableValueEvent;
+                EventHandler<ResolveVariableValueEventArgs> eventHandler2;
+                do
+                {
+                    eventHandler2 = eventHandler;
+                    var value2 = (EventHandler<ResolveVariableValueEventArgs>) Delegate.Combine(eventHandler2, value);
+                    eventHandler = Interlocked.CompareExchange(ref this.resolveVariableValueEvent, value2, eventHandler2);
+                } while (eventHandler != eventHandler2);
+            }
+            [CompilerGenerated]
+            remove
+            {
+                var eventHandler = this.resolveVariableValueEvent;
+                EventHandler<ResolveVariableValueEventArgs> eventHandler2;
+                do
+                {
+                    eventHandler2 = eventHandler;
+                    var value2 = (EventHandler<ResolveVariableValueEventArgs>) Delegate.Remove(eventHandler2, value);
+                    eventHandler = Interlocked.CompareExchange(ref this.resolveVariableValueEvent, value2, eventHandler2);
+                } while (eventHandler != eventHandler2);
+            }
+        }
+
+        public event EventHandler<ResolveFunctionEventArgs> ResolveFunction
+        {
+            [CompilerGenerated]
+            add
+            {
+                var eventHandler = this.resolveFunctionEvent;
+                EventHandler<ResolveFunctionEventArgs> eventHandler2;
+                do
+                {
+                    eventHandler2 = eventHandler;
+                    var value2 = (EventHandler<ResolveFunctionEventArgs>) Delegate.Combine(eventHandler2, value);
+                    eventHandler = Interlocked.CompareExchange(ref this.resolveFunctionEvent, value2, eventHandler2);
+                } while (eventHandler != eventHandler2);
+            }
+            [CompilerGenerated]
+            remove
+            {
+                var eventHandler = this.resolveFunctionEvent;
+                EventHandler<ResolveFunctionEventArgs> eventHandler2;
+                do
+                {
+                    eventHandler2 = eventHandler;
+                    var value2 = (EventHandler<ResolveFunctionEventArgs>) Delegate.Remove(eventHandler2, value);
+                    eventHandler = Interlocked.CompareExchange(ref this.resolveFunctionEvent, value2, eventHandler2);
+                } while (eventHandler != eventHandler2);
+            }
+        }
+
+        public event EventHandler<InvokeFunctionEventArgs> InvokeFunction
+        {
+            [CompilerGenerated]
+            add
+            {
+                var eventHandler = this.invokeFunctionEvent;
+                EventHandler<InvokeFunctionEventArgs> eventHandler2;
+                do
+                {
+                    eventHandler2 = eventHandler;
+                    var value2 = (EventHandler<InvokeFunctionEventArgs>) Delegate.Combine(eventHandler2, value);
+                    eventHandler = Interlocked.CompareExchange(ref this.invokeFunctionEvent, value2, eventHandler2);
+                } while (eventHandler != eventHandler2);
+            }
+            [CompilerGenerated]
+            remove
+            {
+                var eventHandler = this.invokeFunctionEvent;
+                EventHandler<InvokeFunctionEventArgs> eventHandler2;
+                do
+                {
+                    eventHandler2 = eventHandler;
+                    var value2 = (EventHandler<InvokeFunctionEventArgs>) Delegate.Remove(eventHandler2, value);
+                    eventHandler = Interlocked.CompareExchange(ref this.invokeFunctionEvent, value2, eventHandler2);
+                } while (eventHandler != eventHandler2);
+            }
+        }
+
+        private void HookOptions()
+        {
+            this.myContext.Options.CaseSensitiveChanged += this.OnOptionsCaseSensitiveChanged;
+        }
+
+        private void CreateDictionary()
+        {
+            this.myVariables = new Dictionary<string, IVariable>(this.myContext.Options.StringComparer);
+        }
+
+        private void OnOptionsCaseSensitiveChanged(object sender, EventArgs e)
+        {
+            this.CreateDictionary();
+        }
+
+        internal void Copy(VariableCollection dest)
+        {
+            dest.CreateDictionary();
+            dest.HookOptions();
+
+            foreach (var pair in this.myVariables)
+            {
+                var copyVariable = pair.Value.Clone();
+                dest.myVariables.Add(pair.Key, copyVariable);
+            }
+            //try
+            //{
+            //    var enumerator = this.myVariables.GetEnumerator();
+            //    while (enumerator.MoveNext())
+            //    {
+            //        var pair = enumerator.Current;
+            //        var copyVariable = pair.Value.Clone();
+            //        dest.myVariables.Add(pair.Key, copyVariable);
+            //    }
+            //}
+            //finally
+            //{
+            //    IEnumerator<KeyValuePair<string, IVariable>> enumerator;
+            //    if (enumerator != null)
+            //    {
+            //        enumerator.Dispose();
+            //    }
+            //}
+        }
+
+        internal void DefineVariableInternal(string name, Type variableType, object variableValue)
+        {
+            Utility.AssertNotNull(variableType, "variableType");
+            var flag = this.myVariables.ContainsKey(name);
             if (flag)
             {
-                value = RuntimeHelpers.GetObjectValue(v.ValueAsObject);
+                var msg = Utility.GetGeneralErrorMessage("VariableWithNameAlreadyDefined", name);
+                throw new ArgumentException(msg);
+            }
+            var v = this.CreateVariable(variableType, RuntimeHelpers.GetObjectValue(variableValue));
+            this.myVariables.Add(name, v);
+        }
+
+        internal Type GetVariableTypeInternal(string name)
+        {
+            IVariable value;
+            var success = this.myVariables.TryGetValue(name, out value);
+            var flag = success;
+            Type getVariableTypeInternal;
+            if (flag)
+            {
+                getVariableTypeInternal = value.VariableType;
             }
             else
             {
-                value = null;
+                var args = new ResolveVariableTypeEventArgs(name);
+                var resolveVariableTypeEvent1 = this.resolveVariableTypeEvent;
+                resolveVariableTypeEvent1?.Invoke(this, args);
+                getVariableTypeInternal = args.VariableType;
             }
-            return v != null;
+            return getVariableTypeInternal;
+        }
+
+        private IVariable GetVariable(string name, bool throwOnNotFound)
+        {
+            IVariable value;
+            var success = this.myVariables.TryGetValue(name, out value);
+            var flag = !success & throwOnNotFound;
+            if (flag)
+            {
+                var msg = Utility.GetGeneralErrorMessage("UndefinedVariable", name);
+                throw new ArgumentException(msg);
+            }
+            return value;
+        }
+
+        private IVariable CreateVariable(Type variableValueType, object variableValue)
+        {
+            var expression = variableValue as IExpression;
+            ExpressionOptions options = null;
+            var flag = expression != null;
+            if (flag)
+            {
+                options = expression.Context.Options;
+                variableValueType = options.ResultType;
+            }
+            var flag2 = expression != null;
+            Type variableType;
+            if (flag2)
+            {
+                var flag3 = !options.IsGeneric;
+                variableType = flag3 ? typeof(DynamicExpressionVariable<>) : typeof(GenericExpressionVariable<>);
+            }
+            else
+            {
+                this.myContext.AssertTypeIsAccessible(variableValueType);
+                variableType = typeof(GenericVariable<>);
+            }
+            variableType = variableType.MakeGenericType(variableValueType);
+            return (IVariable) Activator.CreateInstance(variableType);
+        }
+
+        internal Type ResolveOnDemandFunction(string name, Type[] argumentTypes)
+        {
+            var args = new ResolveFunctionEventArgs(name, argumentTypes);
+            var resolveFunctionEvent1 = this.resolveFunctionEvent;
+            resolveFunctionEvent1?.Invoke(this, args);
+            return args.ReturnType;
+        }
+
+        private static T ReturnGenericValue<T>(object value)
+        {
+            var flag = value == null;
+            T returnGenericValue;
+            if (flag)
+            {
+                returnGenericValue = default(T);
+            }
+            else
+            {
+                returnGenericValue = (T) value;
+            }
+            return returnGenericValue;
+        }
+
+        private static void ValidateSetValueType(Type requiredType, object value)
+        {
+            var flag = value == null;
+            if (!flag)
+            {
+                var valueType = value.GetType();
+                var flag2 = !requiredType.IsAssignableFrom(valueType);
+                if (flag2)
+                {
+                    var msg = Utility.GetGeneralErrorMessage("VariableValueNotAssignableToType", valueType.Name, requiredType.Name);
+                    throw new ArgumentException(msg);
+                }
+            }
+        }
+
+        internal static MethodInfo GetVariableLoadMethod(Type variableType)
+        {
+            var mi = typeof(VariableCollection).GetMethod("GetVariableValueInternal", BindingFlags.Instance | BindingFlags.Public);
+            return mi.MakeGenericMethod(variableType);
+        }
+
+        internal static MethodInfo GetFunctionInvokeMethod(Type returnType)
+        {
+            var mi = typeof(VariableCollection).GetMethod("GetFunctionResultInternal", BindingFlags.Instance | BindingFlags.Public);
+            return mi.MakeGenericMethod(returnType);
+        }
+
+        internal static MethodInfo GetVirtualPropertyLoadMethod(Type returnType)
+        {
+            var mi = typeof(VariableCollection).GetMethod("GetVirtualPropertyValueInternal",
+                BindingFlags.Instance | BindingFlags.Public);
+            return mi.MakeGenericMethod(returnType);
+        }
+
+        private Dictionary<string, object> GetNameValueDictionary()
+        {
+            var dict = new Dictionary<string, object>();
+            this.myVariables.Each(d => dict.Add(d.Key, RuntimeHelpers.GetObjectValue(d.Value.ValueAsObject)));
+
+            //try
+            //{
+            //    var enumerator = this.myVariables.GetEnumerator();
+            //    while (enumerator.MoveNext())
+            //    {
+            //        var pair = enumerator.Current;
+            //        dict.Add(pair.Key, RuntimeHelpers.GetObjectValue(pair.Value.ValueAsObject));
+            //    }
+            //}
+            //finally
+            //{
+            //    IEnumerator<KeyValuePair<string, IVariable>> enumerator;
+            //    if (enumerator != null)
+            //    {
+            //        enumerator.Dispose();
+            //    }
+            //}
+            return dict;
+        }
+
+        public Type GetVariableType(string name)
+        {
+            var v = this.GetVariable(name, true);
+            return v.VariableType;
+        }
+
+        public void DefineVariable(string name, Type variableType)
+        {
+            this.DefineVariableInternal(name, variableType, null);
+        }
+
+        public T GetVariableValueInternal<T>(string name)
+        {
+            var arg140 = this.myVariables;
+            IVariable variable;
+            var flag = arg140.TryGetValue(name, out variable);
+            var v = (IGenericVariable<T>) variable;
+            var flag2 = flag;
+            T getVariableValueInternal;
+            if (flag2)
+            {
+                getVariableValueInternal = v.GetValue();
+            }
+            else
+            {
+                var vTemp = new GenericVariable<T>();
+                var args = new ResolveVariableValueEventArgs(name, typeof(T));
+                var resolveVariableValueEvent1 = this.resolveVariableValueEvent;
+                resolveVariableValueEvent1?.Invoke(this, args);
+                ValidateSetValueType(typeof(T), RuntimeHelpers.GetObjectValue(args.VariableValue));
+                vTemp.ValueAsObject = RuntimeHelpers.GetObjectValue(args.VariableValue);
+                v = vTemp;
+                getVariableValueInternal = v.GetValue();
+            }
+            return getVariableValueInternal;
+        }
+
+        public T GetVirtualPropertyValueInternal<T>(string name, object component)
+        {
+            var coll = TypeDescriptor.GetProperties(RuntimeHelpers.GetObjectValue(component));
+            var pd = coll.Find(name, true);
+            var value = RuntimeHelpers.GetObjectValue(pd.GetValue(RuntimeHelpers.GetObjectValue(component)));
+            ValidateSetValueType(typeof(T), RuntimeHelpers.GetObjectValue(value));
+            return ReturnGenericValue<T>(RuntimeHelpers.GetObjectValue(value));
+        }
+
+        public T GetFunctionResultInternal<T>(string name, object[] arguments)
+        {
+            var args = new InvokeFunctionEventArgs(name, arguments);
+            var invokeFunctionEvent1 = this.invokeFunctionEvent;
+            invokeFunctionEvent1?.Invoke(this, args);
+            var result = RuntimeHelpers.GetObjectValue(args.Result);
+            ValidateSetValueType(typeof(T), RuntimeHelpers.GetObjectValue(result));
+            return ReturnGenericValue<T>(RuntimeHelpers.GetObjectValue(result));
         }
     }
 }

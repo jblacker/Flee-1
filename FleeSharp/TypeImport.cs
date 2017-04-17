@@ -6,35 +6,17 @@ namespace Flee
 {
     public sealed class TypeImport : ImportBase
     {
-        private Type MyType;
+        private readonly Type myType;
 
-        private BindingFlags MyBindFlags;
+        private readonly BindingFlags myBindFlags;
 
-        private bool MyUseTypeNameAsNamespace;
+        private readonly bool myUseTypeNameAsNamespace;
 
-        public override bool IsContainer
-        {
-            get
-            {
-                return this.MyUseTypeNameAsNamespace;
-            }
-        }
+        public override bool IsContainer => this.myUseTypeNameAsNamespace;
 
-        public override string Name
-        {
-            get
-            {
-                return this.MyType.Name;
-            }
-        }
+        public override string Name => this.myType.Name;
 
-        public Type Target
-        {
-            get
-            {
-                return this.MyType;
-            }
-        }
+        public Type Target => this.myType;
 
         public TypeImport(Type importType) : this(importType, false)
         {
@@ -47,75 +29,67 @@ namespace Flee
         internal TypeImport(Type t, BindingFlags flags, bool useTypeNameAsNamespace)
         {
             Utility.AssertNotNull(t, "t");
-            this.MyType = t;
-            this.MyBindFlags = flags;
-            this.MyUseTypeNameAsNamespace = useTypeNameAsNamespace;
+            this.myType = t;
+            this.myBindFlags = flags;
+            this.myUseTypeNameAsNamespace = useTypeNameAsNamespace;
         }
 
         internal override void Validate()
         {
-            this.Context.AssertTypeIsAccessible(this.MyType);
+            this.Context.AssertTypeIsAccessible(this.myType);
         }
 
         protected override void AddMembers(string memberName, MemberTypes memberType, ICollection<MemberInfo> dest)
         {
-            MemberInfo[] members = this.MyType.FindMembers(memberType, this.MyBindFlags, this.Context.Options.MemberFilter, memberName);
+            var members = this.myType.FindMembers(memberType, this.myBindFlags, this.Context.Options.MemberFilter, memberName);
             AddMemberRange(members, dest);
         }
 
         protected override void AddMembers(MemberTypes memberType, ICollection<MemberInfo> dest)
         {
-            bool flag = !this.MyUseTypeNameAsNamespace;
+            bool flag = !this.myUseTypeNameAsNamespace;
             if (flag)
             {
-                MemberInfo[] members = this.MyType.FindMembers(memberType, this.MyBindFlags, new MemberFilter(this.AlwaysMemberFilter), null);
+                var members = this.myType.FindMembers(memberType, this.myBindFlags, this.AlwaysMemberFilter, null);
                 AddMemberRange(members, dest);
             }
         }
 
         internal override bool IsMatch(string name)
         {
-            bool myUseTypeNameAsNamespace = this.MyUseTypeNameAsNamespace;
-            return myUseTypeNameAsNamespace && string.Equals(this.MyType.Name, name, this.Context.Options.MemberStringComparison);
+            bool myUseTypeNameAsNamespace1 = this.myUseTypeNameAsNamespace;
+            return myUseTypeNameAsNamespace1 && string.Equals(this.myType.Name, name, this.Context.Options.MemberStringComparison);
         }
 
         internal override Type FindType(string typeName)
         {
-            bool flag = string.Equals(typeName, this.MyType.Name, this.Context.Options.MemberStringComparison);
-            Type FindType;
-            if (flag)
-            {
-                FindType = this.MyType;
-            }
-            else
-            {
-                FindType = null;
-            }
-            return FindType;
+            bool flag = string.Equals(typeName, this.myType.Name, this.Context.Options.MemberStringComparison);
+            var findType = flag ? this.myType : null;
+            return findType;
         }
 
         protected override bool EqualsInternal(ImportBase import)
         {
-            TypeImport otherSameType = import as TypeImport;
-            return otherSameType != null && this.MyType == otherSameType.MyType;
+            var otherSameType = import as TypeImport;
+            return otherSameType != null && this.myType == otherSameType.myType;
         }
 
         public override IEnumerator<ImportBase> GetEnumerator()
         {
-            bool myUseTypeNameAsNamespace = this.MyUseTypeNameAsNamespace;
-            IEnumerator<ImportBase> GetEnumerator;
-            if (myUseTypeNameAsNamespace)
+            bool myUseTypeNameAsNamespace1 = this.myUseTypeNameAsNamespace;
+            IEnumerator<ImportBase> getEnumerator;
+            if (myUseTypeNameAsNamespace1)
             {
-                GetEnumerator = (IEnumerator<ImportBase>)new List<ImportBase>
+                getEnumerator = new List<ImportBase>
                 {
-                    new TypeImport(this.MyType, false)
+                    new TypeImport(this.myType, false)
                 }.GetEnumerator();
             }
             else
             {
-                GetEnumerator = base.GetEnumerator();
+                getEnumerator = base.GetEnumerator();
             }
-            return GetEnumerator;
+            return getEnumerator;
         }
     }
 }

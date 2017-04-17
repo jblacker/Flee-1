@@ -173,7 +173,7 @@ namespace Flee.CalculationEngine
 			return this.myNameNodeMap.ContainsKey(tailName);
 		}
 
-		internal void EmitLoad(string tailName, FleeILGenerator ilg)
+		internal void EmitLoad(string tailName, FleeIlGenerator ilg)
 		{
 			var pi = typeof(ExpressionContext).GetProperty("CalculationEngine");
 			ilg.Emit(OpCodes.Callvirt, pi.GetGetMethod());

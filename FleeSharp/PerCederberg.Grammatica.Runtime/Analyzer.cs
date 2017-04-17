@@ -1,6 +1,6 @@
 namespace Flee.PerCederberg.Grammatica.Runtime
 {
-    using System.Collections;
+    using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using Exceptions;
     using Microsoft.VisualBasic.CompilerServices;
@@ -193,9 +193,9 @@ namespace Flee.PerCederberg.Grammatica.Runtime
 			throw new ParseException(ParseException.ErrorType.Internal, Conversions.ToString(Conversions.ToDouble("node '" + node.Name + "' has no string value at position ") + pos), node.StartLine, node.StartColumn);
 		}
 
-		protected ArrayList GetChildValues(Node node)
+		protected List<object> GetChildValues(Node node)
 		{
-			var result = new ArrayList();
+			var result = new List<object>();
 			var num = node.Count - 1;
 			for (var i = 0; i <= num; i++)
 			{
@@ -204,7 +204,11 @@ namespace Flee.PerCederberg.Grammatica.Runtime
 				var flag = values != null;
 				if (flag)
 				{
-					result.AddRange(values);
+				    foreach (var o in values)
+				    {
+				        result.Add(o);
+				    }
+					//result.AddRange((object)values);
 				}
 			}
 			return result;

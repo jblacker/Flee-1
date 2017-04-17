@@ -89,7 +89,7 @@ namespace Flee
 
         internal ExpressionParserOptions Clone()
         {
-            ExpressionParserOptions copy = (ExpressionParserOptions)this.MemberwiseClone();
+            var copy = (ExpressionParserOptions)this.MemberwiseClone();
             copy.myProperties = this.myProperties.Clone();
             return copy;
         }

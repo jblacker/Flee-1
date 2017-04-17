@@ -5,48 +5,38 @@ namespace Flee
 {
     internal class RootExpressionElement : ExpressionElement
     {
-        private ExpressionElement MyChild;
+        private readonly ExpressionElement myChild;
 
-        private Type MyResultType;
+        private readonly Type myResultType;
 
-        public override Type ResultType
-        {
-            get
-            {
-                return typeof(object);
-            }
-        }
+        public override Type ResultType => typeof(object);
 
         public RootExpressionElement(ExpressionElement child, Type resultType)
         {
-            this.MyChild = child;
-            this.MyResultType = resultType;
+            this.myChild = child;
+            this.myResultType = resultType;
             this.Validate();
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
-            this.MyChild.Emit(ilg, services);
-            ImplicitConverter.EmitImplicitConvert(this.MyChild.ResultType, this.MyResultType, ilg);
-            ExpressionOptions options = (ExpressionOptions)services.GetService(typeof(ExpressionOptions));
-            bool flag = !options.IsGeneric;
+            this.myChild.Emit(ilg, services);
+            ImplicitConverter.EmitImplicitConvert(this.myChild.ResultType, this.myResultType, ilg);
+            var options = (ExpressionOptions)services.GetService(typeof(ExpressionOptions));
+            var flag = !options.IsGeneric;
             if (flag)
             {
-                ImplicitConverter.EmitImplicitConvert(this.MyResultType, typeof(object), ilg);
+                ImplicitConverter.EmitImplicitConvert(this.myResultType, typeof(object), ilg);
             }
             ilg.Emit(OpCodes.Ret);
         }
 
         private void Validate()
         {
-            bool flag = !ImplicitConverter.EmitImplicitConvert(this.MyChild.ResultType, this.MyResultType, null);
+            var flag = !ImplicitConverter.EmitImplicitConvert(this.myChild.ResultType, this.myResultType, null);
             if (flag)
             {
-                this.ThrowCompileException("CannotConvertTypeToExpressionResult", CompileExceptionReason.TypeMismatch, new object[]
-                {
-                    this.MyChild.ResultType.Name,
-                    this.MyResultType.Name
-                });
+                this.ThrowCompileException("CannotConvertTypeToExpressionResult", CompileExceptionReason.TypeMismatch, this.myChild.ResultType.Name, this.myResultType.Name);
             }
         }
     }

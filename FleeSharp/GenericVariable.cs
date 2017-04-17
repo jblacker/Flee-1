@@ -4,32 +4,26 @@ namespace Flee
 {
     internal class GenericVariable<T> : IVariable, IGenericVariable<T>
     {
-        public T MyValue;
+        public T myValue;
 
-        public Type VariableType
-        {
-            get
-            {
-                return typeof(T);
-            }
-        }
+        public Type VariableType => typeof(T);
 
         public object ValueAsObject
         {
             get
             {
-                return this.MyValue;
+                return this.myValue;
             }
             set
             {
                 bool flag = value == null;
                 if (flag)
                 {
-                    this.MyValue = default(T);
+                    this.myValue = default(T);
                 }
                 else
                 {
-                    this.MyValue = (T)((object)value);
+                    this.myValue = (T)((object)value);
                 }
             }
         }
@@ -38,13 +32,13 @@ namespace Flee
         {
             return new GenericVariable<T>
             {
-                MyValue = this.MyValue
+                myValue = this.myValue
             };
         }
 
         public T GetValue()
         {
-            return this.MyValue;
+            return this.myValue;
         }
     }
 }

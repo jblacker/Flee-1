@@ -39,7 +39,7 @@ namespace Flee
             return parse;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             ilg.Emit(OpCodes.Ldc_R8, this.myValue);
         }

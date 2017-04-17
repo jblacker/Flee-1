@@ -6,15 +6,9 @@ namespace Flee
 {
     internal class SingleLiteralElement : RealLiteralElement
     {
-        private float MyValue;
+        private readonly float myValue;
 
-        public override Type ResultType
-        {
-            get
-            {
-                return typeof(float);
-            }
-        }
+        public override Type ResultType => typeof(float);
 
         private SingleLiteralElement()
         {
@@ -22,32 +16,32 @@ namespace Flee
 
         public SingleLiteralElement(float value)
         {
-            this.MyValue = value;
+            this.myValue = value;
         }
 
         public static SingleLiteralElement Parse(string image, IServiceProvider services)
         {
-            ExpressionParserOptions options = (ExpressionParserOptions)services.GetService(typeof(ExpressionParserOptions));
-            SingleLiteralElement element = new SingleLiteralElement();
-            SingleLiteralElement Parse;
+            var options = (ExpressionParserOptions)services.GetService(typeof(ExpressionParserOptions));
+            var element = new SingleLiteralElement();
+            SingleLiteralElement parse;
             try
             {
-                float value = options.ParseSingle(image);
-                Parse = new SingleLiteralElement(value);
+                var value = options.ParseSingle(image);
+                parse = new SingleLiteralElement(value);
             }
             catch (OverflowException expr_2F)
             {
                 ProjectData.SetProjectError(expr_2F);
                 element.OnParseOverflow(image);
-                Parse = null;
+                parse = null;
                 ProjectData.ClearProjectError();
             }
-            return Parse;
+            return parse;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
-            ilg.Emit(OpCodes.Ldc_R4, this.MyValue);
+            ilg.Emit(OpCodes.Ldc_R4, this.myValue);
         }
     }
 }

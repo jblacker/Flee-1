@@ -113,7 +113,7 @@ namespace Flee
             return getCompareOperatorName;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             var binaryResultType = ImplicitConverter.GetBinaryResultType(this.myLeftChild.ResultType, this.myRightChild.ResultType);
             var overloadedOperator = this.GetOverloadedCompareOperator();
@@ -172,14 +172,14 @@ namespace Flee
             }
         }
 
-        private void EmitRegular(FleeILGenerator ilg, IServiceProvider services)
+        private void EmitRegular(FleeIlGenerator ilg, IServiceProvider services)
         {
             this.myLeftChild.Emit(ilg, services);
             this.myRightChild.Emit(ilg, services);
             this.EmitCompareOperation(ilg, this.myOperation);
         }
 
-        private static void EmitStringEquality(FleeILGenerator ilg, LogicalCompareOperation op, IServiceProvider services)
+        private static void EmitStringEquality(FleeIlGenerator ilg, LogicalCompareOperation op, IServiceProvider services)
         {
             var options = (ExpressionOptions) services.GetService(typeof(ExpressionOptions));
             var ic = new Int32LiteralElement((int) options.StringComparison);
@@ -214,7 +214,7 @@ namespace Flee
             return this.myLeftChild.ResultType.IsEnum && this.myLeftChild.ResultType == this.myRightChild.ResultType;
         }
 
-        private void EmitCompareOperation(FleeILGenerator ilg, LogicalCompareOperation op)
+        private void EmitCompareOperation(FleeIlGenerator ilg, LogicalCompareOperation op)
         {
             var ltOpcode = this.GetCompareGtltOpcode(false);
             var gtOpcode = this.GetCompareGtltOpcode(true);

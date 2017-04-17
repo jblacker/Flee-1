@@ -2,22 +2,14 @@ using System;
 
 namespace Flee
 {
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, Inherited = false)]
     public sealed class ExpressionOwnerMemberAccessAttribute : Attribute
     {
-        private bool MyAllowAccess;
-
-        internal bool AllowAccess
-        {
-            get
-            {
-                return this.MyAllowAccess;
-            }
-        }
+        internal bool AllowAccess { get; set; }
 
         public ExpressionOwnerMemberAccessAttribute(bool allowAccess)
         {
-            this.MyAllowAccess = allowAccess;
+            this.AllowAccess = allowAccess;
         }
     }
 }

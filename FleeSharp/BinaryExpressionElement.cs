@@ -101,7 +101,7 @@ namespace Flee
             return getOverloadedBinaryOperator;
         }
 
-        protected void EmitOverloadedOperatorCall(MethodInfo method, FleeILGenerator ilg, IServiceProvider services)
+        protected void EmitOverloadedOperatorCall(MethodInfo method, FleeIlGenerator ilg, IServiceProvider services)
         {
             var @params = method.GetParameters();
             var pLeft = @params[0];
@@ -123,7 +123,7 @@ namespace Flee
 
         protected abstract Type GetResultType(Type leftType, Type rightType);
 
-        protected static void EmitChildWithConvert(ExpressionElement child, Type resultType, FleeILGenerator ilg, IServiceProvider services)
+        protected static void EmitChildWithConvert(ExpressionElement child, Type resultType, FleeIlGenerator ilg, IServiceProvider services)
         {
             child.Emit(ilg, services);
             var converted = ImplicitConverter.EmitImplicitConvert(child.ResultType, resultType, ilg);

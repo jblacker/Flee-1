@@ -13,7 +13,7 @@ namespace Flee
             this.myValue = value;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             EmitLoad(this.myValue, ilg);
         }

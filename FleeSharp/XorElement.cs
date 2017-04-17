@@ -1,37 +1,30 @@
-using System;
-using System.Reflection.Emit;
-
 namespace Flee
 {
+    using System;
+    using System.Reflection.Emit;
+
     internal class XorElement : BinaryExpressionElement
     {
         protected override Type GetResultType(Type leftType, Type rightType)
         {
-            Type bitwiseType = Utility.GetBitwiseOpType(leftType, rightType);
-            bool flag = bitwiseType != null;
-            Type GetResultType;
+            var bitwiseType = Utility.GetBitwiseOpType(leftType, rightType);
+            var flag = bitwiseType != null;
+            Type getResultType;
             if (flag)
             {
-                GetResultType = bitwiseType;
+                getResultType = bitwiseType;
             }
             else
             {
-                bool flag2 = this.AreBothChildrenOfType(typeof(bool));
-                if (flag2)
-                {
-                    GetResultType = typeof(bool);
-                }
-                else
-                {
-                    GetResultType = null;
-                }
+                var flag2 = this.AreBothChildrenOfType(typeof(bool));
+                getResultType = flag2 ? typeof(bool) : null;
             }
-            return GetResultType;
+            return getResultType;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
-            Type resultType = this.ResultType;
+            var resultType = this.ResultType;
             this.myLeftChild.Emit(ilg, services);
             ImplicitConverter.EmitImplicitConvert(this.myLeftChild.ResultType, resultType, ilg);
             this.myRightChild.Emit(ilg, services);

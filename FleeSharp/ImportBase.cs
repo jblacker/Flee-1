@@ -56,7 +56,7 @@ namespace Flee
             { 
                 while (enumerator.MoveNext())
                 {
-                    MemberInfo mi = enumerator.Current;
+                    var mi = enumerator.Current;
                     dest.Add(mi);
                 }
             }
@@ -79,22 +79,22 @@ namespace Flee
 
         internal MemberInfo[] FindMembers(string memberName, MemberTypes memberType)
         {
-            List<MemberInfo> found = new List<MemberInfo>();
+            var found = new List<MemberInfo>();
             this.AddMembers(memberName, memberType, found);
             return found.ToArray();
         }
 
         public MemberInfo[] GetMembers(MemberTypes memberType)
         {
-            List<MemberInfo> found = new List<MemberInfo>();
+            var found = new List<MemberInfo>();
             this.AddMembers(memberType, found);
             return found.ToArray();
         }
 
         public virtual IEnumerator<ImportBase> GetEnumerator()
         {
-            List<ImportBase> coll = new List<ImportBase>();
-            return (IEnumerator<ImportBase>)coll.GetEnumerator();
+            var coll = new List<ImportBase>();
+            return coll.GetEnumerator();
         }
 
         public bool Equals(ImportBase other)

@@ -7,20 +7,20 @@ namespace Flee
 
     internal class IdentifierAnalyzer : Analyzer
     {
-        private IDictionary<int, string> MyIdentifiers;
+        private readonly IDictionary<int, string> myIdentifiers;
 
-        private int MyMemberExpressionCount;
+        private int myMemberExpressionCount;
 
-        private bool MyInFieldPropertyExpression;
+        private bool myInFieldPropertyExpression;
 
         public IdentifierAnalyzer()
         {
-            this.MyIdentifiers = new Dictionary<int, string>();
+            this.myIdentifiers = new Dictionary<int, string>();
         }
 
         public override Node Exit(Node node)
         {
-            int id = node.Id;
+            var id = node.Id;
             if (id != 1034)
             {
                 if (id == 2019)
@@ -37,7 +37,7 @@ namespace Flee
 
         public override void Enter(Node node)
         {
-            int id = node.Id;
+            var id = node.Id;
             if (id != 2015)
             {
                 if (id == 2019)
@@ -53,67 +53,82 @@ namespace Flee
 
         private void ExitIdentifier(Token node)
         {
-            bool flag = !this.MyInFieldPropertyExpression;
+            var flag = !this.myInFieldPropertyExpression;
             if (!flag)
             {
-                bool flag2 = !this.MyIdentifiers.ContainsKey(this.MyMemberExpressionCount);
+                var flag2 = !this.myIdentifiers.ContainsKey(this.myMemberExpressionCount);
                 if (flag2)
                 {
-                    this.MyIdentifiers.Add(this.MyMemberExpressionCount, node.Image);
+                    this.myIdentifiers.Add(this.myMemberExpressionCount, node.Image);
                 }
             }
         }
 
         private void EnterMemberExpression()
         {
-            this.MyMemberExpressionCount++;
+            this.myMemberExpressionCount++;
         }
 
         private void EnterFieldPropertyExpression()
         {
-            this.MyInFieldPropertyExpression = true;
+            this.myInFieldPropertyExpression = true;
         }
 
         private void ExitFieldPropertyExpression()
         {
-            this.MyInFieldPropertyExpression = false;
+            this.myInFieldPropertyExpression = false;
         }
 
         public void Reset()
         {
-            this.MyIdentifiers.Clear();
-            this.MyMemberExpressionCount = -1;
+            this.myIdentifiers.Clear();
+            this.myMemberExpressionCount = -1;
         }
 
         public ICollection<string> GetIdentifiers(ExpressionContext context)
         {
-            Dictionary<string, object> dict = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            ExpressionImports ei = context.Imports;
-            try
+            var dict = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            var ei = context.Imports;
+
+            foreach (var identifier in this.myIdentifiers.Values)
             {
-                IEnumerator<string> enumerator = this.MyIdentifiers.Values.GetEnumerator();
-                while (enumerator.MoveNext())
+                //        string identifier = enumerator.Current;
+                var flag = ei.HasNamespace(identifier);
+                if (!flag)
                 {
-                    string identifier = enumerator.Current;
-                    bool flag = ei.HasNamespace(identifier);
-                    if (!flag)
+                    var flag2 = context.Variables.ContainsKey(identifier);
+                    if (!flag2)
                     {
-                        bool flag2 = context.Variables.ContainsKey(identifier);
-                        if (!flag2)
-                        {
-                            dict[identifier] = null;
-                        }
+                        dict[identifier] = null;
                     }
                 }
             }
-            finally
-            {
-                IEnumerator<string> enumerator;
-                if (enumerator != null)
-                {
-                    enumerator.Dispose();
-                }
-            }
+
+            //try
+            //{
+            //    IEnumerator<string> enumerator = this.myIdentifiers.Values.GetEnumerator();
+            //    while (enumerator.MoveNext())
+            //    {
+            //        string identifier = enumerator.Current;
+            //        bool flag = ei.HasNamespace(identifier);
+            //        if (!flag)
+            //        {
+            //            bool flag2 = context.Variables.ContainsKey(identifier);
+            //            if (!flag2)
+            //            {
+            //                dict[identifier] = null;
+            //            }
+            //        }
+            //    }
+            //}
+            //finally
+            //{
+            //    IEnumerator<string> enumerator;
+            //    if (enumerator != null)
+            //    {
+            //        enumerator.Dispose();
+            //    }
+            //}
             return dict.Keys;
         }
     }

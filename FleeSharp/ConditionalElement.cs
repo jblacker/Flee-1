@@ -43,7 +43,7 @@ namespace Flee
             }
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
             var bm = new BranchManager();
             bm.GetLabel("falseLabel", ilg);
@@ -63,7 +63,7 @@ namespace Flee
             }
         }
 
-        private void EmitConditional(FleeILGenerator ilg, IServiceProvider services, BranchManager bm)
+        private void EmitConditional(FleeIlGenerator ilg, IServiceProvider services, BranchManager bm)
         {
             var falseLabel = bm.FindLabel("falseLabel");
             var endLabel = bm.FindLabel("endLabel");

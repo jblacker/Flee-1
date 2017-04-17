@@ -4,44 +4,16 @@ namespace Flee
 {
     public class ResolveFunctionEventArgs : EventArgs
     {
-        private string MyName;
+        public string FunctionName { get; }
 
-        private Type[] MyArgumentTypes;
+        public Type[] ArgumentTypes { get; }
 
-        private Type MyReturnType;
-
-        public string FunctionName
-        {
-            get
-            {
-                return this.MyName;
-            }
-        }
-
-        public Type[] ArgumentTypes
-        {
-            get
-            {
-                return this.MyArgumentTypes;
-            }
-        }
-
-        public Type ReturnType
-        {
-            get
-            {
-                return this.MyReturnType;
-            }
-            set
-            {
-                this.MyReturnType = value;
-            }
-        }
+        public Type ReturnType { get; set; }
 
         internal ResolveFunctionEventArgs(string name, Type[] argumentTypes)
         {
-            this.MyName = name;
-            this.MyArgumentTypes = argumentTypes;
+            this.FunctionName = name;
+            this.ArgumentTypes = argumentTypes;
         }
     }
 }

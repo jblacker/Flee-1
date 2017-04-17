@@ -9,25 +9,21 @@ using Microsoft.VisualBasic.CompilerServices;
 
 namespace Flee
 {
+    using System.Linq;
+    using Extensions;
     using PerCederberg.Grammatica.Runtime;
 
     internal class FleeExpressionAnalyzer : ExpressionAnalyzer
     {
-        private IServiceProvider MyServices;
+        private IServiceProvider myServices;
 
-        private Regex MyUnicodeEscapeRegex;
+        private Regex myUnicodeEscapeRegex;
 
-        private Regex MyRegularEscapeRegex;
+        private Regex myRegularEscapeRegex;
 
-        private bool MyInUnaryNegate;
+        private bool myInUnaryNegate;
 
-        private ExpressionContext Context
-        {
-            get
-            {
-                return (ExpressionContext)this.MyServices.GetService(typeof(ExpressionContext));
-            }
-        }
+        private ExpressionContext Context => (ExpressionContext)this.myServices.GetService(typeof(ExpressionContext));
 
         internal FleeExpressionAnalyzer()
         {
@@ -35,14 +31,14 @@ namespace Flee
 
         public void SetServices(IServiceProvider services)
         {
-            this.MyServices = services;
-            this.MyUnicodeEscapeRegex = new Regex("\\\\u[0-9a-f]{4}", RegexOptions.IgnoreCase);
-            this.MyRegularEscapeRegex = new Regex(string.Format("\\\\[\\\\{0}'trn]", this.Context.ParserOptions.StringQuote), RegexOptions.IgnoreCase);
+            this.myServices = services;
+            this.myUnicodeEscapeRegex = new Regex("\\\\u[0-9a-f]{4}", RegexOptions.IgnoreCase);
+            this.myRegularEscapeRegex = new Regex(string.Format("\\\\[\\\\{0}'trn]", this.Context.ParserOptions.StringQuote), RegexOptions.IgnoreCase);
         }
 
         public void Reset()
         {
-            this.MyServices = null;
+            this.myServices = null;
         }
 
         public override Node ExitExpression(Production node)
@@ -114,8 +110,8 @@ namespace Flee
         public override Node ExitNegateExpression(Production node)
         {
             IList childValues = this.GetChildValues(node);
-            ExpressionElement childElement = (ExpressionElement)childValues[childValues.Count - 1];
-            bool flag = childElement.GetType() == typeof(Int32LiteralElement) & childValues.Count == 2;
+            var childElement = (ExpressionElement)childValues[childValues.Count - 1];
+            var flag = childElement.GetType() == typeof(Int32LiteralElement) & childValues.Count == 2;
             if (flag)
             {
                 ((Int32LiteralElement)childElement).Negate();
@@ -123,7 +119,7 @@ namespace Flee
             }
             else
             {
-                bool flag2 = childElement.GetType() == typeof(Int64LiteralElement) & childValues.Count == 2;
+                var flag2 = childElement.GetType() == typeof(Int64LiteralElement) & childValues.Count == 2;
                 if (flag2)
                 {
                     ((Int64LiteralElement)childElement).Negate();
@@ -139,16 +135,17 @@ namespace Flee
 
         public override Node ExitMemberExpression(Production node)
         {
-            IList childValues = this.GetChildValues(node);
-            object first = RuntimeHelpers.GetObjectValue(childValues[0]);
-            bool flag = childValues.Count == 1 && !(first is MemberElement);
+            var childValues = this.GetChildValues(node);
+            var first = RuntimeHelpers.GetObjectValue(childValues[0]);
+            var flag = childValues.Count == 1 && !(first is MemberElement);
+
             if (flag)
             {
                 node.AddValue(RuntimeHelpers.GetObjectValue(first));
             }
             else
             {
-                InvocationListElement list = new InvocationListElement(childValues, this.MyServices);
+                var list = new InvocationListElement(childValues, this.myServices);
                 node.AddValue(list);
             }
             return node;
@@ -157,8 +154,8 @@ namespace Flee
         public override Node ExitIndexExpression(Production node)
         {
             IList childValues = this.GetChildValues(node);
-            ArgumentList args = new ArgumentList(childValues);
-            IndexerElement e = new IndexerElement(args);
+            var args = new ArgumentList(childValues);
+            var e = new IndexerElement(args);
             node.AddValue(e);
             return node;
         }
@@ -178,27 +175,27 @@ namespace Flee
         public override Node ExitIfExpression(Production node)
         {
             IList childValues = this.GetChildValues(node);
-            ConditionalElement op = new ConditionalElement((ExpressionElement)childValues[0], (ExpressionElement)childValues[1], (ExpressionElement)childValues[2]);
+            var op = new ConditionalElement((ExpressionElement)childValues[0], (ExpressionElement)childValues[1], (ExpressionElement)childValues[2]);
             node.AddValue(op);
             return node;
         }
 
         public override Node ExitInExpression(Production node)
         {
-            IList childValues = this.GetChildValues(node);
-            bool flag = childValues.Count == 1;
-            Node ExitInExpression;
+            var childValues = this.GetChildValues(node);
+            var flag = childValues.Count == 1;
+            Node exitInExpression;
             if (flag)
             {
                 this.AddFirstChildValue(node);
-                ExitInExpression = node;
+                exitInExpression = node;
             }
             else
             {
-                ExpressionElement operand = (ExpressionElement)childValues[0];
+                var operand = (ExpressionElement)childValues[0];
                 childValues.RemoveAt(0);
-                object second = RuntimeHelpers.GetObjectValue(childValues[0]);
-                bool flag2 = second is IList;
+                var second = RuntimeHelpers.GetObjectValue(childValues[0]);
+                var flag2 = second is IList;
                 InElement op;
                 if (flag2)
                 {
@@ -206,13 +203,13 @@ namespace Flee
                 }
                 else
                 {
-                    InvocationListElement il = new InvocationListElement(childValues, this.MyServices);
+                    var il = new InvocationListElement(childValues, this.myServices);
                     op = new InElement(operand, il);
                 }
                 node.AddValue(op);
-                ExitInExpression = node;
+                exitInExpression = node;
             }
-            return ExitInExpression;
+            return exitInExpression;
         }
 
         public override Node ExitInTargetExpression(Production node)
@@ -231,36 +228,36 @@ namespace Flee
         public override Node ExitCastExpression(Production node)
         {
             IList childValues = this.GetChildValues(node);
-            string[] destTypeParts = (string[])childValues[1];
-            bool isArray = (bool)childValues[2];
-            CastElement op = new CastElement((ExpressionElement)childValues[0], destTypeParts, isArray, this.MyServices);
+            var destTypeParts = (string[])childValues[1];
+            var isArray = (bool)childValues[2];
+            var op = new CastElement((ExpressionElement)childValues[0], destTypeParts, isArray, this.myServices);
             node.AddValue(op);
             return node;
         }
 
         public override Node ExitCastTypeExpression(Production node)
         {
-            IList childValues = this.GetChildValues(node);
-            List<string> parts = new List<string>();
-            try
-            {
-                IEnumerator enumerator = childValues.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    string part = Conversions.ToString(enumerator.Current);
-                    parts.Add(part);
-                }
-            }
-            finally
-            {
-                IEnumerator enumerator;
-                if (enumerator is IDisposable)
-                {
-                    (enumerator as IDisposable).Dispose();
-                }
-            }
-            bool isArray = false;
-            bool flag = Operators.CompareString(parts[parts.Count - 1], "[]", false) == 0;
+            var childValues = this.GetChildValues(node);
+            var parts = childValues.Map(Conversions.ToString).ToList();
+            //try
+            //{
+            //    IEnumerator enumerator = childValues.GetEnumerator();
+            //    while (enumerator.MoveNext())
+            //    {
+            //        string part = Conversions.ToString(enumerator.Current);
+            //        parts.Add(part);
+            //    }
+            //}
+            //finally
+            //{
+            //    IEnumerator enumerator;
+            //    if (enumerator is IDisposable)
+            //    {
+            //        (enumerator as IDisposable).Dispose();
+            //    }
+            //}
+            var isArray = false;
+            var flag = Operators.CompareString(parts[parts.Count - 1], "[]", false) == 0;
             if (flag)
             {
                 isArray = true;
@@ -279,8 +276,8 @@ namespace Flee
 
         public override Node ExitFieldPropertyExpression(Production node)
         {
-            string name = (string)node.GetChildAt(0).GetValue(0);
-            IdentifierElement elem = new IdentifierElement(name);
+            var name = (string)node.GetChildAt(0).GetValue(0);
+            var elem = new IdentifierElement(name);
             node.AddValue(elem);
             return node;
         }
@@ -288,18 +285,18 @@ namespace Flee
         public override Node ExitFunctionCallExpression(Production node)
         {
             IList childValues = this.GetChildValues(node);
-            string name = (string)childValues[0];
+            var name = (string)childValues[0];
             childValues.RemoveAt(0);
-            ArgumentList args = new ArgumentList(childValues);
-            FunctionCallElement funcCall = new FunctionCallElement(name, args);
+            var args = new ArgumentList(childValues);
+            var funcCall = new FunctionCallElement(name, args);
             node.AddValue(funcCall);
             return node;
         }
 
         public override Node ExitArgumentList(Production node)
         {
-            IList childValues = this.GetChildValues(node);
-            node.AddValues((ArrayList)childValues);
+            var childValues = this.GetChildValues(node);
+            node.AddValues(childValues);
             return node;
         }
 
@@ -323,10 +320,10 @@ namespace Flee
         private void AddUnaryOp(Production node, Type elementType)
         {
             IList childValues = this.GetChildValues(node);
-            bool flag = childValues.Count == 2;
+            var flag = childValues.Count == 2;
             if (flag)
             {
-                UnaryElement element = (UnaryElement)Activator.CreateInstance(elementType);
+                var element = (UnaryElement)Activator.CreateInstance(elementType);
                 element.SetChild((ExpressionElement)childValues[1]);
                 node.AddValue(element);
             }
@@ -339,15 +336,15 @@ namespace Flee
         private void AddBinaryOp(Production node, Type elementType)
         {
             IList childValues = this.GetChildValues(node);
-            bool flag = childValues.Count > 1;
+            var flag = childValues.Count > 1;
             if (flag)
             {
-                BinaryExpressionElement e = BinaryExpressionElement.CreateElement(childValues, elementType);
+                var e = BinaryExpressionElement.CreateElement(childValues, elementType);
                 node.AddValue(e);
             }
             else
             {
-                bool flag2 = childValues.Count == 1;
+                var flag2 = childValues.Count == 1;
                 if (flag2)
                 {
                     node.AddValue(RuntimeHelpers.GetObjectValue(childValues[0]));
@@ -361,22 +358,22 @@ namespace Flee
 
         public override Node ExitReal(Token node)
         {
-            string image = node.Image;
-            LiteralElement element = RealLiteralElement.Create(image, this.MyServices);
+            var image = node.Image;
+            var element = RealLiteralElement.Create(image, this.myServices);
             node.AddValue(element);
             return node;
         }
 
         public override Node ExitInteger(Token node)
         {
-            LiteralElement element = IntegralLiteralElement.Create(node.Image, false, this.MyInUnaryNegate, this.MyServices);
+            var element = IntegralLiteralElement.Create(node.Image, false, this.myInUnaryNegate, this.myServices);
             node.AddValue(element);
             return node;
         }
 
         public override Node ExitHexLiteral(Token node)
         {
-            LiteralElement element = IntegralLiteralElement.Create(node.Image, true, this.MyInUnaryNegate, this.MyServices);
+            var element = IntegralLiteralElement.Create(node.Image, true, this.myInUnaryNegate, this.myServices);
             node.AddValue(element);
             return node;
         }
@@ -401,32 +398,32 @@ namespace Flee
 
         public override Node ExitStringLiteral(Token node)
         {
-            string s = this.DoEscapes(node.Image);
-            StringLiteralElement element = new StringLiteralElement(s);
+            var s = this.DoEscapes(node.Image);
+            var element = new StringLiteralElement(s);
             node.AddValue(element);
             return node;
         }
 
         public override Node ExitCharLiteral(Token node)
         {
-            string s = this.DoEscapes(node.Image);
+            var s = this.DoEscapes(node.Image);
             node.AddValue(new CharLiteralElement(s[0]));
             return node;
         }
 
         public override Node ExitDatetime(Token node)
         {
-            ExpressionContext context = (ExpressionContext)this.MyServices.GetService(typeof(ExpressionContext));
-            string image = node.Image.Substring(1, node.Image.Length - 2);
-            DateTimeLiteralElement element = new DateTimeLiteralElement(image, context);
+            var context = (ExpressionContext)this.myServices.GetService(typeof(ExpressionContext));
+            var image = node.Image.Substring(1, node.Image.Length - 2);
+            var element = new DateTimeLiteralElement(image, context);
             node.AddValue(element);
             return node;
         }
 
         public override Node ExitTimespan(Token node)
         {
-            string image = node.Image.Substring(2, node.Image.Length - 3);
-            TimeSpanLiteralElement element = new TimeSpanLiteralElement(image);
+            var image = node.Image.Substring(2, node.Image.Length - 3);
+            var element = new TimeSpanLiteralElement(image);
             node.AddValue(element);
             return node;
         }
@@ -434,59 +431,59 @@ namespace Flee
         private string DoEscapes(string image)
         {
             image = image.Substring(1, image.Length - 2);
-            image = this.MyUnicodeEscapeRegex.Replace(image, new MatchEvaluator(this.UnicodeEscapeMatcher));
-            image = this.MyRegularEscapeRegex.Replace(image, new MatchEvaluator(this.RegularEscapeMatcher));
+            image = this.myUnicodeEscapeRegex.Replace(image, new MatchEvaluator(this.UnicodeEscapeMatcher));
+            image = this.myRegularEscapeRegex.Replace(image, new MatchEvaluator(this.RegularEscapeMatcher));
             return image;
         }
 
         private string RegularEscapeMatcher(Match m)
         {
-            string s = m.Value;
+            var s = m.Value;
             s = s.Remove(0, 1);
-            string left = s;
-            bool flag = Operators.CompareString(left, "\\", false) == 0 || Operators.CompareString(left, Conversions.ToString(this.Context.ParserOptions.StringQuote), false) == 0 || Operators.CompareString(left, "'", false) == 0;
-            string RegularEscapeMatcher;
+            var left = s;
+            var flag = Operators.CompareString(left, "\\", false) == 0 || Operators.CompareString(left, Conversions.ToString(this.Context.ParserOptions.StringQuote), false) == 0 || Operators.CompareString(left, "'", false) == 0;
+            string regularEscapeMatcher;
             if (flag)
             {
-                RegularEscapeMatcher = s;
+                regularEscapeMatcher = s;
             }
             else
             {
                 flag = (Operators.CompareString(left, "t", false) == 0 || Operators.CompareString(left, "T", false) == 0);
                 if (flag)
                 {
-                    RegularEscapeMatcher = Convert.ToChar(9).ToString();
+                    regularEscapeMatcher = Convert.ToChar(9).ToString();
                 }
                 else
                 {
                     flag = (Operators.CompareString(left, "n", false) == 0 || Operators.CompareString(left, "N", false) == 0);
                     if (flag)
                     {
-                        RegularEscapeMatcher = Convert.ToChar(10).ToString();
+                        regularEscapeMatcher = Convert.ToChar(10).ToString();
                     }
                     else
                     {
                         flag = (Operators.CompareString(left, "r", false) == 0 || Operators.CompareString(left, "R", false) == 0);
                         if (flag)
                         {
-                            RegularEscapeMatcher = Convert.ToChar(13).ToString();
+                            regularEscapeMatcher = Convert.ToChar(13).ToString();
                         }
                         else
                         {
                             Debug.Assert(false, "Unrecognized escape sequence");
-                            RegularEscapeMatcher = null;
+                            regularEscapeMatcher = null;
                         }
                     }
                 }
             }
-            return RegularEscapeMatcher;
+            return regularEscapeMatcher;
         }
 
         private string UnicodeEscapeMatcher(Match m)
         {
-            string s = m.Value;
+            var s = m.Value;
             s = s.Remove(0, 2);
-            int code = int.Parse(s, NumberStyles.AllowHexSpecifier);
+            var code = int.Parse(s, NumberStyles.AllowHexSpecifier);
             return Convert.ToChar(code).ToString();
         }
 
@@ -619,7 +616,7 @@ namespace Flee
         public override void Child(Production node, Node child)
         {
             base.Child(node, child);
-            this.MyInUnaryNegate = (node.Id == 2014 & child.Id == 1002);
+            this.myInUnaryNegate = (node.Id == 2014 & child.Id == 1002);
         }
     }
 }

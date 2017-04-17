@@ -6,25 +6,19 @@ namespace Flee
 {
     internal class UInt64LiteralElement : IntegralLiteralElement
     {
-        private ulong MyValue;
+        private readonly ulong myValue;
 
-        public override Type ResultType
-        {
-            get
-            {
-                return typeof(ulong);
-            }
-        }
+        public override Type ResultType => typeof(ulong);
 
         public UInt64LiteralElement(string image, NumberStyles ns)
         {
             try
             {
-                this.MyValue = ulong.Parse(image, ns);
+                this.myValue = ulong.Parse(image, ns);
             }
-            catch (OverflowException expr_18)
+            catch (OverflowException overflowException)
             {
-                ProjectData.SetProjectError(expr_18);
+                ProjectData.SetProjectError(overflowException);
                 this.OnParseOverflow(image);
                 ProjectData.ClearProjectError();
             }
@@ -32,12 +26,12 @@ namespace Flee
 
         public UInt64LiteralElement(ulong value)
         {
-            this.MyValue = value;
+            this.myValue = value;
         }
 
-        public override void Emit(FleeILGenerator ilg, IServiceProvider services)
+        public override void Emit(FleeIlGenerator ilg, IServiceProvider services)
         {
-            EmitLoad((long)this.MyValue, ilg);
+            EmitLoad((long)this.myValue, ilg);
         }
     }
 }
