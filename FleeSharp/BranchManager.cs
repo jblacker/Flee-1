@@ -17,7 +17,7 @@
 // ' Copyright © 2007 Eugene Ciloci
 // ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
-namespace Flee
+namespace FleeSharp
 {
     using System;
     using System.Collections.Generic;
@@ -61,7 +61,7 @@ namespace Flee
         private int CountLongBranches(ICollection<BranchInfo> dest)
         {
             var count = 0;
-            dest.Each(d => count += Convert.ToInt32(d.ComputeIsLongBranch()));
+            dest.Each(d => count += Convert.ToInt32((bool) d.ComputeIsLongBranch()));
             //try
             //{
             //    var enumerator = dest.GetEnumerator();

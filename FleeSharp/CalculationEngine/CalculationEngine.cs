@@ -17,7 +17,7 @@
 // ' Copyright © 2007 Eugene Ciloci
 // ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
-namespace Flee.CalculationEngine
+namespace FleeSharp.CalculationEngine
 {
     using System;
     using System.Collections.Generic;
@@ -173,6 +173,8 @@ namespace Flee.CalculationEngine
             var actualTail = this.GetTail(tailName);
             var headName = context.CalcEngineExpressionName;
             var actualHead = this.GetTail(headName);
+
+            // adding here.. what if tailName is null?
             this.myDependencies.AddDepedency(actualTail, actualHead);
         }
 

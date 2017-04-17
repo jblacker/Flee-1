@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Flee {
+namespace FleeSharp {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Flee {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Flee.ElementNames", typeof(ElementNames).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FleeSharp.ElementNames", typeof(ElementNames).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

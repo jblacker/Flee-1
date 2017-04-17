@@ -17,7 +17,7 @@
 // ' Copyright © 2007 Eugene Ciloci
 // ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
-namespace Flee.CalculationEngine
+namespace FleeSharp.CalculationEngine
 {
     using System;
     using System.Collections.Generic;
@@ -43,10 +43,17 @@ namespace Flee.CalculationEngine
 
         private IDictionary<T, object> GetInnerDictionary(T tail)
         {
+            if (tail == null)
+            {
+                return null;
+            }
             Dictionary<T, object> value;
-            var flag = this.myDependentsMap.TryGetValue(tail, out value);
-            IDictionary<T, object> getInnerDictionary = flag ? value : null;
-            return getInnerDictionary;
+
+            if (this.myDependentsMap.TryGetValue(tail, out value))
+            {
+                return value;
+            }
+            return null;
         }
 
         public DependencyManager<T> CloneDependents(T[] tails)
@@ -122,8 +129,11 @@ namespace Flee.CalculationEngine
 
         public void AddDepedency(T tail, T head)
         {
+            // get inner dictionary
             var innerDict = this.GetInnerDictionary(tail);
+
             var flag = !innerDict.ContainsKey(head);
+
             if (flag)
             {
                 innerDict.Add(head, head);

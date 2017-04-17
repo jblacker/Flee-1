@@ -17,7 +17,7 @@
 // ' Copyright © 2007 Eugene Ciloci
 // ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
-namespace Flee.PerCederberg.Grammatica.Runtime
+namespace FleeSharp.PerCederberg.Grammatica.Runtime
 {
     using System.Collections;
     using System.IO;

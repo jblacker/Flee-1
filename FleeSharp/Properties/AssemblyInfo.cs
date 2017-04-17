@@ -28,7 +28,7 @@ using System.Runtime.InteropServices;
         DebuggableAttribute.DebuggingModes.Default | DebuggableAttribute.DebuggingModes.DisableOptimizations |
         DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints | DebuggableAttribute.DebuggingModes.EnableEditAndContinue)]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyCopyright("Copyright © Eugene Ciloci 2007")]
+[assembly: AssemblyCopyright("Copyright © Eugene Ciloci 2007, Steve Hoff 2017")]
 [assembly: AssemblyDescription("Updated in 2017 - Steve Hoff to use C# and .Net 4.5")]
 [assembly: AssemblyProduct("Fast Lightweight Expression Evaluator")]
 [assembly: AssemblyTitle("Fast Lightweight Expression Evaluator")]

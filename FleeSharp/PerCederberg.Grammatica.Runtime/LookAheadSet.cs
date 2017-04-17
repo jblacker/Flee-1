@@ -20,7 +20,7 @@
 
 #pragma warning disable 659
 
-namespace Flee.PerCederberg.Grammatica.Runtime
+namespace FleeSharp.PerCederberg.Grammatica.Runtime
 {
     using System;
     using System.Collections;
@@ -517,7 +517,7 @@ namespace Flee.PerCederberg.Grammatica.Runtime
                 return false;
             }
 
-            /// <summary>Returns a value that indicates whether the values of two <see cref="T:Flee.PerCederberg.Grammatica.Runtime.LookAheadSet.Sequence" /> objects are equal.</summary>
+            /// <summary>Returns a value that indicates whether the values of two <see cref="T:FleeSharp.PerCederberg.Grammatica.Runtime.LookAheadSet.Sequence" /> objects are equal.</summary>
             /// <param name="left">The first value to compare.</param>
             /// <param name="right">The second value to compare.</param>
             /// <returns>true if the <paramref name="left" /> and <paramref name="right" /> parameters have the same value; otherwise, false.</returns>
@@ -526,7 +526,7 @@ namespace Flee.PerCederberg.Grammatica.Runtime
                 return Equals(left, right);
             }
 
-            /// <summary>Returns a value that indicates whether two <see cref="T:Flee.PerCederberg.Grammatica.Runtime.LookAheadSet.Sequence" /> objects have different values.</summary>
+            /// <summary>Returns a value that indicates whether two <see cref="T:FleeSharp.PerCederberg.Grammatica.Runtime.LookAheadSet.Sequence" /> objects have different values.</summary>
             /// <param name="left">The first value to compare.</param>
             /// <param name="right">The second value to compare.</param>
             /// <returns>true if <paramref name="left" /> and <paramref name="right" /> are not equal; otherwise, false.</returns>

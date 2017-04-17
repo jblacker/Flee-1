@@ -19,7 +19,7 @@
 
 // ReSharper disable InconsistentNaming
 
-namespace Flee
+namespace FleeSharp
 {
     using System;
     using System.IO;

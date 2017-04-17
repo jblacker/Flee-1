@@ -17,7 +17,7 @@
 // ' Copyright © 2007 Eugene Ciloci
 // ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
-namespace Flee
+namespace FleeSharp
 {
     using System.Globalization;
     using Microsoft.VisualBasic.CompilerServices;

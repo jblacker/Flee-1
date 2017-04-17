@@ -20,7 +20,7 @@
 
 #pragma warning disable 612
 
-namespace Flee
+namespace FleeSharp
 {
     using System;
     using System.Collections.Generic;

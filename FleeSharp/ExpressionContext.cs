@@ -17,7 +17,7 @@
 // ' Copyright © 2007 Eugene Ciloci
 // ' Updated to .net 4.6 Copyright 2017 Steven Hoff
 
-namespace Flee
+namespace FleeSharp
 {
     using System;
     using System.IO;
@@ -192,20 +192,11 @@ namespace Flee
             return new Expression<TResultType>(expression, this, true);
         }
 
-        internal string CalcEngineExpressionName
-        {
-            get { return this.myProperties.GetValue<string>("CalcEngineExpressionName"); }
-        }
+        internal string CalcEngineExpressionName => this.myProperties.GetValue<string>("CalcEngineExpressionName");
 
-        public CalculationEngine.CalculationEngine CalculationEngine
-        {
-            get { return this.myProperties.GetValue<CalculationEngine.CalculationEngine>("CalculationEngine"); }
-        }
+        public CalculationEngine.CalculationEngine CalculationEngine => this.myProperties.GetValue<CalculationEngine.CalculationEngine>("CalculationEngine");
 
-        internal object ExpressionOwner
-        {
-            get { return this.myProperties.GetValue<object>("ExpressionOwner"); }
-        }
+        internal object ExpressionOwner => this.myProperties.GetValue<object>("ExpressionOwner");
 
         private ExpressionParser IdentifierParser
         {
@@ -223,10 +214,7 @@ namespace Flee
             }
         }
 
-        public ExpressionImports Imports
-        {
-            get { return this.myProperties.GetValue<ExpressionImports>("Imports"); }
-        }
+        public ExpressionImports Imports => this.myProperties.GetValue<ExpressionImports>("Imports");
 
         internal bool NoClone
         {
@@ -234,20 +222,11 @@ namespace Flee
             set { this.myProperties.SetValue("NoClone", value); }
         }
 
-        public ExpressionOptions Options
-        {
-            get { return this.myProperties.GetValue<ExpressionOptions>("Options"); }
-        }
+        public ExpressionOptions Options => this.myProperties.GetValue<ExpressionOptions>("Options");
 
-        internal ExpressionParser Parser
-        {
-            get { return this.myProperties.GetValue<ExpressionParser>("ExpressionParser"); }
-        }
+        internal ExpressionParser Parser => this.myProperties.GetValue<ExpressionParser>("ExpressionParser");
 
-        public ExpressionParserOptions ParserOptions
-        {
-            get { return this.myProperties.GetValue<ExpressionParserOptions>("ParserOptions"); }
-        }
+        public ExpressionParserOptions ParserOptions => this.myProperties.GetValue<ExpressionParserOptions>("ParserOptions");
 
         public VariableCollection Variables { get; private set; }
     }

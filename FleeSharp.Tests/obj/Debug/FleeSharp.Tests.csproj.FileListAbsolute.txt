@@ -1,0 +1,13 @@
+C:\dev\Flee\FleeSharp.Tests\bin\Debug\FleeSharp.Tests.dll
+C:\dev\Flee\FleeSharp.Tests\bin\Debug\FleeSharp.Tests.pdb
+C:\dev\Flee\FleeSharp.Tests\bin\Debug\Castle.Core.dll
+C:\dev\Flee\FleeSharp.Tests\bin\Debug\FleeSharp.dll
+C:\dev\Flee\FleeSharp.Tests\bin\Debug\Moq.dll
+C:\dev\Flee\FleeSharp.Tests\bin\Debug\nunit.framework.dll
+C:\dev\Flee\FleeSharp.Tests\bin\Debug\FleeSharp.pdb
+C:\dev\Flee\FleeSharp.Tests\bin\Debug\Castle.Core.xml
+C:\dev\Flee\FleeSharp.Tests\bin\Debug\Moq.xml
+C:\dev\Flee\FleeSharp.Tests\bin\Debug\nunit.framework.xml
+C:\dev\Flee\FleeSharp.Tests\obj\Debug\FleeSharp.Tests.csprojResolveAssemblyReference.cache
+C:\dev\Flee\FleeSharp.Tests\obj\Debug\FleeSharp.Tests.dll
+C:\dev\Flee\FleeSharp.Tests\obj\Debug\FleeSharp.Tests.pdb
