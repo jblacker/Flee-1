@@ -17,7 +17,7 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Tests", "Tests\Tests.vbproj
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Demo", "Demo\Demo.vbproj", "{A2DA0835-A2C5-45F0-8A5E-4A070B93FAAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ciloci.Flee", "FleeSharp\Ciloci.Flee.csproj", "{2632AB88-E307-4840-B682-68D5B493C879}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flee", "FleeSharp\Flee.csproj", "{2632AB88-E307-4840-B682-68D5B493C879}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,1 @@
+C:\dev\Flee\ConsoleTester\obj\Debug\ConsoleTester.vbprojResolveAssemblyReference.cache
