@@ -1,9 +1,0 @@
-C:\dev\Flee\FleeSharp\obj\Debug\Flee.csprojResolveAssemblyReference.cache
-C:\dev\Flee\FleeSharp\obj\Debug\Flee.CompileErrors.resources
-C:\dev\Flee\FleeSharp\obj\Debug\Flee.ElementNames.resources
-C:\dev\Flee\FleeSharp\obj\Debug\Flee.GeneralErrors.resources
-C:\dev\Flee\FleeSharp\obj\Debug\Flee.csproj.GenerateResource.Cache
-C:\dev\Flee\FleeSharp\bin\Debug\Flee.dll
-C:\dev\Flee\FleeSharp\bin\Debug\Flee.pdb
-C:\dev\Flee\FleeSharp\obj\Debug\Flee.dll
-C:\dev\Flee\FleeSharp\obj\Debug\Flee.pdb

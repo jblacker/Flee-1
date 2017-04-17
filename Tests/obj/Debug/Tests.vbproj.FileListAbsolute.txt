@@ -1,3 +1,0 @@
-C:\dev\Flee\Tests\obj\Debug\Tests.vbprojResolveAssemblyReference.cache
-C:\dev\Flee\Tests\obj\Debug\Ciloci.Flee.Tests.Resources.resources
-C:\dev\Flee\Tests\obj\Debug\Tests.vbproj.GenerateResource.Cache
